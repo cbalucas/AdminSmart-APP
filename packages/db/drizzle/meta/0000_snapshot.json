@@ -1,0 +1,2596 @@
+{
+  "id": "0b9a34e8-da70-4b24-84ce-c0a795d28726",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.acuerdo_honorarios": {
+      "name": "acuerdo_honorarios",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propietario_id": {
+          "name": "propietario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "modalidad": {
+          "name": "modalidad",
+          "type": "modalidad_honorarios",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "porcentaje": {
+          "name": "porcentaje",
+          "type": "numeric(7, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monto_fijo": {
+          "name": "monto_fijo",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "moneda": {
+          "name": "moneda",
+          "type": "moneda",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "incluye_cobros_directos": {
+          "name": "incluye_cobros_directos",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "vigente_desde": {
+          "name": "vigente_desde",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vigente_hasta": {
+          "name": "vigente_hasta",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "acuerdo_honorarios_propietario_idx": {
+          "name": "acuerdo_honorarios_propietario_idx",
+          "columns": [
+            {
+              "expression": "propietario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "acuerdo_honorarios_organizacion_id_organizacion_id_fk": {
+          "name": "acuerdo_honorarios_organizacion_id_organizacion_id_fk",
+          "tableFrom": "acuerdo_honorarios",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "acuerdo_honorarios_propietario_id_propietario_id_fk": {
+          "name": "acuerdo_honorarios_propietario_id_propietario_id_fk",
+          "tableFrom": "acuerdo_honorarios",
+          "tableTo": "propietario",
+          "columnsFrom": [
+            "propietario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "acuerdo_honorarios_valor_ck": {
+          "name": "acuerdo_honorarios_valor_ck",
+          "value": "(\"acuerdo_honorarios\".\"modalidad\" = 'porcentaje' and \"acuerdo_honorarios\".\"porcentaje\" is not null and \"acuerdo_honorarios\".\"porcentaje\" between 0 and 100 and \"acuerdo_honorarios\".\"monto_fijo\" is null)\n       or (\"acuerdo_honorarios\".\"modalidad\" = 'monto_fijo' and \"acuerdo_honorarios\".\"monto_fijo\" is not null and \"acuerdo_honorarios\".\"monto_fijo\" >= 0 and \"acuerdo_honorarios\".\"moneda\" is not null and \"acuerdo_honorarios\".\"porcentaje\" is null)"
+        },
+        "acuerdo_honorarios_vigencia_ck": {
+          "name": "acuerdo_honorarios_vigencia_ck",
+          "value": "\"acuerdo_honorarios\".\"vigente_hasta\" is null or \"acuerdo_honorarios\".\"vigente_hasta\" >= \"acuerdo_honorarios\".\"vigente_desde\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.bien": {
+      "name": "bien",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo_bien": {
+          "name": "tipo_bien",
+          "type": "tipo_bien",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subtipo": {
+          "name": "subtipo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alias": {
+          "name": "alias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "calle": {
+          "name": "calle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "numero": {
+          "name": "numero",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "piso": {
+          "name": "piso",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "departamento": {
+          "name": "departamento",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "localidad": {
+          "name": "localidad",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provincia": {
+          "name": "provincia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "codigo_postal": {
+          "name": "codigo_postal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latitud": {
+          "name": "latitud",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitud": {
+          "name": "longitud",
+          "type": "numeric(9, 6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dominio": {
+          "name": "dominio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "marca_modelo": {
+          "name": "marca_modelo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "anio": {
+          "name": "anio",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estado": {
+          "name": "estado",
+          "type": "estado_bien",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "edificio_id": {
+          "name": "edificio_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unidad_funcional": {
+          "name": "unidad_funcional",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "modo_liquidacion": {
+          "name": "modo_liquidacion",
+          "type": "modo_liquidacion",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'por_separado'"
+        },
+        "modo_honorarios": {
+          "name": "modo_honorarios",
+          "type": "modo_honorarios",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'sobre_parte_de_cada_titular'"
+        },
+        "es_gastos_varios": {
+          "name": "es_gastos_varios",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "observaciones": {
+          "name": "observaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "bien_organizacion_idx": {
+          "name": "bien_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "bien_alias_uq": {
+          "name": "bien_alias_uq",
+          "columns": [
+            {
+              "expression": "lower(\"alias\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"bien\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "bien_dominio_uq": {
+          "name": "bien_dominio_uq",
+          "columns": [
+            {
+              "expression": "upper(\"dominio\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"bien\".\"deleted_at\" is null and \"bien\".\"dominio\" is not null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "bien_organizacion_id_organizacion_id_fk": {
+          "name": "bien_organizacion_id_organizacion_id_fk",
+          "tableFrom": "bien",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bien_edificio_id_edificio_id_fk": {
+          "name": "bien_edificio_id_edificio_id_fk",
+          "tableFrom": "bien",
+          "tableTo": "edificio",
+          "columnsFrom": [
+            "edificio_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "bien_vehiculo_dominio_ck": {
+          "name": "bien_vehiculo_dominio_ck",
+          "value": "\"bien\".\"tipo_bien\" <> 'vehiculo' or \"bien\".\"dominio\" is not null"
+        },
+        "bien_direccion_ck": {
+          "name": "bien_direccion_ck",
+          "value": "\"bien\".\"tipo_bien\" not in ('inmueble','terreno') or \"bien\".\"edificio_id\" is not null\n        or (\"bien\".\"calle\" is not null and \"bien\".\"numero\" is not null and \"bien\".\"localidad\" is not null and \"bien\".\"provincia\" is not null)"
+        },
+        "bien_subtipo_ck": {
+          "name": "bien_subtipo_ck",
+          "value": "\"bien\".\"tipo_bien\" not in ('inmueble','vehiculo') or \"bien\".\"subtipo\" is not null"
+        },
+        "bien_estado_ck": {
+          "name": "bien_estado_ck",
+          "value": "(\"bien\".\"tipo_bien\" in ('inmueble','terreno') and \"bien\".\"estado\" in ('disponible','alquilado','en_refaccion','vendido'))\n       or (\"bien\".\"tipo_bien\" = 'vehiculo' and \"bien\".\"estado\" in ('activo','vendido'))\n       or (\"bien\".\"tipo_bien\" = 'otros' and \"bien\".\"estado\" in ('activo','de_baja'))"
+        },
+        "bien_coordenadas_ck": {
+          "name": "bien_coordenadas_ck",
+          "value": "(\"bien\".\"latitud\" is null) = (\"bien\".\"longitud\" is null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.bien_propietario": {
+      "name": "bien_propietario",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bien_id": {
+          "name": "bien_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propietario_id": {
+          "name": "propietario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "porcentaje": {
+          "name": "porcentaje",
+          "type": "numeric(7, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "es_representante": {
+          "name": "es_representante",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "observaciones": {
+          "name": "observaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "bien_propietario_organizacion_idx": {
+          "name": "bien_propietario_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "bien_propietario_propietario_idx": {
+          "name": "bien_propietario_propietario_idx",
+          "columns": [
+            {
+              "expression": "propietario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "bien_propietario_uq": {
+          "name": "bien_propietario_uq",
+          "columns": [
+            {
+              "expression": "bien_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "propietario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"bien_propietario\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "bien_propietario_organizacion_id_organizacion_id_fk": {
+          "name": "bien_propietario_organizacion_id_organizacion_id_fk",
+          "tableFrom": "bien_propietario",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bien_propietario_bien_id_bien_id_fk": {
+          "name": "bien_propietario_bien_id_bien_id_fk",
+          "tableFrom": "bien_propietario",
+          "tableTo": "bien",
+          "columnsFrom": [
+            "bien_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bien_propietario_propietario_id_propietario_id_fk": {
+          "name": "bien_propietario_propietario_id_propietario_id_fk",
+          "tableFrom": "bien_propietario",
+          "tableTo": "propietario",
+          "columnsFrom": [
+            "propietario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "bien_propietario_porcentaje_ck": {
+          "name": "bien_propietario_porcentaje_ck",
+          "value": "\"bien_propietario\".\"porcentaje\" > 0 and \"bien_propietario\".\"porcentaje\" <= 100"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.bien_servicio": {
+      "name": "bien_servicio",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bien_id": {
+          "name": "bien_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "concepto_id": {
+          "name": "concepto_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nro_cuenta_cliente": {
+          "name": "nro_cuenta_cliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "empresa_prestadora": {
+          "name": "empresa_prestadora",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responsable_default": {
+          "name": "responsable_default",
+          "type": "responsable",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "estado_activo",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'activo'"
+        },
+        "titular_servicio": {
+          "name": "titular_servicio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "periodicidad": {
+          "name": "periodicidad",
+          "type": "periodicidad",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dia_vencimiento": {
+          "name": "dia_vencimiento",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monto_estimado": {
+          "name": "monto_estimado",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monto_estimado_moneda": {
+          "name": "monto_estimado_moneda",
+          "type": "moneda",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "debito_automatico": {
+          "name": "debito_automatico",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sitio_boletas": {
+          "name": "sitio_boletas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observaciones": {
+          "name": "observaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "bien_servicio_organizacion_idx": {
+          "name": "bien_servicio_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "bien_servicio_uq": {
+          "name": "bien_servicio_uq",
+          "columns": [
+            {
+              "expression": "bien_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "concepto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"bien_servicio\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "bien_servicio_organizacion_id_organizacion_id_fk": {
+          "name": "bien_servicio_organizacion_id_organizacion_id_fk",
+          "tableFrom": "bien_servicio",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bien_servicio_bien_id_bien_id_fk": {
+          "name": "bien_servicio_bien_id_bien_id_fk",
+          "tableFrom": "bien_servicio",
+          "tableTo": "bien",
+          "columnsFrom": [
+            "bien_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bien_servicio_concepto_id_concepto_id_fk": {
+          "name": "bien_servicio_concepto_id_concepto_id_fk",
+          "tableFrom": "bien_servicio",
+          "tableTo": "concepto",
+          "columnsFrom": [
+            "concepto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "bien_servicio_dia_ck": {
+          "name": "bien_servicio_dia_ck",
+          "value": "\"bien_servicio\".\"dia_vencimiento\" is null or \"bien_servicio\".\"dia_vencimiento\" between 1 and 31"
+        },
+        "bien_servicio_monto_ck": {
+          "name": "bien_servicio_monto_ck",
+          "value": "(\"bien_servicio\".\"monto_estimado\" is null) = (\"bien_servicio\".\"monto_estimado_moneda\" is null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.concepto": {
+      "name": "concepto",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categoria": {
+          "name": "categoria",
+          "type": "categoria_concepto",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "estado_activo",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'activo'"
+        }
+      },
+      "indexes": {
+        "concepto_organizacion_idx": {
+          "name": "concepto_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "concepto_nombre_uq": {
+          "name": "concepto_nombre_uq",
+          "columns": [
+            {
+              "expression": "lower(\"nombre\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"concepto\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "concepto_organizacion_id_organizacion_id_fk": {
+          "name": "concepto_organizacion_id_organizacion_id_fk",
+          "tableFrom": "concepto",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cuenta_bancaria": {
+      "name": "cuenta_bancaria",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "banco": {
+          "name": "banco",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo_cuenta": {
+          "name": "tipo_cuenta",
+          "type": "tipo_cuenta",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "moneda": {
+          "name": "moneda",
+          "type": "moneda",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ARS'"
+        },
+        "cbu_cvu": {
+          "name": "cbu_cvu",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alias": {
+          "name": "alias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titular": {
+          "name": "titular",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "estado_activo",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'activo'"
+        }
+      },
+      "indexes": {
+        "cuenta_bancaria_organizacion_idx": {
+          "name": "cuenta_bancaria_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "cuenta_bancaria_organizacion_id_organizacion_id_fk": {
+          "name": "cuenta_bancaria_organizacion_id_organizacion_id_fk",
+          "tableFrom": "cuenta_bancaria",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "cuenta_bancaria_cbu_ck": {
+          "name": "cuenta_bancaria_cbu_ck",
+          "value": "\"cuenta_bancaria\".\"cbu_cvu\" ~ '^[0-9]{22}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.edificio": {
+      "name": "edificio",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "calle": {
+          "name": "calle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero": {
+          "name": "numero",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "localidad": {
+          "name": "localidad",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provincia": {
+          "name": "provincia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "codigo_postal": {
+          "name": "codigo_postal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observaciones": {
+          "name": "observaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "edificio_organizacion_idx": {
+          "name": "edificio_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "edificio_organizacion_id_organizacion_id_fk": {
+          "name": "edificio_organizacion_id_organizacion_id_fk",
+          "tableFrom": "edificio",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.organizacion": {
+      "name": "organizacion",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "logo_path": {
+          "name": "logo_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cuit": {
+          "name": "cuit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contacto_telefono": {
+          "name": "contacto_telefono",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contacto_email": {
+          "name": "contacto_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contacto_direccion": {
+          "name": "contacto_direccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cuenta_deposito_banco": {
+          "name": "cuenta_deposito_banco",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cuenta_deposito_titular": {
+          "name": "cuenta_deposito_titular",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cuenta_deposito_cbu": {
+          "name": "cuenta_deposito_cbu",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cuenta_deposito_alias": {
+          "name": "cuenta_deposito_alias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_envio": {
+          "name": "email_envio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idioma_defecto": {
+          "name": "idioma_defecto",
+          "type": "idioma",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'es'"
+        },
+        "moneda_defecto": {
+          "name": "moneda_defecto",
+          "type": "moneda",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ARS'"
+        },
+        "dias_aviso_recurrentes": {
+          "name": "dias_aviso_recurrentes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "politica_doble_factor": {
+          "name": "politica_doble_factor",
+          "type": "politica_doble_factor",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'desactivado'"
+        },
+        "registro_abierto_habilitado": {
+          "name": "registro_abierto_habilitado",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.propietario": {
+      "name": "propietario",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo_persona": {
+          "name": "tipo_persona",
+          "type": "tipo_persona",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'humana'"
+        },
+        "nombre_razon_social": {
+          "name": "nombre_razon_social",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "telefonos": {
+          "name": "telefonos",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "emails": {
+          "name": "emails",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "estado_activo",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'activo'"
+        },
+        "apoderado_nombre": {
+          "name": "apoderado_nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "apoderado_contacto": {
+          "name": "apoderado_contacto",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "periodicidad_liquidacion": {
+          "name": "periodicidad_liquidacion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'mensual'"
+        },
+        "dia_liquidacion": {
+          "name": "dia_liquidacion",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "horizonte_resumen_dias": {
+          "name": "horizonte_resumen_dias",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 30
+        },
+        "fondo_reserva_ars": {
+          "name": "fondo_reserva_ars",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fondo_reserva_usd": {
+          "name": "fondo_reserva_usd",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idioma_informes": {
+          "name": "idioma_informes",
+          "type": "idioma",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'es'"
+        },
+        "avatar_path": {
+          "name": "avatar_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observaciones": {
+          "name": "observaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "propietario_organizacion_idx": {
+          "name": "propietario_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "propietario_organizacion_id_organizacion_id_fk": {
+          "name": "propietario_organizacion_id_organizacion_id_fk",
+          "tableFrom": "propietario",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "propietario_horizonte_ck": {
+          "name": "propietario_horizonte_ck",
+          "value": "\"propietario\".\"horizonte_resumen_dias\" > 0"
+        },
+        "propietario_dia_liquidacion_ck": {
+          "name": "propietario_dia_liquidacion_ck",
+          "value": "\"propietario\".\"dia_liquidacion\" is null or \"propietario\".\"dia_liquidacion\" between 1 and 31"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.propietario_cuenta": {
+      "name": "propietario_cuenta",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propietario_id": {
+          "name": "propietario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cuenta_bancaria_id": {
+          "name": "cuenta_bancaria_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "predeterminada": {
+          "name": "predeterminada",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "propietario_cuenta_organizacion_idx": {
+          "name": "propietario_cuenta_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "propietario_cuenta_uq": {
+          "name": "propietario_cuenta_uq",
+          "columns": [
+            {
+              "expression": "propietario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "cuenta_bancaria_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"propietario_cuenta\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "propietario_cuenta_organizacion_id_organizacion_id_fk": {
+          "name": "propietario_cuenta_organizacion_id_organizacion_id_fk",
+          "tableFrom": "propietario_cuenta",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "propietario_cuenta_propietario_id_propietario_id_fk": {
+          "name": "propietario_cuenta_propietario_id_propietario_id_fk",
+          "tableFrom": "propietario_cuenta",
+          "tableTo": "propietario",
+          "columnsFrom": [
+            "propietario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "propietario_cuenta_cuenta_bancaria_id_cuenta_bancaria_id_fk": {
+          "name": "propietario_cuenta_cuenta_bancaria_id_cuenta_bancaria_id_fk",
+          "tableFrom": "propietario_cuenta",
+          "tableTo": "cuenta_bancaria",
+          "columnsFrom": [
+            "cuenta_bancaria_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.reparto_concepto": {
+      "name": "reparto_concepto",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bien_id": {
+          "name": "bien_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "concepto_id": {
+          "name": "concepto_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aplica_a_alquiler": {
+          "name": "aplica_a_alquiler",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "modalidad": {
+          "name": "modalidad",
+          "type": "modalidad_reparto",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propietario_id": {
+          "name": "propietario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "reparto_concepto_organizacion_idx": {
+          "name": "reparto_concepto_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "reparto_concepto_uq": {
+          "name": "reparto_concepto_uq",
+          "columns": [
+            {
+              "expression": "bien_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "coalesce(\"concepto_id\", '00000000-0000-0000-0000-000000000000'::uuid)",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"reparto_concepto\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "reparto_concepto_organizacion_id_organizacion_id_fk": {
+          "name": "reparto_concepto_organizacion_id_organizacion_id_fk",
+          "tableFrom": "reparto_concepto",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "reparto_concepto_bien_id_bien_id_fk": {
+          "name": "reparto_concepto_bien_id_bien_id_fk",
+          "tableFrom": "reparto_concepto",
+          "tableTo": "bien",
+          "columnsFrom": [
+            "bien_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "reparto_concepto_concepto_id_concepto_id_fk": {
+          "name": "reparto_concepto_concepto_id_concepto_id_fk",
+          "tableFrom": "reparto_concepto",
+          "tableTo": "concepto",
+          "columnsFrom": [
+            "concepto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "reparto_concepto_propietario_id_propietario_id_fk": {
+          "name": "reparto_concepto_propietario_id_propietario_id_fk",
+          "tableFrom": "reparto_concepto",
+          "tableTo": "propietario",
+          "columnsFrom": [
+            "propietario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "reparto_concepto_destino_ck": {
+          "name": "reparto_concepto_destino_ck",
+          "value": "(\"reparto_concepto\".\"concepto_id\" is not null) <> \"reparto_concepto\".\"aplica_a_alquiler\""
+        },
+        "reparto_concepto_propietario_ck": {
+          "name": "reparto_concepto_propietario_ck",
+          "value": "(\"reparto_concepto\".\"modalidad\" = 'un_solo_propietario') = (\"reparto_concepto\".\"propietario_id\" is not null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.reparto_concepto_porcentaje": {
+      "name": "reparto_concepto_porcentaje",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reparto_concepto_id": {
+          "name": "reparto_concepto_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propietario_id": {
+          "name": "propietario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "porcentaje": {
+          "name": "porcentaje",
+          "type": "numeric(7, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "reparto_concepto_porcentaje_organizacion_idx": {
+          "name": "reparto_concepto_porcentaje_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "reparto_concepto_porcentaje_uq": {
+          "name": "reparto_concepto_porcentaje_uq",
+          "columns": [
+            {
+              "expression": "reparto_concepto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "propietario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"reparto_concepto_porcentaje\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "reparto_concepto_porcentaje_organizacion_id_organizacion_id_fk": {
+          "name": "reparto_concepto_porcentaje_organizacion_id_organizacion_id_fk",
+          "tableFrom": "reparto_concepto_porcentaje",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "reparto_concepto_porcentaje_reparto_concepto_id_reparto_concepto_id_fk": {
+          "name": "reparto_concepto_porcentaje_reparto_concepto_id_reparto_concepto_id_fk",
+          "tableFrom": "reparto_concepto_porcentaje",
+          "tableTo": "reparto_concepto",
+          "columnsFrom": [
+            "reparto_concepto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "reparto_concepto_porcentaje_propietario_id_propietario_id_fk": {
+          "name": "reparto_concepto_porcentaje_propietario_id_propietario_id_fk",
+          "tableFrom": "reparto_concepto_porcentaje",
+          "tableTo": "propietario",
+          "columnsFrom": [
+            "propietario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "reparto_concepto_porcentaje_ck": {
+          "name": "reparto_concepto_porcentaje_ck",
+          "value": "\"reparto_concepto_porcentaje\".\"porcentaje\" > 0 and \"reparto_concepto_porcentaje\".\"porcentaje\" <= 100"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.usuario": {
+      "name": "usuario",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "roles": {
+          "name": "roles",
+          "type": "rol[]",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propietario_id": {
+          "name": "propietario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estado": {
+          "name": "estado",
+          "type": "estado_usuario",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'activo'"
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "canal_notificaciones": {
+          "name": "canal_notificaciones",
+          "type": "canal_notificaciones",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ambos'"
+        },
+        "idioma_app": {
+          "name": "idioma_app",
+          "type": "idioma",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "apariencia": {
+          "name": "apariencia",
+          "type": "apariencia",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'automatico'"
+        },
+        "doble_factor": {
+          "name": "doble_factor",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "usuario_organizacion_idx": {
+          "name": "usuario_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "usuario_email_uq": {
+          "name": "usuario_email_uq",
+          "columns": [
+            {
+              "expression": "lower(\"email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"usuario\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "usuario_propietario_uq": {
+          "name": "usuario_propietario_uq",
+          "columns": [
+            {
+              "expression": "propietario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"usuario\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "usuario_organizacion_id_organizacion_id_fk": {
+          "name": "usuario_organizacion_id_organizacion_id_fk",
+          "tableFrom": "usuario",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "usuario_propietario_id_propietario_id_fk": {
+          "name": "usuario_propietario_id_propietario_id_fk",
+          "tableFrom": "usuario",
+          "tableTo": "propietario",
+          "columnsFrom": [
+            "propietario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "usuario_roles_ck": {
+          "name": "usuario_roles_ck",
+          "value": "cardinality(\"usuario\".\"roles\") > 0"
+        },
+        "usuario_rol_propietario_ck": {
+          "name": "usuario_rol_propietario_ck",
+          "value": "not ('propietario' = any(\"usuario\".\"roles\")) or \"usuario\".\"propietario_id\" is not null"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.usuario_bien": {
+      "name": "usuario_bien",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "organizacion_id": {
+          "name": "organizacion_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bien_id": {
+          "name": "bien_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "usuario_bien_organizacion_idx": {
+          "name": "usuario_bien_organizacion_idx",
+          "columns": [
+            {
+              "expression": "organizacion_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "usuario_bien_uq": {
+          "name": "usuario_bien_uq",
+          "columns": [
+            {
+              "expression": "usuario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "bien_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"usuario_bien\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "usuario_bien_organizacion_id_organizacion_id_fk": {
+          "name": "usuario_bien_organizacion_id_organizacion_id_fk",
+          "tableFrom": "usuario_bien",
+          "tableTo": "organizacion",
+          "columnsFrom": [
+            "organizacion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "usuario_bien_usuario_id_usuario_id_fk": {
+          "name": "usuario_bien_usuario_id_usuario_id_fk",
+          "tableFrom": "usuario_bien",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "usuario_bien_bien_id_bien_id_fk": {
+          "name": "usuario_bien_bien_id_bien_id_fk",
+          "tableFrom": "usuario_bien",
+          "tableTo": "bien",
+          "columnsFrom": [
+            "bien_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.apariencia": {
+      "name": "apariencia",
+      "schema": "public",
+      "values": [
+        "claro",
+        "oscuro",
+        "automatico"
+      ]
+    },
+    "public.canal_notificaciones": {
+      "name": "canal_notificaciones",
+      "schema": "public",
+      "values": [
+        "push",
+        "email",
+        "ambos"
+      ]
+    },
+    "public.categoria_concepto": {
+      "name": "categoria_concepto",
+      "schema": "public",
+      "values": [
+        "servicio",
+        "impuesto",
+        "tasa",
+        "expensa",
+        "seguro",
+        "otro"
+      ]
+    },
+    "public.estado_activo": {
+      "name": "estado_activo",
+      "schema": "public",
+      "values": [
+        "activo",
+        "inactivo"
+      ]
+    },
+    "public.estado_bien": {
+      "name": "estado_bien",
+      "schema": "public",
+      "values": [
+        "disponible",
+        "alquilado",
+        "en_refaccion",
+        "vendido",
+        "activo",
+        "de_baja"
+      ]
+    },
+    "public.estado_usuario": {
+      "name": "estado_usuario",
+      "schema": "public",
+      "values": [
+        "activo",
+        "inactivo",
+        "pendiente"
+      ]
+    },
+    "public.idioma": {
+      "name": "idioma",
+      "schema": "public",
+      "values": [
+        "es",
+        "en",
+        "pt"
+      ]
+    },
+    "public.modalidad_honorarios": {
+      "name": "modalidad_honorarios",
+      "schema": "public",
+      "values": [
+        "porcentaje",
+        "monto_fijo"
+      ]
+    },
+    "public.modalidad_reparto": {
+      "name": "modalidad_reparto",
+      "schema": "public",
+      "values": [
+        "segun_porcentaje",
+        "un_solo_propietario",
+        "personalizado"
+      ]
+    },
+    "public.modo_honorarios": {
+      "name": "modo_honorarios",
+      "schema": "public",
+      "values": [
+        "sobre_parte_de_cada_titular",
+        "sobre_total_al_representante"
+      ]
+    },
+    "public.modo_liquidacion": {
+      "name": "modo_liquidacion",
+      "schema": "public",
+      "values": [
+        "por_separado",
+        "al_representante"
+      ]
+    },
+    "public.moneda": {
+      "name": "moneda",
+      "schema": "public",
+      "values": [
+        "ARS",
+        "USD"
+      ]
+    },
+    "public.periodicidad": {
+      "name": "periodicidad",
+      "schema": "public",
+      "values": [
+        "mensual",
+        "bimestral",
+        "trimestral",
+        "cuatrimestral",
+        "semestral",
+        "anual"
+      ]
+    },
+    "public.politica_doble_factor": {
+      "name": "politica_doble_factor",
+      "schema": "public",
+      "values": [
+        "desactivado",
+        "opcional",
+        "obligatorio"
+      ]
+    },
+    "public.responsable": {
+      "name": "responsable",
+      "schema": "public",
+      "values": [
+        "propietario",
+        "inquilino"
+      ]
+    },
+    "public.rol": {
+      "name": "rol",
+      "schema": "public",
+      "values": [
+        "administrador",
+        "operador",
+        "propietario",
+        "inquilino"
+      ]
+    },
+    "public.tipo_bien": {
+      "name": "tipo_bien",
+      "schema": "public",
+      "values": [
+        "inmueble",
+        "terreno",
+        "vehiculo",
+        "otros"
+      ]
+    },
+    "public.tipo_cuenta": {
+      "name": "tipo_cuenta",
+      "schema": "public",
+      "values": [
+        "caja_ahorro",
+        "cuenta_corriente",
+        "billetera"
+      ]
+    },
+    "public.tipo_persona": {
+      "name": "tipo_persona",
+      "schema": "public",
+      "values": [
+        "humana",
+        "juridica"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
