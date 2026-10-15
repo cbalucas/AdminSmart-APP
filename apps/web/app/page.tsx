@@ -1,17 +1,12 @@
-import Image from "next/image";
-import { t } from "@ai/i18n";
+import { redirect } from "next/navigation";
+import { consultarConfiguracion } from "@/lib/configuracion";
+import { crearClienteServidor } from "@/lib/supabase/servidor";
 
-export default function Inicio() {
-  return (
-    <main className="inicio">
-      <div className="tarjeta">
-        <Image src="/logo.svg" alt={t("app.nombre")} width={96} height={96} priority />
-        <h1>{t("app.nombre")}</h1>
-        <div className="resalte" />
-        <p className="muted">{t("app.lema")}</p>
-        <span className="etiqueta">{t("inicio.estado")}</span>
-      </div>
-      <p className="muted">{t("inicio.version")}</p>
-    </main>
-  );
+// P-01 Inicio: no muestra nada; pasa sola a Configuración inicial, Ingreso o Inicio.
+export default async function Raiz() {
+  if ((await consultarConfiguracion()) === false) redirect("/configuracion-inicial");
+
+  const supabase = await crearClienteServidor();
+  const { data } = await supabase.auth.getClaims();
+  redirect(data?.claims ? "/inicio" : "/ingreso");
 }

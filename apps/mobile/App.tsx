@@ -1,15 +1,24 @@
+import { useCallback, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, useColorScheme } from "react-native";
-import Svg, { Path, Rect } from "react-native-svg";
+import * as Linking from "expo-linking";
 import { useFonts } from "expo-font";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SourceSerif4_500Medium, SourceSerif4_600SemiBold } from "@expo-google-fonts/source-serif-4";
 import { IBMPlexSans_400Regular, IBMPlexSans_500Medium } from "@expo-google-fonts/ibm-plex-sans";
-import { colores, logoMosaico as logo } from "@ai/ui";
 import { t } from "@ai/i18n";
+import { consultarConfiguracion } from "./src/configuracion";
+import { supabase } from "./src/supabase";
+import { Configuracion } from "./src/pantallas/Configuracion";
+import { Ingreso } from "./src/pantallas/Ingreso";
+import { Inicio } from "./src/pantallas/Inicio";
+import { MiCuenta } from "./src/pantallas/MiCuenta";
+import { NuevaContrasena } from "./src/pantallas/NuevaContrasena";
+import { Recuperar } from "./src/pantallas/Recuperar";
+import { PantallaAcceso, Logo, Texto, useTema } from "./src/componentes";
+
+type Pantalla = "cargando" | "configuracion" | "ingreso" | "recuperar" | "nueva_contrasena" | "inicio" | "mi_cuenta";
 
 export default function App() {
-  const modo = useColorScheme() === "dark" ? "oscuro" : "claro";
-  const c = colores[modo];
   const [fuentesListas] = useFonts({
     SourceSerif4_500Medium,
     SourceSerif4_600SemiBold,
@@ -17,44 +26,100 @@ export default function App() {
     IBMPlexSans_500Medium,
   });
 
-  if (!fuentesListas) return null;
-
   return (
-    <View style={[estilos.contenedor, { backgroundColor: c.bg }]}>
-      <View style={[estilos.tarjeta, { backgroundColor: c.surface, borderColor: c.line }]}>
-        <Svg width={96} height={96} viewBox={logo.viewBox}>
-          <Rect width={64} height={64} rx={logo.radioFondo} fill={logo.fondo} />
-          {logo.piezasBlancas.map((p) => (
-            <Rect key={`${p.x}-${p.y}`} x={p.x} y={p.y} width={logo.lado} height={logo.lado} rx={logo.radioPieza} fill={logo.pieza} />
-          ))}
-          <Path d={logo.caminoAmbar} fill={logo.piezaAmbar} />
-        </Svg>
-        <Text
-          style={[
-            estilos.titulo,
-            { color: c.text, fontFamily: modo === "claro" ? "SourceSerif4_600SemiBold" : "SourceSerif4_500Medium" },
-          ]}
-        >
-          {t("app.nombre")}
-        </Text>
-        <View style={[estilos.resalte, { backgroundColor: c.highlight }]} />
-        <Text style={[estilos.texto, { color: c.muted }]}>{t("app.lema")}</Text>
-        <View style={[estilos.etiqueta, { backgroundColor: c.okBg }]}>
-          <Text style={[estilos.textoEtiqueta, { color: c.ok }]}>{t("inicio.estado")}</Text>
-        </View>
-      </View>
-      <Text style={[estilos.texto, { color: c.muted }]}>{t("inicio.version")}</Text>
-      <StatusBar style={modo === "claro" ? "dark" : "light"} />
-    </View>
+    <SafeAreaProvider>
+      {fuentesListas ? <Aplicacion /> : null}
+    </SafeAreaProvider>
   );
 }
 
-const estilos = StyleSheet.create({
-  contenedor: { flex: 1, alignItems: "center", justifyContent: "center", gap: 16, padding: 24 },
-  tarjeta: { borderWidth: 1, borderRadius: 14, padding: 28, alignItems: "center", gap: 12, maxWidth: 420 },
-  titulo: { fontSize: 26, textAlign: "center" },
-  texto: { fontFamily: "IBMPlexSans_400Regular", fontSize: 15, textAlign: "center" },
-  resalte: { width: 40, height: 4, borderRadius: 2 },
-  etiqueta: { borderRadius: 999, paddingVertical: 4, paddingHorizontal: 12 },
-  textoEtiqueta: { fontFamily: "IBMPlexSans_500Medium", fontSize: 13, textAlign: "center" },
-});
+function Aplicacion() {
+  const { modo } = useTema();
+  const [pantalla, setPantalla] = useState<Pantalla>("cargando");
+  const [errorIngreso, setErrorIngreso] = useState<string>();
+
+  // P-01 Inicio: decide a dónde ir según la configuración y la sesión.
+  useEffect(() => {
+    (async () => {
+      if ((await consultarConfiguracion()) === false) return setPantalla("configuracion");
+      const { data } = await supabase.auth.getSession();
+      setPantalla(data.session ? "inicio" : "ingreso");
+    })().catch(() => setPantalla("ingreso"));
+  }, []);
+
+  // Cerrar sesión (en cualquier pantalla) vuelve al ingreso.
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((evento) => {
+      if (evento === "SIGNED_OUT") setPantalla("ingreso");
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  // Enlace del email de recuperación: la app se abre con un código que se canjea por la sesión.
+  const manejarEnlace = useCallback(async (url: string | null) => {
+    if (!url) return;
+    const { path, queryParams } = Linking.parse(url);
+    if (path !== "recuperar/nueva") return;
+    const codigo = typeof queryParams?.code === "string" ? queryParams.code : undefined;
+    const { error } = codigo ? await supabase.auth.exchangeCodeForSession(codigo) : { error: new Error("sin código") };
+    if (error) {
+      setErrorIngreso("ingreso.error_enlace");
+      setPantalla("ingreso");
+    } else {
+      setPantalla("nueva_contrasena");
+    }
+  }, []);
+
+  useEffect(() => {
+    Linking.getInitialURL().then(manejarEnlace).catch(() => undefined);
+    const suscripcion = Linking.addEventListener("url", ({ url }) => void manejarEnlace(url));
+    return () => suscripcion.remove();
+  }, [manejarEnlace]);
+
+  const barra = <StatusBar style={modo === "claro" ? "dark" : "light"} />;
+
+  let contenido;
+  switch (pantalla) {
+    case "configuracion":
+      contenido = <Configuracion alTerminar={() => setPantalla("inicio")} />;
+      break;
+    case "ingreso":
+      contenido = (
+        <Ingreso
+          errorInicial={errorIngreso}
+          alIngresar={() => {
+            setErrorIngreso(undefined);
+            setPantalla("inicio");
+          }}
+          alRecuperar={() => setPantalla("recuperar")}
+        />
+      );
+      break;
+    case "recuperar":
+      contenido = <Recuperar alVolver={() => setPantalla("ingreso")} />;
+      break;
+    case "nueva_contrasena":
+      contenido = <NuevaContrasena alTerminar={() => setPantalla("inicio")} />;
+      break;
+    case "inicio":
+      contenido = <Inicio alAbrirCuenta={() => setPantalla("mi_cuenta")} />;
+      break;
+    case "mi_cuenta":
+      contenido = <MiCuenta alVolver={() => setPantalla("inicio")} />;
+      break;
+    default:
+      contenido = (
+        <PantallaAcceso conCabecera={false}>
+          <Logo />
+          <Texto atenuado>{t("app.cargando")}</Texto>
+        </PantallaAcceso>
+      );
+  }
+
+  return (
+    <>
+      {contenido}
+      {barra}
+    </>
+  );
+}

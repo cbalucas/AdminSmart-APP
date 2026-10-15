@@ -1,0 +1,8 @@
+# Configuración mínima del proyecto de Supabase para publicar las funciones del servidor.
+project_id = "bgxjuhosidzjojycnwwu"
+
+# Las claves nuevas de Supabase (sb_publishable_...) no son tokens JWT, por lo que la
+# verificación automática de JWT se desactiva y cada función comprueba por su cuenta quién la
+# llama. `configuracion-inicial` exige el código de instalación y valida la sesión del usuario.
+[functions.configuracion-inicial]
+verify_jwt = false

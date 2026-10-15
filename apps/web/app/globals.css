@@ -5,33 +5,108 @@ body {
   color: var(--text);
   font-family: var(--fuente-texto), sans-serif;
   font-variant-numeric: tabular-nums;
+  line-height: 1.45;
 }
-h1 { font-family: var(--fuente-titulo), serif; font-weight: 600; margin: 0; }
-@media (prefers-color-scheme: dark) { h1 { font-weight: 500; } }
+h1, h2, h3 { font-family: var(--fuente-titulo), serif; font-weight: 600; margin: 0; }
+@media (prefers-color-scheme: dark) { h1, h2, h3 { font-weight: 500; } }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; margin-top: 4px; }
+a { color: var(--accent); }
+.muted { color: var(--muted); margin: 0; }
 
-.inicio {
+/* Pantallas de acceso: ingreso, recuperación, configuración inicial */
+.pantalla-acceso {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  padding: 24px;
-  text-align: center;
+  gap: 20px;
+  padding: 24px 16px;
 }
-.tarjeta {
+.cabecera { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cabecera h1 { font-size: 1.6rem; }
+
+.formulario {
+  width: 100%;
+  max-width: 420px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 32px;
-  max-width: 480px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
+  gap: 14px;
+}
+.grupo-formulario { display: flex; flex-direction: column; gap: 14px; }
+
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-size: 0.9rem; font-weight: 500; }
+.campo input[type="text"], .campo input[type="email"], .campo input[type="password"], .campo input[type="tel"] {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--inputLine);
+  border-radius: 8px;
+}
+.campo input:focus-visible, .boton:focus-visible, .boton-texto:focus-visible, .casilla input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.campo input[aria-invalid="true"] { border-color: var(--danger); }
+.con-boton { display: flex; gap: 8px; align-items: center; }
+.con-boton input { flex: 1; }
+.error-campo { color: var(--danger); font-size: 0.85rem; }
+
+.casilla { display: flex; gap: 8px; align-items: center; font-size: 0.9rem; }
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 16px;
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--onAccent);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.boton:disabled { opacity: 0.6; cursor: default; }
+.boton-secundario { color: var(--text); background: var(--surface); border-color: var(--inputLine); }
+.boton-texto {
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.separador {
+  display: flex;
   align-items: center;
   gap: 12px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
-.muted { color: var(--muted); margin: 0; }
+.separador::before, .separador::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.enlaces { margin: 0; text-align: center; font-size: 0.9rem; }
+.acciones { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+
+/* Los estados llevan su etiqueta escrita además del color (sección 12) */
+.aviso-error, .aviso-ok { margin: 0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; }
+.aviso-error { color: var(--danger); background: var(--dangerBg); }
+.aviso-ok { color: var(--ok); background: var(--okBg); }
 .etiqueta {
+  align-self: flex-start;
   background: var(--okBg);
   color: var(--ok);
   border-radius: 999px;
@@ -39,4 +114,7 @@ h1 { font-family: var(--fuente-titulo), serif; font-weight: 600; margin: 0; }
   font-size: 13px;
   font-weight: 500;
 }
-.resalte { width: 40px; height: 4px; border-radius: 2px; background: var(--highlight); }
+
+.datos { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; }
+.datos dt { color: var(--muted); font-size: 0.9rem; }
+.datos dd { margin: 0; word-break: break-word; }

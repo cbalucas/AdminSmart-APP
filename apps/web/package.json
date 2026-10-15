@@ -10,12 +10,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai/domain": "workspace:*",
+    "@ai/i18n": "workspace:*",
+    "@ai/ui": "workspace:*",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
     "next": "16.4.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "@ai/ui": "workspace:*",
-    "@ai/i18n": "workspace:*",
-    "@ai/domain": "workspace:*"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@types/node": "^20",
