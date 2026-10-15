@@ -1,0 +1,19 @@
+# Dependencias y compilados
+node_modules/
+.pnpm-store/
+.turbo/
+.next/
+dist/
+build/
+.expo/
+coverage/
+
+# Secretos: nunca se suben a GitHub
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,9 @@
+{
+  "app.nombre": "Administración Inteligente",
+  "app.lema": "Tus bienes, tus vencimientos y tus depósitos, en orden.",
+  "inicio.titulo": "Inicio",
+  "inicio.estado": "La aplicación está lista para empezar a construirse.",
+  "inicio.version": "Versión de preparación técnica",
+  "modo.claro": "Modo claro",
+  "modo.oscuro": "Modo oscuro"
+}

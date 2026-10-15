@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ficha del bien</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3A5F}a:hover{color:#15294A}
+.tema-oscuro a{color:#8DB4E6}.tema-oscuro a:hover{color:#B5CEF0}
+</style>
+</helmet>
+<div class="{{rootClass}}" lang="{{langTag}}" style="min-height: 1100px; display: flex; flex-wrap: wrap; background: {{t.bg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: {{t.text}}; font-size: 14px; font-variant-numeric: tabular-nums; color-scheme: {{t.scheme}}">
+
+  <nav aria-label="{{x.menu}}" style="flex: 1 1 248px; max-width: 100%; background: {{t.sidebar}}; color: {{t.sidebarText}}; padding: 24px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 8px 24px">
+      <svg aria-hidden="true" width="36" height="36" viewBox="0 0 64 64" style="flex: none; display: block"><rect width="64" height="64" rx="15" fill="#1F3A5F"></rect><rect x="12" y="12" width="18" height="18" rx="4" fill="#FFFFFF"></rect><path d="M34 30 V16 a4 4 0 0 1 4 -4 a18 18 0 0 1 14 14 a4 4 0 0 1 -4 4 Z" fill="#E8A33D"></path><rect x="12" y="34" width="18" height="18" rx="4" fill="#FFFFFF"></rect><rect x="34" y="34" width="18" height="18" rx="4" fill="#FFFFFF"></rect></svg>
+      <div style="display: flex; flex-direction: column">
+        <span style="font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; font-weight: 600; color: {{t.sidebarStrong}}">{{x.app1}}</span>
+        <span style="font-size: 12px; color: {{t.sidebarMuted}}">{{x.app2}}</span>
+      </div>
+    </div>
+    <sc-for list="{{nav}}" as="item" hint-placeholder-count="11">
+      <a href="{{item.href}}" style="{{item.style}}">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{item.icon}}"></path></svg>
+        <span>{{item.label}}</span>
+      </a>
+    </sc-for>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; border-radius: 5px">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <nav aria-label="{{x.ruta}}" style="font-size: 13px; color: {{t.muted}}"><a href="Main.dc.html">{{x.inicio}}</a> / <a href="#">{{x.propiedades}}</a> / <span>Depto Centro 3B</span></nav>
+      <div style="display: flex; gap: 8px">
+        <button type="button" onClick="{{cambiarIdioma}}" aria-label="{{idiomaLabel}}" title="{{idiomaLabel}}" style="height: 44px; padding: 0 12px; border: 1px solid {{t.line}}; border-radius: 8px; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
+          <span>{{idiomaCodigo}}</span>
+        </button>
+        <button type="button" onClick="{{toggleTema}}" aria-label="{{temaLabel}}" title="{{temaLabel}}" style="width: 44px; height: 44px; border: 1px solid {{t.line}}; border-radius: 8px; background: {{t.surface}}; color: {{t.text}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{temaIcon}}"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <header style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+          <h1 style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 30px; font-weight: {{t.titleWeight}}">Depto Centro 3B</h1>
+          <span style="padding: 3px 10px; border-radius: 12px; background: {{t.okBg}}; color: {{t.okText}}; font-size: 12px; font-weight: 600">{{x.alquilada}}</span>
+        </div>
+        <p style="margin: 0; color: {{t.muted}}">{{x.subtitulo}}</p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid {{t.inputLine}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-weight: 500; cursor: pointer">{{x.editar}}</button>
+        <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid {{t.inputLine}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-weight: 500; cursor: pointer">{{x.cambiarEstado}}</button>
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=-31.4167,-64.1833" target="_blank" rel="noopener" style="height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid {{t.inputLine}}; background: {{t.surface}}; color: {{t.text}}; font-weight: 500; display: flex; align-items: center; gap: 6px; text-decoration: none"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>{{x.maps}}</a>
+        <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid {{t.accent}}; background: {{t.accent}}; color: {{t.onAccent}}; font: inherit; font-weight: 500; cursor: pointer">{{x.nuevaObl}}</button>
+      </div>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid {{t.line}}">
+      <div role="tablist" aria-label="{{x.secciones}}" style="display: flex; flex-wrap: wrap; gap: 4px">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="4">
+          <button type="button" role="tab" aria-selected="{{tb.selected}}" onClick="{{tb.pick}}" style="{{tb.style}}">{{tb.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 16px; font-size: 13px; padding-bottom: 8px">
+        <a href="#">{{x.contratos}}</a>
+        <a href="#">{{x.pagos}}</a>
+        <a href="#">{{x.cobros}}</a>
+      </div>
+    </div>
+
+    <sc-if value="{{showDatos}}" hint-placeholder-val="{{ true }}">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; align-items: start">
+        <section style="background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+          <h2 style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 19px; font-weight: {{t.titleWeight}}">{{x.datosGenerales}}</h2>
+          <dl style="margin: 0; display: grid; grid-template-columns: 160px 1fr; gap: 10px 16px">
+            <dt style="color: {{t.muted}}">{{x.tipo}}</dt><dd style="margin: 0">{{x.departamento}}</dd>
+            <dt style="color: {{t.muted}}">{{x.alias}}</dt><dd style="margin: 0">Depto Centro 3B</dd>
+            <dt style="color: {{t.muted}}">{{x.direccion}}</dt><dd style="margin: 0">{{x.direccionVal}}</dd>
+            <dt style="color: {{t.muted}}">{{x.ubicacion}}</dt><dd style="margin: 0; display: flex; flex-wrap: wrap; gap: 4px 10px"><span>{{x.ubicacionVal}}</span><a href="https://www.google.com/maps/search/?api=1&amp;query=-31.4167,-64.1833" target="_blank" rel="noopener" style="font-weight: 500">{{x.maps}}</a></dd>
+            <dt style="color: {{t.muted}}">{{x.unidad}}</dt><dd style="margin: 0">{{x.unidadVal}}</dd>
+            <dt style="color: {{t.muted}}">{{x.estado}}</dt><dd style="margin: 0">{{x.alquilada}}</dd>
+            <dt style="color: {{t.muted}}">{{x.observaciones}}</dt><dd style="margin: 0; color: {{t.muted}}">—</dd>
+          </dl>
+        </section>
+
+        <section style="background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between">
+            <h2 style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 19px; font-weight: {{t.titleWeight}}">{{x.contratoVigente}}</h2>
+            <a href="#" style="font-size: 13px">{{x.abrirContrato}}</a>
+          </div>
+          <dl style="margin: 0; display: grid; grid-template-columns: 160px 1fr; gap: 10px 16px">
+            <dt style="color: {{t.muted}}">{{x.inquilino}}</dt><dd style="margin: 0">{{x.inquilinoPh}}</dd>
+            <dt style="color: {{t.muted}}">{{x.canon}}</dt><dd style="margin: 0; font-weight: 600">{{canon}} <span style="font-weight: 400; color: {{t.muted}}">{{x.desde}}</span></dd>
+            <dt style="color: {{t.muted}}">{{x.moneda}}</dt><dd style="margin: 0">{{x.pesos}}</dd>
+            <dt style="color: {{t.muted}}">{{x.cobro}}</dt><dd style="margin: 0">{{x.porAdmin}}</dd>
+            <dt style="color: {{t.muted}}">{{x.vigencia}}</dt><dd style="margin: 0">{{x.vigenciaVal}}</dd>
+          </dl>
+        </section>
+
+        <section style="background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 10px; overflow: hidden; grid-column: 1 / -1">
+          <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; padding: 18px 20px; border-bottom: 1px solid {{t.lineSoft}}">
+            <h2 style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 19px; font-weight: {{t.titleWeight}}">{{x.titulares}}</h2>
+            <span style="font-size: 13px; color: {{t.muted}}">{{x.modoLiq}}</span>
+          </div>
+          <div style="overflow-x: auto">
+            <table style="width: 100%; border-collapse: collapse">
+              <thead>
+                <tr style="text-align: left; color: {{t.muted}}; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em">
+                  <th scope="col" style="padding: 10px 20px; font-weight: 500">{{x.titular}}</th>
+                  <th scope="col" style="padding: 10px 12px; font-weight: 500; text-align: right">{{x.participacion}}</th>
+                  <th scope="col" style="padding: 10px 20px; font-weight: 500">{{x.representante}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-top: 1px solid {{t.lineSoft}}"><td style="padding: 12px 20px; font-weight: 500">{{x.propA}}</td><td style="padding: 12px; text-align: right">60 %</td><td style="padding: 12px 20px">{{x.si}}</td></tr>
+                <tr style="border-top: 1px solid {{t.lineSoft}}"><td style="padding: 12px 20px; font-weight: 500">{{x.propB}}</td><td style="padding: 12px; text-align: right">40 %</td><td style="padding: 12px 20px; color: {{t.muted}}">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding: 14px 20px; background: {{t.surface2}}; border-top: 1px solid {{t.lineSoft}}; font-size: 13px; color: {{t.body2}}">{{x.reglaPre}} <strong style="font-weight: 600">{{x.expensas}}</strong>{{x.reglaPost}}</div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showServicios}}" hint-placeholder-val="{{ false }}">
+      <section style="background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 10px; overflow: hidden">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid {{t.lineSoft}}">
+          <h2 style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 19px; font-weight: {{t.titleWeight}}">{{x.tabServicios}}</h2>
+          <button type="button" style="height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid {{t.inputLine}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; cursor: pointer">{{x.agregarServicio}}</button>
+        </div>
+        <div style="overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse">
+            <thead>
+              <tr style="text-align: left; color: {{t.muted}}; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em">
+                <th scope="col" style="padding: 10px 20px; font-weight: 500">{{x.concepto}}</th>
+                <th scope="col" style="padding: 10px 12px; font-weight: 500">{{x.empresa}}</th>
+                <th scope="col" style="padding: 10px 12px; font-weight: 500">{{x.nroCuenta}}</th>
+                <th scope="col" style="padding: 10px 12px; font-weight: 500">{{x.paga}}</th>
+                <th scope="col" style="padding: 10px 20px; font-weight: 500">{{x.periodicidad}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{servicios}}" as="s" hint-placeholder-count="6">
+                <tr style="border-top: 1px solid {{t.lineSoft}}">
+                  <td style="padding: 12px 20px; font-weight: 500">{{s.concepto}}</td>
+                  <td style="padding: 12px">{{s.empresa}}</td>
+                  <td style="padding: 12px; color: {{t.muted}}">{{s.cuenta}}</td>
+                  <td style="padding: 12px">{{s.paga}}</td>
+                  <td style="padding: 12px 20px">{{s.periodo}}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{showObligaciones}}" hint-placeholder-val="{{ false }}">
+      <section style="background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 10px; overflow: hidden">
+        <div style="overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse">
+            <thead>
+              <tr style="text-align: left; color: {{t.muted}}; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em">
+                <th scope="col" style="padding: 12px 20px; font-weight: 500">{{x.concepto}}</th>
+                <th scope="col" style="padding: 12px; font-weight: 500">{{x.periodo}}</th>
+                <th scope="col" style="padding: 12px; font-weight: 500; text-align: right">{{x.monto}}</th>
+                <th scope="col" style="padding: 12px; font-weight: 500">{{x.vencimiento}}</th>
+                <th scope="col" style="padding: 12px 20px; font-weight: 500">{{x.estado}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{obligaciones}}" as="o" hint-placeholder-count="5">
+                <tr style="border-top: 1px solid {{t.lineSoft}}">
+                  <td style="padding: 12px 20px; font-weight: 500">{{o.concepto}}</td>
+                  <td style="padding: 12px">{{o.periodo}}</td>
+                  <td style="padding: 12px; text-align: right">{{o.monto}}</td>
+                  <td style="padding: 12px">{{o.vto}}</td>
+                  <td style="padding: 12px 20px"><span style="{{o.chipStyle}}">{{o.estado}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{showDocumentos}}" hint-placeholder-val="{{ false }}">
+      <section style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px">
+        <sc-for list="{{documentos}}" as="d" hint-placeholder-count="4">
+          <a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 16px; background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 10px; text-decoration: none; color: {{t.text}}">
+            <div aria-hidden="true" style="height: 96px; border-radius: 6px; background: {{t.neutralBg}}; display: flex; align-items: center; justify-content: center; color: {{t.muted}}; font-size: 12px">{{d.formato}}</div>
+            <span style="font-weight: 500">{{d.nombre}}</span>
+            <span style="font-size: 12px; color: {{t.muted}}">{{d.tipo}}</span>
+          </a>
+        </sc-for>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"idioma":{"editor":"enum","options":["es","en","pt"],"default":"es"},"tema":{"editor":"enum","options":["claro","oscuro"],"default":"claro"},"accent":{"editor":"color","default":"#1F3A5F","options":["#1F3A5F","#1E5E4E","#5B3A7A","#8A4B00"]},"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'datos', oscuro: props.tema === 'oscuro', lang: props.idioma || 'es' }; }
+  componentDidUpdate(prev) {
+    if (prev.tema !== this.props.tema) this.setState({ oscuro: this.props.tema === 'oscuro' });
+    if (prev.idioma !== this.props.idioma) this.setState({ lang: this.props.idioma || 'es' });
+  }
+  tokens(oscuro, accent) {
+    const accentOscuro = { '#1F3A5F': '#8DB4E6', '#1E5E4E': '#4FB596', '#1F4E79': '#6FA8DC', '#5B3A7A': '#B596D6', '#8A4B00': '#E8B460' };
+    if (!oscuro) return {
+      scheme: 'light', bg: '#F3F5F8', surface: '#FFFFFF', surface2: '#F8FAFC', line: '#D8DEE6', lineSoft: '#ECF0F4', inputLine: '#C5CDD8',
+      text: '#18212B', muted: '#55606B', body2: '#3D4752', titleWeight: 600,
+      sidebar: '#18212B', sidebarActive: '#2C3846', sidebarText: '#C7CED6', sidebarStrong: '#FFFFFF', sidebarMuted: '#A9B2BC',
+      accent, onAccent: '#FFFFFF', highlight: '#E8A33D',
+      dangerBg: '#F9E3E0', dangerText: '#8A1F14', neutralBg: '#ECF0F4', neutralText: '#3D4752', okBg: '#E3EEEA', okText: '#14453A'
+    };
+    return {
+      scheme: 'dark', bg: '#12171D', surface: '#1A2129', surface2: '#222B35', line: '#2E3843', lineSoft: '#252E38', inputLine: '#3A4552',
+      text: '#E8ECEF', muted: '#9AA6B2', body2: '#C3CBD3', titleWeight: 500,
+      sidebar: '#0D1116', sidebarActive: '#222B35', sidebarText: '#B8C1CA', sidebarStrong: '#E8ECEF', sidebarMuted: '#8E99A5',
+      accent: accentOscuro[accent] || accent, onAccent: '#0E1A2B', highlight: '#F0B85A',
+      dangerBg: '#3A1F1C', dangerText: '#F2948A', neutralBg: '#2A333D', neutralText: '#C3CBD3', okBg: '#17332A', okText: '#7DD3B2'
+    };
+  }
+  textos(lang) {
+    const D = {
+      es: {
+        menu: 'Menú principal', app1: 'Administración', app2: 'Inteligente', ruta: 'Ruta', inicio: 'Inicio', propiedades: 'Bienes',
+        alquilada: 'Alquilado', maps: 'Ver en Google Maps', ubicacion: 'Ubicación', ubicacionVal: 'Punto marcado en el mapa', subtitulo: 'Inmueble · Departamento · [Calle y número], Piso 3 B · Córdoba · Edificio [Nombre]',
+        editar: 'Editar', cambiarEstado: 'Cambiar estado', nuevaObl: 'Nueva obligación', secciones: 'Secciones del bien',
+        tabDatos: 'Datos', tabServicios: 'Servicios e impuestos', tabObligaciones: 'Obligaciones', tabDocumentos: 'Documentos y fotos',
+        contratos: 'Contratos (3)', pagos: 'Pagos', cobros: 'Cobros',
+        datosGenerales: 'Datos generales', tipo: 'Tipo de bien', departamento: 'Inmueble · Departamento', alias: 'Alias', direccion: 'Dirección',
+        direccionVal: '[Calle y número], Córdoba (del edificio)', unidad: 'Unidad funcional', unidadVal: 'Piso 3 · Depto B · UF 14',
+        estado: 'Estado', observaciones: 'Observaciones',
+        contratoVigente: 'Contrato vigente', abrirContrato: 'Abrir contrato', inquilino: 'Inquilino', inquilinoPh: '[Nombre del inquilino]',
+        canon: 'Canon vigente', desde: 'desde 10/2026', moneda: 'Moneda', pesos: 'Pesos', cobro: 'Cobro', porAdmin: 'Por la administración',
+        vigencia: 'Vigencia', vigenciaVal: '04/2026 a 03/2028',
+        titulares: 'Titulares y reparto', modoLiq: 'Liquidación: por separado a cada titular', titular: 'Titular', participacion: 'Participación',
+        representante: 'Representante', propA: '[Propietario A]', propB: '[Propietario B]', si: 'Sí',
+        reglaPre: 'Reglas por concepto:', reglaPost: ' las asume [Propietario B] al 100 %. El resto se reparte según la participación.',
+        agregarServicio: 'Agregar servicio', concepto: 'Concepto', empresa: 'Empresa', nroCuenta: 'N.º de cuenta', paga: 'Paga', periodicidad: 'Periodicidad',
+        periodo: 'Período', monto: 'Monto', vencimiento: 'Vencimiento',
+        luz: 'Luz', agua: 'Agua', gas: 'Gas', expensas: 'Expensas', municipalidad: 'Municipalidad', rentas: 'Rentas', reparacion: 'Reparación de calefón',
+        eEnergia: '[Empresa de energía]', eAgua: '[Empresa de agua]', eGas: '[Distribuidora de gas]', eConsorcio: '[Administración del consorcio]',
+        nCliente: '[N.º de cliente]', nCuenta: '[N.º de cuenta]', nPartida: '[N.º de partida]', uf: 'UF 14',
+        rProp: 'Propietario', rInq: 'Inquilino', bimestral: 'Bimestral', mensual: 'Mensual',
+        Vencida: 'Vencida', Pendiente: 'Pendiente', Pagada: 'Pagada',
+        doc1: 'Contrato firmado 2026', doc2: 'Inventario de ingreso', doc3: 'Living', doc4: 'Boleta expensas 10/2026',
+        tContrato: 'Contrato', tOtro: 'Otro', tFoto: 'Foto', tBoleta: 'Boleta', fImagen: 'Imagen',
+        nav: ['Inicio', 'Propietarios', 'Bienes', 'Edificios', 'Inquilinos', 'Contratos', 'Obligaciones y cobros', 'Cuentas corrientes', 'Liquidaciones', 'Reportes', 'Configuración'],
+        aClaro: 'Cambiar a modo claro', aOscuro: 'Cambiar a modo oscuro', idioma: 'Idioma: Español. Cambiar idioma'
+      },
+      en: {
+        menu: 'Main menu', app1: 'Administración', app2: 'Inteligente', ruta: 'Breadcrumb', inicio: 'Home', propiedades: 'Assets',
+        alquilada: 'Rented', maps: 'View on Google Maps', ubicacion: 'Location', ubicacionVal: 'Point pinned on the map', subtitulo: 'Property · Apartment · [Street and number], Floor 3 B · Córdoba · [Name] building',
+        editar: 'Edit', cambiarEstado: 'Change status', nuevaObl: 'New bill', secciones: 'Asset sections',
+        tabDatos: 'Details', tabServicios: 'Utilities and taxes', tabObligaciones: 'Bills', tabDocumentos: 'Documents and photos',
+        contratos: 'Leases (3)', pagos: 'Payments', cobros: 'Collections',
+        datosGenerales: 'General details', tipo: 'Asset type', departamento: 'Property · Apartment', alias: 'Alias', direccion: 'Address',
+        direccionVal: '[Street and number], Córdoba (from building)', unidad: 'Unit', unidadVal: 'Floor 3 · Apt B · Unit 14',
+        estado: 'Status', observaciones: 'Notes',
+        contratoVigente: 'Active lease', abrirContrato: 'Open lease', inquilino: 'Tenant', inquilinoPh: '[Tenant name]',
+        canon: 'Current rent', desde: 'from 10/2026', moneda: 'Currency', pesos: 'Argentine pesos', cobro: 'Collection', porAdmin: 'By the management',
+        vigencia: 'Term', vigenciaVal: '04/2026 to 03/2028',
+        titulares: 'Owners and split', modoLiq: 'Statements: separate for each owner', titular: 'Owner', participacion: 'Share',
+        representante: 'Representative', propA: '[Owner A]', propB: '[Owner B]', si: 'Yes',
+        reglaPre: 'Rules by item:', reglaPost: ' are paid 100 % by [Owner B]. Everything else is split by share.',
+        agregarServicio: 'Add utility', concepto: 'Item', empresa: 'Provider', nroCuenta: 'Account no.', paga: 'Paid by', periodicidad: 'Frequency',
+        periodo: 'Period', monto: 'Amount', vencimiento: 'Due date',
+        luz: 'Electricity', agua: 'Water', gas: 'Gas', expensas: 'Building fees', municipalidad: 'Municipal tax', rentas: 'Provincial property tax', reparacion: 'Water heater repair',
+        eEnergia: '[Power company]', eAgua: '[Water company]', eGas: '[Gas distributor]', eConsorcio: '[Building management]',
+        nCliente: '[Customer no.]', nCuenta: '[Account no.]', nPartida: '[Parcel no.]', uf: 'Unit 14',
+        rProp: 'Owner', rInq: 'Tenant', bimestral: 'Every two months', mensual: 'Monthly',
+        Vencida: 'Overdue', Pendiente: 'Pending', Pagada: 'Paid',
+        doc1: 'Signed lease 2026', doc2: 'Move-in inventory', doc3: 'Living room', doc4: 'Building fees bill 10/2026',
+        tContrato: 'Lease', tOtro: 'Other', tFoto: 'Photo', tBoleta: 'Bill', fImagen: 'Image',
+        nav: ['Home', 'Owners', 'Assets', 'Buildings', 'Tenants', 'Leases', 'Bills and collections', 'Current accounts', 'Owner statements', 'Reports', 'Settings'],
+        aClaro: 'Switch to light mode', aOscuro: 'Switch to dark mode', idioma: 'Language: English. Change language'
+      },
+      pt: {
+        menu: 'Menu principal', app1: 'Administración', app2: 'Inteligente', ruta: 'Navegação', inicio: 'Início', propiedades: 'Bens',
+        alquilada: 'Alugado', maps: 'Ver no Google Maps', ubicacion: 'Localização', ubicacionVal: 'Ponto marcado no mapa', subtitulo: 'Imóvel · Apartamento · [Rua e número], Andar 3 B · Córdoba · Edifício [Nome]',
+        editar: 'Editar', cambiarEstado: 'Alterar situação', nuevaObl: 'Nova obrigação', secciones: 'Seções do bem',
+        tabDatos: 'Dados', tabServicios: 'Serviços e impostos', tabObligaciones: 'Obrigações', tabDocumentos: 'Documentos e fotos',
+        contratos: 'Contratos (3)', pagos: 'Pagamentos', cobros: 'Recebimentos',
+        datosGenerales: 'Dados gerais', tipo: 'Tipo de bem', departamento: 'Imóvel · Apartamento', alias: 'Apelido', direccion: 'Endereço',
+        direccionVal: '[Rua e número], Córdoba (do edifício)', unidad: 'Unidade', unidadVal: 'Andar 3 · Apto B · Unidade 14',
+        estado: 'Situação', observaciones: 'Observações',
+        contratoVigente: 'Contrato vigente', abrirContrato: 'Abrir contrato', inquilino: 'Inquilino', inquilinoPh: '[Nome do inquilino]',
+        canon: 'Aluguel vigente', desde: 'desde 10/2026', moneda: 'Moeda', pesos: 'Pesos argentinos', cobro: 'Recebimento', porAdmin: 'Pela administração',
+        vigencia: 'Vigência', vigenciaVal: '04/2026 a 03/2028',
+        titulares: 'Titulares e rateio', modoLiq: 'Prestação de contas: separada para cada titular', titular: 'Titular', participacion: 'Participação',
+        representante: 'Representante', propA: '[Proprietário A]', propB: '[Proprietário B]', si: 'Sim',
+        reglaPre: 'Regras por item:', reglaPost: ' é assumido 100 % por [Proprietário B]. O restante é rateado pela participação.',
+        agregarServicio: 'Adicionar serviço', concepto: 'Item', empresa: 'Empresa', nroCuenta: 'N.º da conta', paga: 'Pago por', periodicidad: 'Periodicidade',
+        periodo: 'Período', monto: 'Valor', vencimiento: 'Vencimento',
+        luz: 'Luz', agua: 'Água', gas: 'Gás', expensas: 'Condomínio', municipalidad: 'Taxa municipal', rentas: 'Imposto provincial', reparacion: 'Conserto do aquecedor',
+        eEnergia: '[Companhia de energia]', eAgua: '[Companhia de água]', eGas: '[Distribuidora de gás]', eConsorcio: '[Administração do condomínio]',
+        nCliente: '[N.º do cliente]', nCuenta: '[N.º da conta]', nPartida: '[N.º da matrícula]', uf: 'Unidade 14',
+        rProp: 'Proprietário', rInq: 'Inquilino', bimestral: 'Bimestral', mensual: 'Mensal',
+        Vencida: 'Vencida', Pendiente: 'Pendente', Pagada: 'Paga',
+        doc1: 'Contrato assinado 2026', doc2: 'Inventário de entrada', doc3: 'Sala', doc4: 'Boleto do condomínio 10/2026',
+        tContrato: 'Contrato', tOtro: 'Outro', tFoto: 'Foto', tBoleta: 'Boleto', fImagen: 'Imagem',
+        nav: ['Início', 'Proprietários', 'Bens', 'Edifícios', 'Inquilinos', 'Contratos', 'Obrigações e recebimentos', 'Contas correntes', 'Prestações de contas', 'Relatórios', 'Configurações'],
+        aClaro: 'Mudar para modo claro', aOscuro: 'Mudar para modo escuro', idioma: 'Idioma: Português. Mudar idioma'
+      }
+    };
+    return D[lang] || D.es;
+  }
+  renderVals() {
+    const oscuro = this.state.oscuro;
+    const lang = this.state.lang;
+    const loc = { es: 'es-AR', en: 'en-US', pt: 'pt-BR' }[lang] || 'es-AR';
+    const x = this.textos(lang);
+    const t = this.tokens(oscuro, this.props.accent ?? '#1F3A5F');
+    const tab = this.state.tab;
+    const money = (n) => new Intl.NumberFormat(loc, { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+    const fecha = (d) => new Intl.DateTimeFormat(loc, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+    const icons = [
+      'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z',
+      'M16 20v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',
+      'M4 21V7l8-4 8 4v14M9 21v-6h6v6',
+      'M3 21h18M5 21V5h9v16M14 9h5v12',
+      'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1',
+      'M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M9 13h6M9 17h6',
+      'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+      'M4 4h16v16H4zM4 9h16M9 9v11',
+      'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6',
+      'M4 20V10M10 20V4M16 20v-7M22 20H2',
+      'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1'
+    ];
+    const base = 'display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 8px; text-decoration: none; font-size: 14px;';
+    const nav = x.nav.map((label, i) => ({
+      label, icon: icons[i], href: i === 0 ? 'Main.dc.html' : '#',
+      style: base + (i === 2 ? ' background: ' + t.sidebarActive + '; color: ' + t.sidebarStrong + '; font-weight: 500;' : ' color: ' + t.sidebarText + ';')
+    }));
+    const tabBase = 'height: 44px; padding: 0 14px; border: 0; background: transparent; font: inherit; cursor: pointer; margin-bottom: -1px;';
+    const tabs = [['datos', x.tabDatos], ['servicios', x.tabServicios], ['obligaciones', x.tabObligaciones], ['documentos', x.tabDocumentos]]
+      .map(([id, label]) => ({
+        label, selected: tab === id ? 'true' : 'false',
+        pick: () => this.setState({ tab: id }),
+        style: tabBase + (tab === id ? ' color: ' + t.text + '; font-weight: 600; border-bottom: 2px solid ' + t.accent + ';' : ' color: ' + t.muted + '; border-bottom: 2px solid transparent;')
+      }));
+    const servicios = [
+      ['luz', 'eEnergia', 'nCliente', 'rInq', 'bimestral'],
+      ['agua', 'eAgua', 'nCuenta', 'rProp', 'mensual'],
+      ['gas', 'eGas', 'nCliente', 'rInq', 'mensual'],
+      ['expensas', 'eConsorcio', 'uf', 'rProp', 'mensual'],
+      ['municipalidad', null, 'nCuenta', 'rProp', 'mensual'],
+      ['rentas', null, 'nPartida', 'rProp', 'mensual']
+    ].map(([c, e, n, r, p], i) => ({
+      concepto: x[c], empresa: e ? x[e] : (i === 4 ? 'Municipalidad de Córdoba' : 'Rentas de Córdoba'), cuenta: x[n], paga: x[r], periodo: x[p]
+    }));
+    const chip = 'display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 500;';
+    const est = {
+      Vencida: chip + ' background: ' + t.dangerBg + '; color: ' + t.dangerText + ';',
+      Pendiente: chip + ' background: ' + t.neutralBg + '; color: ' + t.neutralText + ';',
+      Pagada: chip + ' background: ' + t.okBg + '; color: ' + t.okText + ';'
+    };
+    const obligaciones = [
+      ['municipalidad', '10/2026', 41300, new Date(2026, 9, 8), 'Vencida'],
+      ['expensas', '10/2026', 96000, new Date(2026, 9, 15), 'Pendiente'],
+      ['rentas', '10/2026', 33900, new Date(2026, 9, 20), 'Pendiente'],
+      ['agua', '10/2026', 18200, new Date(2026, 9, 22), 'Pagada'],
+      ['reparacion', '09/2026', 85000, null, 'Pagada']
+    ].map(([c, periodo, monto, vto, estado]) => ({
+      concepto: x[c], periodo, monto: money(monto), vto: vto ? fecha(vto) : '—', estado: x[estado], chipStyle: est[estado]
+    }));
+    const documentos = [['doc1', 'tContrato', 'PDF'], ['doc2', 'tOtro', 'PDF'], ['doc3', 'tFoto', null], ['doc4', 'tBoleta', 'PDF']]
+      .map(([n, tp, f]) => ({ nombre: x[n], tipo: x[tp], formato: f || x.fImagen }));
+    const orden = ['es', 'en', 'pt'];
+    return {
+      t, x, nav, tabs, servicios, obligaciones, documentos,
+      canon: money(480000),
+      showDatos: tab === 'datos', showServicios: tab === 'servicios',
+      showObligaciones: tab === 'obligaciones', showDocumentos: tab === 'documentos',
+      langTag: loc,
+      idiomaCodigo: lang.toUpperCase(),
+      idiomaLabel: x.idioma,
+      cambiarIdioma: () => this.setState({ lang: orden[(orden.indexOf(lang) + 1) % orden.length] }),
+      rootClass: oscuro ? 'tema-oscuro' : 'tema-claro',
+      temaLabel: oscuro ? x.aClaro : x.aOscuro,
+      temaIcon: oscuro ? 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4' : 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z',
+      toggleTema: () => this.setState({ oscuro: !this.state.oscuro })
+    };
+  }
+}
+</script>
+</body>
+</html>

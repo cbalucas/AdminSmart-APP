@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio (app)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3A5F}a:hover{color:#15294A}
+.tema-oscuro a{color:#8DB4E6}.tema-oscuro a:hover{color:#B5CEF0}
+</style>
+</helmet>
+<div class="{{rootClass}}" lang="{{langTag}}" style="position: relative; width: 390px; height: 844px; overflow: hidden; background: {{t.bg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: {{t.text}}; font-size: 15px; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; color-scheme: {{t.scheme}}">
+  <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 24px 16px 96px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+    <header style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+      <div style="min-width: 0">
+        <p style="margin: 0; font-size: 13px; color: {{t.muted}}">{{fechaHoy}}</p>
+        <h1 style="margin: 2px 0 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 26px; font-weight: {{t.titleWeight}}">{{x.inicio}}</h1>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; flex: none">
+        <span aria-label="{{x.sync}}" role="img" style="width: 10px; height: 10px; border-radius: 5px; background: #2E8B6A"></span>
+        <button type="button" onClick="{{cambiarIdioma}}" aria-label="{{idiomaLabel}}" title="{{idiomaLabel}}" style="height: 44px; padding: 0 10px; border: 1px solid {{t.line}}; border-radius: 22px; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
+          <span>{{idiomaCodigo}}</span>
+        </button>
+        <button type="button" onClick="{{toggleTema}}" aria-label="{{temaLabel}}" title="{{temaLabel}}" style="width: 44px; height: 44px; border: 1px solid {{t.line}}; border-radius: 22px; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{temaIcon}}"></path></svg>
+        </button>
+        <button type="button" aria-label="{{x.notif}}" style="position: relative; width: 44px; height: 44px; border: 1px solid {{t.line}}; border-radius: 22px; background: {{t.surface}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg>
+          <span aria-hidden="true" style="position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; border-radius: 8px; background: #C0392B; color: #FFFFFF; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">5</span>
+        </button>
+      </div>
+    </header>
+
+    <section aria-label="{{x.indicadores}}" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+        <a href="#" style="display: flex; flex-direction: column; gap: 4px; padding: 14px; background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 12px; text-decoration: none; color: {{t.text}}">
+          <span style="font-size: 12px; color: {{t.muted}}">{{k.label}}</span>
+          <span style="{{k.valueStyle}}">{{k.value}}</span>
+          <span style="font-size: 11px; color: {{t.muted}}">{{k.sub}}</span>
+        </a>
+      </sc-for>
+      <a href="#" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 14px; background: {{t.totalBg}}; border: 1px solid {{t.totalLine}}; border-radius: 12px; text-decoration: none; color: {{t.totalText}}">
+        <span style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 12px; color: {{t.totalMuted}}">{{x.total}}</span>
+          <span style="font-family: 'Source Serif 4', Georgia, serif; font-size: 22px; font-weight: {{t.titleWeight}}">{{totalArs}}</span>
+        </span>
+        <span style="font-size: 14px; color: {{t.totalText}}">{{totalUsd}}</span>
+      </a>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <h2 style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 19px; font-weight: {{t.titleWeight}}">{{x.proxVtos}}</h2>
+        <a href="#" style="font-size: 14px">{{x.verTodas}}</a>
+      </div>
+      <ul style="list-style: none; margin: 0; padding: 0; background: {{t.surface}}; border: 1px solid {{t.line}}; border-radius: 12px; overflow: hidden">
+        <sc-for list="{{vencimientos}}" as="v" hint-placeholder-count="4">
+          <li style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid {{t.lineSoft}}">
+            <div style="width: 36px; text-align: center; flex: none">
+              <div style="font-size: 17px; font-weight: 600; line-height: 1">{{v.dia}}</div>
+              <div style="font-size: 10px; color: {{t.muted}}; text-transform: uppercase">{{v.mes}}</div>
+            </div>
+            <div style="flex: 1; min-width: 0">
+              <div style="font-weight: 500">{{v.concepto}}</div>
+              <div style="font-size: 12px; color: {{t.muted}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{v.propiedad}}</div>
+            </div>
+            <div style="text-align: right">
+              <div style="white-space: nowrap; font-size: 14px">{{v.monto}}</div>
+              <span style="{{v.chipStyle}}">{{v.estado}}</span>
+            </div>
+          </li>
+        </sc-for>
+      </ul>
+    </section>
+  </div>
+
+  <a href="PagoApp.dc.html" aria-label="{{x.fab}}" style="position: absolute; right: 16px; bottom: 92px; width: 56px; height: 56px; border-radius: 28px; background: {{t.accent}}; color: {{t.onAccent}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3)">
+    <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+  </a>
+
+  <nav aria-label="{{x.navPrincipal}}" style="position: absolute; left: 0; right: 0; bottom: 0; height: 76px; background: {{t.surface}}; border-top: 1px solid {{t.line}}; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding-bottom: 8px; box-sizing: border-box">
+    <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5">
+      <a href="#" style="{{tb.style}}">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{tb.icon}}"></path></svg>
+        <span>{{tb.label}}</span>
+      </a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"idioma":{"editor":"enum","options":["es","en","pt"],"default":"es"},"tema":{"editor":"enum","options":["claro","oscuro"],"default":"claro"},"accent":{"editor":"color","default":"#1F3A5F","options":["#1F3A5F","#1E5E4E","#5B3A7A","#8A4B00"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { oscuro: props.tema === 'oscuro', lang: props.idioma || 'es' }; }
+  componentDidUpdate(prev) {
+    if (prev.tema !== this.props.tema) this.setState({ oscuro: this.props.tema === 'oscuro' });
+    if (prev.idioma !== this.props.idioma) this.setState({ lang: this.props.idioma || 'es' });
+  }
+  tokens(oscuro, accent) {
+    const accentOscuro = { '#1F3A5F': '#8DB4E6', '#1E5E4E': '#4FB596', '#1F4E79': '#6FA8DC', '#5B3A7A': '#B596D6', '#8A4B00': '#E8B460' };
+    if (!oscuro) return {
+      scheme: 'light', bg: '#F3F5F8', surface: '#FFFFFF', line: '#D8DEE6', lineSoft: '#ECF0F4',
+      text: '#18212B', muted: '#55606B', titleWeight: 600, accent, onAccent: '#FFFFFF', highlight: '#E8A33D',
+      totalBg: '#18212B', totalLine: '#18212B', totalText: '#FFFFFF', totalMuted: '#C7CED6',
+      danger: '#A3261A', dangerBg: '#F9E3E0', dangerText: '#8A1F14', neutralBg: '#ECF0F4', neutralText: '#3D4752', warn: '#8A4B00'
+    };
+    return {
+      scheme: 'dark', bg: '#12171D', surface: '#1A2129', line: '#2E3843', lineSoft: '#252E38',
+      text: '#E8ECEF', muted: '#9AA6B2', titleWeight: 500, accent: accentOscuro[accent] || accent, onAccent: '#0E1A2B', highlight: '#F0B85A',
+      totalBg: '#222B35', totalLine: '#2E3843', totalText: '#E8ECEF', totalMuted: '#9AA6B2',
+      danger: '#F2948A', dangerBg: '#3A1F1C', dangerText: '#F2948A', neutralBg: '#2A333D', neutralText: '#C3CBD3', warn: '#E8B460'
+    };
+  }
+  textos(lang) {
+    const D = {
+      es: {
+        inicio: 'Inicio', sync: 'Sincronizado', notif: 'Notificaciones, 5 sin leer', indicadores: 'Indicadores',
+        kVencidas: 'Vencidas', k7: 'Vencen en 7 días', k7Sub: '21 en 30 días', kSinCobrar: 'Alquileres sin cobrar',
+        kDeuda: 'Deuda de inquilinos', kDeudaSub: 'A recuperar', total: 'Total administrado',
+        proxVtos: 'Próximos vencimientos', verTodas: 'Ver todas', rProp: 'Propietario', rInq: 'Inquilino', propiedadPh: '[Bien]',
+        patente: 'Patente', municipalidad: 'Municipalidad', luz: 'Luz', expensas: 'Expensas', gas: 'Gas', Vencida: 'Vencida', Pendiente: 'Pendiente',
+        fab: 'Carga rápida: registrar pago, cobro u obligación', navPrincipal: 'Navegación principal',
+        tabs: ['Inicio', 'Bienes', 'Operaciones', 'Propietarios', 'Más'],
+        aClaro: 'Cambiar a modo claro', aOscuro: 'Cambiar a modo oscuro', idioma: 'Idioma: Español. Cambiar idioma'
+      },
+      en: {
+        inicio: 'Home', sync: 'Synced', notif: 'Notifications, 5 unread', indicadores: 'Indicators',
+        kVencidas: 'Overdue', k7: 'Due in 7 days', k7Sub: '21 in 30 days', kSinCobrar: 'Uncollected rents',
+        kDeuda: 'Tenant debt', kDeudaSub: 'To recover', total: 'Total under management',
+        proxVtos: 'Upcoming due dates', verTodas: 'View all', rProp: 'Owner', rInq: 'Tenant', propiedadPh: '[Asset]',
+        patente: 'Vehicle tax', municipalidad: 'Municipal tax', luz: 'Electricity', expensas: 'Building fees', gas: 'Gas', Vencida: 'Overdue', Pendiente: 'Pending',
+        fab: 'Quick entry: record payment, collection or bill', navPrincipal: 'Main navigation',
+        tabs: ['Home', 'Assets', 'Operations', 'Owners', 'More'],
+        aClaro: 'Switch to light mode', aOscuro: 'Switch to dark mode', idioma: 'Language: English. Change language'
+      },
+      pt: {
+        inicio: 'Início', sync: 'Sincronizado', notif: 'Notificações, 5 não lidas', indicadores: 'Indicadores',
+        kVencidas: 'Vencidas', k7: 'Vencem em 7 dias', k7Sub: '21 em 30 dias', kSinCobrar: 'Aluguéis não recebidos',
+        kDeuda: 'Dívida de inquilinos', kDeudaSub: 'A recuperar', total: 'Total administrado',
+        proxVtos: 'Próximos vencimentos', verTodas: 'Ver todas', rProp: 'Proprietário', rInq: 'Inquilino', propiedadPh: '[Bem]',
+        patente: 'IPVA', municipalidad: 'Taxa municipal', luz: 'Luz', expensas: 'Condomínio', gas: 'Gás', Vencida: 'Vencida', Pendiente: 'Pendente',
+        fab: 'Lançamento rápido: pagamento, recebimento ou obrigação', navPrincipal: 'Navegação principal',
+        tabs: ['Início', 'Bens', 'Operações', 'Proprietários', 'Mais'],
+        aClaro: 'Mudar para modo claro', aOscuro: 'Mudar para modo escuro', idioma: 'Idioma: Português. Mudar idioma'
+      }
+    };
+    return D[lang] || D.es;
+  }
+  renderVals() {
+    const oscuro = this.state.oscuro;
+    const lang = this.state.lang;
+    const loc = { es: 'es-AR', en: 'en-US', pt: 'pt-BR' }[lang] || 'es-AR';
+    const x = this.textos(lang);
+    const t = this.tokens(oscuro, this.props.accent ?? '#1F3A5F');
+    const money = (n, cur) => new Intl.NumberFormat(loc, { style: 'currency', currency: cur || 'ARS', maximumFractionDigits: 0 }).format(n);
+    const hoy = new Date(2026, 9, 13);
+    const fechaTxt = new Intl.DateTimeFormat(loc, { weekday: 'long', day: 'numeric', month: 'long' }).format(hoy);
+    const periodo = new Intl.DateTimeFormat(loc, { month: 'long', year: 'numeric' }).format(hoy);
+    const big = 'font-family: \'Source Serif 4\', Georgia, serif; font-size: 24px; font-weight: ' + t.titleWeight + '; line-height: 1.1;';
+    const kpis = [
+      { label: x.kVencidas, value: '3', sub: money(184500), valueStyle: big + ' color: ' + t.danger + ';' },
+      { label: x.k7, value: '8', sub: x.k7Sub, valueStyle: big },
+      { label: x.kSinCobrar, value: '4', sub: periodo.charAt(0).toUpperCase() + periodo.slice(1), valueStyle: big + ' color: ' + t.warn + ';' },
+      { label: x.kDeuda, value: money(96200), sub: x.kDeudaSub, valueStyle: big }
+    ];
+    const chip = 'display: inline-block; margin-top: 2px; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 500;';
+    const est = {
+      Vencida: chip + ' background: ' + t.dangerBg + '; color: ' + t.dangerText + ';',
+      Pendiente: chip + ' background: ' + t.neutralBg + '; color: ' + t.neutralText + ';'
+    };
+    const mesCorto = new Intl.DateTimeFormat(loc, { month: 'short' }).format(hoy).replace('.', '');
+    const vencimientos = [
+      ['10', 'patente', 'Auto AI539LO', 'rProp', 22400, 'Vencida'],
+      ['14', 'luz', 'Depto Centro 3B', 'rInq', 28750, 'Pendiente'],
+      ['15', 'expensas', 'Dúplex Güemes', 'rProp', 68400, 'Pendiente'],
+      ['17', 'gas', null, 'rInq', 12400, 'Pendiente']
+    ].map(([dia, c, prop, r, monto, estado]) => ({
+      dia, mes: mesCorto, concepto: x[c], propiedad: (prop || x.propiedadPh) + ' · ' + x[r], monto: money(monto), estado: x[estado], chipStyle: est[estado]
+    }));
+    const base = 'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 44px; font-size: 11px; text-decoration: none; text-align: center;';
+    const icons = [
+      'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z',
+      'M4 21V7l8-4 8 4v14M9 21v-6h6v6',
+      'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+      'M16 20v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',
+      'M5 12h.01M12 12h.01M19 12h.01'
+    ];
+    const tabs = x.tabs.map((label, i) => ({ label, icon: icons[i], style: base + (i === 0 ? ' color: ' + t.accent + '; font-weight: 600;' : ' color: ' + t.muted + ';') }));
+    const orden = ['es', 'en', 'pt'];
+    return {
+      t, x, kpis, vencimientos, tabs,
+      totalArs: money(4812300), totalUsd: money(3150, 'USD'),
+      fechaHoy: fechaTxt.charAt(0).toUpperCase() + fechaTxt.slice(1),
+      langTag: loc,
+      idiomaCodigo: lang.toUpperCase(),
+      idiomaLabel: x.idioma,
+      cambiarIdioma: () => this.setState({ lang: orden[(orden.indexOf(lang) + 1) % orden.length] }),
+      rootClass: oscuro ? 'tema-oscuro' : 'tema-claro',
+      temaLabel: oscuro ? x.aClaro : x.aOscuro,
+      temaIcon: oscuro ? 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4' : 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z',
+      toggleTema: () => this.setState({ oscuro: !this.state.oscuro })
+    };
+  }
+}
+</script>
+</body>
+</html>

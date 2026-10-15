@@ -1,0 +1,42 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--fuente-texto), sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+h1 { font-family: var(--fuente-titulo), serif; font-weight: 600; margin: 0; }
+@media (prefers-color-scheme: dark) { h1 { font-weight: 500; } }
+
+.inicio {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+}
+.tarjeta {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 32px;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.muted { color: var(--muted); margin: 0; }
+.etiqueta {
+  background: var(--okBg);
+  color: var(--ok);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.resalte { width: 40px; height: 4px; border-radius: 2px; background: var(--highlight); }
