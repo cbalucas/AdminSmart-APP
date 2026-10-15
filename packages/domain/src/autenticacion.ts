@@ -39,9 +39,29 @@ const contrasenaNueva = z
   .string()
   .min(LARGO_MINIMO_CONTRASENA, { error: "validacion.contrasena_corta" });
 
+// Nombre de usuario (opcional): alternativa al email para ingresar. Minúsculas, números, punto,
+// guion y guion bajo; de 3 a 30 caracteres.
+export const PATRON_NOMBRE_USUARIO = /^[a-z0-9._-]{3,30}$/;
+
+export function esNombreUsuarioValido(valor: string): boolean {
+  return PATRON_NOMBRE_USUARIO.test(valor);
+}
+
+// En el ingreso se escribe el email o el nombre de usuario: si lleva arroba es un email.
+export const esEmail = (identificador: string) => identificador.includes("@");
+
+const identificador = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(1, { error: "validacion.identificador_obligatorio" })
+  .refine((valor) => !esEmail(valor) || z.email().safeParse(valor).success, {
+    error: "validacion.email_invalido",
+  });
+
 // P-02 Ingreso
 export const esquemaIngreso = z.object({
-  email,
+  identificador,
   contrasena: z.string().min(1, { error: "validacion.contrasena_obligatoria" }),
 });
 

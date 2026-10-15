@@ -4,6 +4,7 @@ import { t } from "@ai/i18n";
 import { guardarPreferencia, leerPreferencia } from "../almacenamiento";
 import { Aviso, Boton, Campo, Enlace, Interruptor, PantallaAcceso, Separador, Tarjeta, Titulo } from "../componentes";
 import { ingresarConGoogle } from "../google";
+import { ingresarConIdentificador } from "../ingreso";
 import { supabase } from "../supabase";
 
 const CLAVE_EMAIL = "ai.email_recordado";
@@ -12,10 +13,10 @@ type Props = { errorInicial?: string; alIngresar: () => void; alRecuperar: () =>
 
 // P-02 Ingreso
 export function Ingreso({ errorInicial, alIngresar, alRecuperar }: Props) {
-  const [email, setEmail] = useState(() => leerPreferencia(CLAVE_EMAIL) ?? "");
+  const [identificador, setIdentificador] = useState(() => leerPreferencia(CLAVE_EMAIL) ?? "");
   const [contrasena, setContrasena] = useState("");
   const [recordar, setRecordar] = useState(true);
-  const [errores, setErrores] = useState<{ email?: string; contrasena?: string }>({});
+  const [errores, setErrores] = useState<{ identificador?: string; contrasena?: string }>({});
   const [mensaje, setMensaje] = useState<string | undefined>(errorInicial);
   const [enCurso, setEnCurso] = useState(false);
 
@@ -23,30 +24,19 @@ export function Ingreso({ errorInicial, alIngresar, alRecuperar }: Props) {
 
   async function ingresar() {
     setMensaje(undefined);
-    const validado = esquemaIngreso.safeParse({ email, contrasena });
+    const validado = esquemaIngreso.safeParse({ identificador, contrasena });
     if (!validado.success) {
-      const campos: { email?: string; contrasena?: string } = {};
-      for (const problema of validado.error.issues) campos[problema.path[0] as "email" | "contrasena"] ??= problema.message;
+      const campos: { identificador?: string; contrasena?: string } = {};
+      for (const problema of validado.error.issues) campos[problema.path[0] as "identificador" | "contrasena"] ??= problema.message;
       return setErrores(campos);
     }
     setErrores({});
     setEnCurso(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: validado.data.email,
-        password: validado.data.contrasena,
-      });
-      if (error) {
-        setMensaje(error.status === 0 || /network|fetch/i.test(error.message) ? "comun.error_red" : "ingreso.error_credenciales");
-        return;
-      }
-      guardarPreferencia(CLAVE_EMAIL, recordar ? validado.data.email : null);
-      alIngresar();
-    } catch {
-      setMensaje("comun.error_red");
-    } finally {
-      setEnCurso(false);
-    }
+    const resultado = await ingresarConIdentificador(validado.data.identificador, validado.data.contrasena);
+    setEnCurso(false);
+    if (resultado !== "ok") return setMensaje(resultado === "red" ? "comun.error_red" : "ingreso.error_credenciales");
+    guardarPreferencia(CLAVE_EMAIL, recordar ? validado.data.identificador : null);
+    alIngresar();
   }
 
   async function conGoogle() {
@@ -68,13 +58,12 @@ export function Ingreso({ errorInicial, alIngresar, alRecuperar }: Props) {
         <Titulo>{t("ingreso.titulo")}</Titulo>
         {mensaje ? <Aviso tipo="error">{t(mensaje)}</Aviso> : null}
         <Campo
-          etiqueta={t("ingreso.email")}
-          value={email}
-          onChangeText={setEmail}
-          error={errores.email}
-          keyboardType="email-address"
+          etiqueta={t("ingreso.identificador")}
+          value={identificador}
+          onChangeText={setIdentificador}
+          error={errores.identificador}
           autoCapitalize="none"
-          autoComplete="email"
+          autoComplete="username"
           autoCorrect={false}
         />
         <Campo

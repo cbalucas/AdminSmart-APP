@@ -30,6 +30,7 @@
 
   "ingreso.titulo": "Ingresar",
   "ingreso.email": "Email",
+  "ingreso.identificador": "Email o usuario",
   "ingreso.contrasena": "Contraseña",
   "ingreso.recordar_email": "Recordar mi email",
   "ingreso.boton": "Ingresar",
@@ -94,6 +95,7 @@
   "configuracion.error_email_en_uso": "Ya existe una cuenta con ese email.",
   "configuracion.error_servidor": "No pudimos completar la configuración. Intentá de nuevo en unos minutos.",
 
+  "validacion.identificador_obligatorio": "Escribí tu email o tu usuario.",
   "validacion.email_invalido": "Escribí un email válido.",
   "validacion.contrasena_obligatoria": "Escribí tu contraseña.",
   "validacion.contrasena_corta": "La contraseña debe tener al menos 8 caracteres.",

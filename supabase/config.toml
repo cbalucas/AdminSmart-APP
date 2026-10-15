@@ -6,3 +6,7 @@ project_id = "bgxjuhosidzjojycnwwu"
 # llama. `configuracion-inicial` exige el código de instalación y valida la sesión del usuario.
 [functions.configuracion-inicial]
 verify_jwt = false
+
+# Ingreso con nombre de usuario: la llama la app antes de tener sesión.
+[functions.ingresar]
+verify_jwt = false

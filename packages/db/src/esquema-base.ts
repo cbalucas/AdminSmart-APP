@@ -103,6 +103,8 @@ export const usuario = pgTable(
     organizacionId: organizacionId(),
     nombre: text("nombre").notNull(),
     email: text("email").notNull(),
+    // Alternativa al email para ingresar (opcional, único). Lo define el administrador.
+    nombreUsuario: text("nombre_usuario"),
     roles: rol("roles").array().notNull(),
     propietarioId: uuid("propietario_id").references(() => propietario.id),
     estado: estadoUsuario("estado").notNull().default("activo"),
@@ -117,6 +119,13 @@ export const usuario = pgTable(
     uniqueIndex("usuario_email_uq")
       .on(sql`lower(${t.email})`)
       .where(sql`${t.deletedAt} is null`), // USU-01
+    uniqueIndex("usuario_nombre_usuario_uq")
+      .on(t.nombreUsuario)
+      .where(sql`${t.deletedAt} is null and ${t.nombreUsuario} is not null`),
+    check(
+      "usuario_nombre_usuario_ck",
+      sql`${t.nombreUsuario} is null or ${t.nombreUsuario} ~ '^[a-z0-9._-]{3,30}$'`,
+    ),
     uniqueIndex("usuario_propietario_uq").on(t.propietarioId).where(sql`${t.deletedAt} is null`), // USU-03
     check("usuario_roles_ck", sql`cardinality(${t.roles}) > 0`),
     check("usuario_rol_propietario_ck", sql`not ('propietario' = any(${t.roles})) or ${t.propietarioId} is not null`),

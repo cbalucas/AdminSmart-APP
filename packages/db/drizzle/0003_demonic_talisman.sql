@@ -1,0 +1,3 @@
+ALTER TABLE "usuario" ADD COLUMN "nombre_usuario" text;--> statement-breakpoint
+CREATE UNIQUE INDEX "usuario_nombre_usuario_uq" ON "usuario" USING btree ("nombre_usuario") WHERE "usuario"."deleted_at" is null and "usuario"."nombre_usuario" is not null;--> statement-breakpoint
+ALTER TABLE "usuario" ADD CONSTRAINT "usuario_nombre_usuario_ck" CHECK ("usuario"."nombre_usuario" is null or "usuario"."nombre_usuario" ~ '^[a-z0-9._-]{3,30}$');
