@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Administración Inteligente",
-    "slug": "administracion-inteligente",
+    "slug": "AdminSmart",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

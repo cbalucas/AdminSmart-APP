@@ -1,5 +1,5 @@
 {
-  "name": "administracion-inteligente",
+  "name": "AdminSmart",
   "private": true,
   "packageManager": "pnpm@12.11.2",
   "scripts": {

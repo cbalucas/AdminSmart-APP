@@ -65,8 +65,8 @@ Use el mismo email de su cuenta de GitHub.
 
 ## 5. Crear la carpeta del proyecto
 
-- Windows: `C:\Proyectos\administracion-inteligente`
-- Mac: `Proyectos/administracion-inteligente` dentro de su carpeta personal
+- Windows: `C:\Proyectos\AdminSmart`
+- Mac: `Proyectos/AdminSmart` dentro de su carpeta personal
 
 Evite el Escritorio, Documentos sincronizado con OneDrive o iCloud, y nombres con espacios o tildes.
 
@@ -75,7 +75,7 @@ Evite el Escritorio, Documentos sincronizado con OneDrive o iCloud, y nombres co
 Descomprima `administracion-inteligente-paquete.zip` dentro de esa carpeta. Debe quedar así:
 
 ```
-administracion-inteligente/
+AdminSmart/
   CLAUDE.md
   PROMPT_INICIAL.md
   GUIA_DE_INSTALACION.md
@@ -92,7 +92,7 @@ administracion-inteligente/
 
 ## 7. Abrir el proyecto e iniciar sesión
 
-1. En VS Code: menú Archivo → Abrir carpeta → elija `administracion-inteligente`. Si pregunta si confía en los autores, responda que sí.
+1. En VS Code: menú Archivo → Abrir carpeta → elija `AdminSmart`. Si pregunta si confía en los autores, responda que sí.
 2. Abra Claude Code: haga clic en **✻ Claude Code** en la barra inferior derecha, o en el ícono de chispa de la barra lateral izquierda.
 3. La primera vez aparece "Sign in": inicie sesión con su cuenta de Claude y autorice en el navegador.
 
@@ -105,7 +105,7 @@ Abra `PROMPT_INICIAL.md`, copie el texto entre las líneas y péguelo en el pane
 3. Armar la estructura del proyecto y una pantalla inicial con el logo.
 4. Guiarlo para crear el repositorio privado en GitHub y subir el código.
 
-Cuando le pida crear el repositorio: en github.com, botón **New**, nombre `administracion-inteligente`, opción **Private**, sin README ni .gitignore, y **Create repository**.
+Cuando le pida crear el repositorio: en github.com, botón **New**, nombre `AdminSmart`, opción **Private**, sin README ni .gitignore, y **Create repository**.
 
 ## 9. Cómo se trabaja en cada sesión
 
