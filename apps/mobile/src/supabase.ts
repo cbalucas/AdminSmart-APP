@@ -1,3 +1,4 @@
+import "./criptografia";
 import "expo-sqlite/localStorage/install";
 import { createClient } from "@supabase/supabase-js";
 import { AppState } from "react-native";

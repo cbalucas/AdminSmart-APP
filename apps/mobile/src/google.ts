@@ -7,6 +7,8 @@ import { supabase } from "./supabase";
 // Supabase (Authentication → URL Configuration).
 export async function ingresarConGoogle(): Promise<boolean> {
   const retorno = Linking.createURL("auth/callback");
+  // En desarrollo, esta es la dirección que debe estar autorizada en Supabase (URL Configuration).
+  if (__DEV__) console.log("Dirección de retorno de Google:", retorno);
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: retorno, skipBrowserRedirect: true },
