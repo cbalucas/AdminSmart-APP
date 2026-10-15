@@ -64,7 +64,8 @@ Deno.serve(async (peticion) => {
   }
 
   // Código de instalación.
-  const esperado = Deno.env.get("CODIGO_INSTALACION");
+  // Se ignoran espacios y comillas sobrantes alrededor del código guardado (suelen colarse al definirlo en la terminal).
+  const esperado = (Deno.env.get("CODIGO_INSTALACION") ?? "").trim().replace(/^["']+|["']+$/g, "");
   if (!esperado) return responder({ error: "codigo_no_configurado" }, 500);
   if (!(await iguales(texto(cuerpo.codigoInstalacion), esperado))) {
     await new Promise((resolver) => setTimeout(resolver, 1500)); // frena los intentos repetidos
