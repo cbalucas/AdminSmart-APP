@@ -8,6 +8,13 @@
       "when": 1792070512712,
       "tag": "0000_thankful_screwball",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792071578893,
+      "tag": "0001_marvelous_longshot",
+      "breakpoints": true
     }
   ]
 }

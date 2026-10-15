@@ -59,7 +59,7 @@ export const organizacion = pgTable("organizacion", {
   registroAbiertoHabilitado: boolean("registro_abierto_habilitado").notNull().default(false), // USU-08
 });
 
-const organizacionId = () =>
+export const organizacionId = () =>
   uuid("organizacion_id")
     .notNull()
     .references(() => organizacion.id);
