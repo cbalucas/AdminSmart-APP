@@ -88,4 +88,5 @@ Cada vez que durante el desarrollo se decida algo que cambia o completa la espec
 - Instalar dependencias: `pnpm install`
 - Web en modo desarrollo: `pnpm --filter web dev`
 - App móvil: `pnpm --filter mobile start` (se abre con Expo Go en el teléfono)
+- App móvil con ingreso por Google o enlaces del email: `pnpm --filter mobile tunel`. Supabase no acepta direcciones con número IP como retorno, y el túnel da una dirección con nombre
 - Pruebas: `pnpm test`
