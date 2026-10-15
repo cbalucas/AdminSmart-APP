@@ -2,3 +2,4 @@
 export * from "./comunes";
 export * from "./esquema-base";
 export * from "./esquema-operacion";
+export * from "./esquema-control";

@@ -1,5 +1,5 @@
 -- Bloque 1 · Ajustes de seguridad señalados por el verificador de Supabase.
--- Se ejecuta DESPUÉS de 20261015120100_bloque1_restricciones.sql.
+-- Se ejecuta DESPUÉS de bloque1_2_restricciones.sql.
 
 -- 1) La extensión btree_gist no debe estar en el esquema público.
 create schema if not exists extensions;

@@ -1,5 +1,5 @@
 -- Bloque 2 · Restricciones, vistas y automatismos que Drizzle no expresa.
--- Se ejecuta DESPUÉS de 20261015130000_bloque2_operacion.sql.
+-- Se ejecuta DESPUÉS de bloque2_1_operacion.sql.
 
 -- La extensión btree_gist vive en el esquema `extensions`.
 set search_path = public, extensions;

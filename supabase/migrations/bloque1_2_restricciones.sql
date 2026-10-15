@@ -1,5 +1,5 @@
 -- Bloque 1 · Restricciones y automatismos que Drizzle no expresa.
--- Se ejecuta DESPUÉS de 20261015120000_bloque1_base.sql.
+-- Se ejecuta DESPUÉS de bloque1_1_base.sql.
 
 -- PRO-08: los acuerdos de honorarios de un propietario no se superponen en el tiempo.
 create extension if not exists btree_gist;

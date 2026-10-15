@@ -2,7 +2,7 @@
 -- Sin RLS, cualquiera con la clave publicable podría leer y escribir. Con RLS activa y sin
 -- políticas, nadie accede desde la web o la app; las políticas por organización y rol
 -- (SEG-02) se crean en el bloque 3. Es seguro ejecutarla más de una vez.
--- Se ejecuta DESPUÉS de 20261015130100_bloque2_restricciones.sql.
+-- Se ejecuta DESPUÉS de bloque2_2_restricciones.sql.
 
 do $$
 declare

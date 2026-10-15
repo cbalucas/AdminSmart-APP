@@ -15,6 +15,13 @@
       "when": 1792071578893,
       "tag": "0001_marvelous_longshot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792073678673,
+      "tag": "0002_chemical_paladin",
+      "breakpoints": true
     }
   ]
 }
