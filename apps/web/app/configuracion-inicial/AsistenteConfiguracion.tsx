@@ -222,7 +222,7 @@ export function AsistenteConfiguracion() {
           <h3>{t("configuracion.paso_codigo")}</h3>
           <p className="muted">{t("configuracion.texto")}</p>
           <p className="muted">{t("configuracion.codigo_ayuda")}</p>
-          {campoTexto("codigo", "configuracion.codigo", "password", "off")}
+          {campoTexto("codigo", "configuracion.codigo", "text", "off")}
         </>
       )}
 
