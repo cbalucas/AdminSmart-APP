@@ -1,5 +1,5 @@
 {
-  "name": "AdminSmart",
+  "name": "adminsmart",
   "private": true,
   "packageManager": "pnpm@12.11.2",
   "scripts": {
