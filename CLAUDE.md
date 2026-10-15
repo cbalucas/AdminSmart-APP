@@ -88,5 +88,5 @@ Cada vez que durante el desarrollo se decida algo que cambia o completa la espec
 - Instalar dependencias: `pnpm install`
 - Web en modo desarrollo: `pnpm --filter web dev`
 - App móvil: `pnpm --filter mobile start` (se abre con Expo Go en el teléfono)
-- App móvil con ingreso por Google o enlaces del email: `pnpm --filter mobile tunel`. Supabase no acepta direcciones con número IP como retorno, y el túnel da una dirección con nombre
+- App móvil con ingreso por Google o enlaces del email: `pnpm --filter mobile movil`. Supabase no acepta direcciones con número IP como retorno; este comando hace que Expo use un nombre (192-168-x-x.sslip.io). Si el router bloquea ese nombre, en el teléfono se configura el DNS de Google (8.8.8.8 o, en Android, DNS privado `dns.google`)
 - Pruebas: `pnpm test`
