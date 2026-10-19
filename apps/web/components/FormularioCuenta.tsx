@@ -90,6 +90,7 @@ export function FormularioCuenta({
               </select>
             )}
           </div>
+          <p className="muted ancho">{t("cuentas.ayuda_identificacion")}</p>
           <div className="campo ancho">
             <label htmlFor="alias">{t("cuentas.campo_alias")}</label>
             <input id="alias" name="alias" type="text" autoCapitalize="none" defaultValue={valores.alias} aria-invalid={Boolean(errores.alias)} />

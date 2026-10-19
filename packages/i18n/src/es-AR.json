@@ -251,8 +251,8 @@
   "cuentas.campo_banco": "Nombre del banco o de la billetera (opcional)",
   "cuentas.campo_tipo": "Tipo de cuenta",
   "cuentas.campo_moneda": "Moneda",
-  "cuentas.campo_cbu": "CBU o CVU, 22 números (opcional si cargás el alias)",
-  "cuentas.campo_alias": "Alias (opcional si cargás el CBU o CVU)",
+  "cuentas.campo_cbu": "CBU o CVU (22 números)",
+  "cuentas.campo_alias": "Alias",
   "cuentas.campo_titular": "Titular, como figura en el banco",
   "cuentas.tipo_caja_ahorro": "Caja de ahorro",
   "cuentas.tipo_cuenta_corriente": "Cuenta corriente",
@@ -280,5 +280,6 @@
   "validacion.cuenta_cbu_o_alias": "Cargá el alias, el CBU o CVU, o ambos.",
   "cuentas.campo_entidad": "Banco o billetera",
   "cuentas.entidad_banco": "Banco",
-  "cuentas.entidad_billetera": "Billetera virtual"
+  "cuentas.entidad_billetera": "Billetera virtual",
+  "cuentas.ayuda_identificacion": "Cargá el alias, el CBU o CVU, o los dos. Alcanza con uno."
 }
