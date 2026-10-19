@@ -5,3 +5,4 @@ export * from "./cuentaCorriente";
 export * from "./obligaciones";
 export * from "./uuid";
 export * from "./propietarios";
+export * from "./imagen";

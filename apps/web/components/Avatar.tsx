@@ -13,7 +13,11 @@ function tonoDe(nombre: string): number {
   return h;
 }
 
-export function Avatar({ nombre, tamano = 36 }: { nombre: string; tamano?: number }) {
+export function Avatar({ nombre, tamano = 36, url }: { nombre: string; tamano?: number; url?: string | null }) {
+  if (url) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img className="avatar-color avatar-imagen" src={url} alt="" width={tamano} height={tamano} style={{ width: tamano, height: tamano }} />;
+  }
   return (
     <span
       className="avatar-color"

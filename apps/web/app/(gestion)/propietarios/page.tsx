@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { formatearImporte, normalizarNombre, type Moneda } from "@ai/domain";
 import { Avatar } from "@/components/Avatar";
+import { enlacesDeAvatares } from "@/lib/avatares";
 import { esGestion } from "@/lib/menu";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -21,7 +22,7 @@ export default async function Propietarios({
   const supabase = await crearClienteServidor();
   const [{ data: propietarios }, { data: vinculos }, { data: bienes }, { data: saldos }, { data: usuarios }] =
     await Promise.all([
-      supabase.from("propietario").select("id, nombre_razon_social, estado").is("deleted_at", null).order("nombre_razon_social"),
+      supabase.from("propietario").select("id, nombre_razon_social, estado, avatar_path").is("deleted_at", null).order("nombre_razon_social"),
       supabase.from("bien_propietario").select("propietario_id, bien_id").is("deleted_at", null),
       supabase.from("bien").select("id, es_gastos_varios, estado").is("deleted_at", null),
       supabase.from("saldo_propietario").select("propietario_id, moneda, saldo"),
@@ -44,6 +45,8 @@ export default async function Propietarios({
   const lista = (propietarios ?? [])
     .filter((p) => verInactivos || p.estado === "activo")
     .filter((p) => !buscado || normalizarNombre(p.nombre_razon_social as string).includes(buscado));
+
+  const enlaces = await enlacesDeAvatares(lista.map((p) => p.avatar_path as string | null));
 
   const hayDatos = (propietarios ?? []).length > 0;
   const enlaceInactivos = `/propietarios?${new URLSearchParams({ ...(q ? { q } : {}), ...(verInactivos ? {} : { inactivos: "1" }) })}`;
@@ -86,7 +89,7 @@ export default async function Propietarios({
                   <tr key={p.id as string}>
                     <td>
                       <Link href={`/propietarios/${p.id}`} className="celda-persona">
-                        <Avatar nombre={p.nombre_razon_social as string} />
+                        <Avatar nombre={p.nombre_razon_social as string} url={enlaces.get(p.avatar_path as string)} />
                         <strong>{p.nombre_razon_social as string}</strong>
                       </Link>
                     </td>

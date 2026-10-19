@@ -308,3 +308,14 @@ a { color: var(--accent); }
 .grupo > .muted { margin: 0; }
 .fila-tipo-nombre { grid-template-columns: minmax(180px, 240px) minmax(0, 1fr); }
 @media (max-width: 640px) { .fila-tipo-nombre { grid-template-columns: minmax(0, 1fr); } }
+
+/* Avatar con foto y selector de foto */
+.avatar-imagen { object-fit: cover; background: var(--surface2); }
+.avatar-con-boton { position: relative; flex-shrink: 0; }
+.avatar-boton { position: absolute; right: -4px; bottom: -4px; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); cursor: pointer; }
+.avatar-boton:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.recorte { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: 340px; max-width: calc(100vw - 32px); display: flex; flex-direction: column; gap: 12px; align-items: flex-start; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.recorte canvas { width: 256px; height: 256px; max-width: 100%; border-radius: 50%; background: var(--surface2); border: 1px solid var(--line); }
+.recorte label { display: flex; flex-direction: column; gap: 4px; width: 100%; font-size: 0.9rem; font-weight: 500; }
+.recorte input[type="range"] { width: 100%; accent-color: var(--accent); }
+.ficha-avatar { position: relative; display: flex; flex-direction: column; align-items: flex-start; }

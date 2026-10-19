@@ -19,6 +19,7 @@ export interface FichaPropietario {
   fondoReservaArs: number | null;
   fondoReservaUsd: number | null;
   observaciones: string | null;
+  avatarPath: string | null;
 }
 
 // Un propietario por id; la base filtra según lo que el usuario puede ver (RLS).
@@ -42,5 +43,6 @@ export const obtenerPropietario = cache(async (id: string): Promise<FichaPropiet
     fondoReservaArs: p.fondo_reserva_ars === null ? null : Number(p.fondo_reserva_ars),
     fondoReservaUsd: p.fondo_reserva_usd === null ? null : Number(p.fondo_reserva_usd),
     observaciones: p.observaciones,
+    avatarPath: p.avatar_path ?? null,
   };
 });

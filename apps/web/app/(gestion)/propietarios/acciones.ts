@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { generarUuidV7, hayNombreDuplicado, impedimentosDeBaja } from "@ai/domain";
+import { carpetaAvatarPropietario, generarUuidV7, hayNombreDuplicado, impedimentosDeBaja } from "@ai/domain";
 import { aFilaPropietario, leerFormularioPropietario, type EstadoFormulario } from "@/lib/formulario-propietario";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -134,4 +134,20 @@ async function cambiarGastosVarios(propietarioId: string, estado: "activo" | "de
   const ids = (vinculos ?? []).map((v) => v.bien_id as string);
   if (ids.length === 0) return;
   await supabase.from("bien").update({ estado }).in("id", ids).eq("es_gastos_varios", true);
+}
+
+// PRO-12: guarda la ruta de la foto ya subida al almacén (o la quita con null). La ruta debe estar
+// en la carpeta de este propietario y de esta administración: no se acepta cualquier archivo.
+export async function guardarAvatarPropietario(id: string, ruta: string | null): Promise<ResultadoCambioEstado> {
+  const { usuario } = await usuarioActual();
+  if (!usuario) return { error: "avatar.error_subir" };
+  if (ruta !== null && !ruta.startsWith(carpetaAvatarPropietario(usuario.organizacionId, id))) {
+    return { error: "avatar.error_subir" };
+  }
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase.from("propietario").update({ avatar_path: ruta }).eq("id", id);
+  if (error) return { error: "avatar.error_subir" };
+  revalidatePath("/propietarios");
+  revalidatePath(`/propietarios/${id}`);
+  return {};
 }

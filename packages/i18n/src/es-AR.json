@@ -284,5 +284,18 @@
   "cuentas.ayuda_identificacion": "Cargá el alias, el CBU o CVU, o los dos. Alcanza con uno.",
   "cuentas.seccion_cuenta": "Cuenta",
   "cuentas.seccion_identificacion": "Cómo se identifica la cuenta",
-  "cuentas.seccion_titular": "Titular"
+  "cuentas.seccion_titular": "Titular",
+  "avatar.cambiar": "Cambiar foto",
+  "avatar.quitar": "Quitar foto",
+  "avatar.titulo": "Foto del propietario",
+  "avatar.zoom": "Acercar",
+  "avatar.horizontal": "Mover a los costados",
+  "avatar.vertical": "Mover arriba o abajo",
+  "avatar.guardar": "Guardar foto",
+  "avatar.elegir": "Elegir otra imagen",
+  "avatar.error_tipo": "Elegí una imagen JPG, PNG o WebP.",
+  "avatar.error_grande": "La imagen es demasiado pesada. Elegí una de hasta 15 MB.",
+  "avatar.error_leer": "No se pudo leer la imagen. Probá con otra.",
+  "avatar.error_subir": "No se pudo guardar la foto. Intentá de nuevo.",
+  "avatar.ayuda": "Se recorta en cuadrado y se muestra en círculo."
 }

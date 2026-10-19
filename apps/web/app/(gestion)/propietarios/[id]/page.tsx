@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { calcularPagoPromedio, formatearImporte, type Moneda } from "@ai/domain";
-import { Avatar } from "@/components/Avatar";
+import { CambiarFoto } from "@/components/CambiarFoto";
 import { BotonEstadoPropietario } from "@/components/BotonEstadoPropietario";
 import { SeccionCuentas } from "@/components/SeccionCuentas";
+import { enlacesDeAvatares } from "@/lib/avatares";
 import { esGestion } from "@/lib/menu";
 import { obtenerPropietario } from "@/lib/propietarios";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
@@ -83,7 +84,13 @@ export default async function FichaPropietario({
       </p>
 
       <div className="ficha-cabecera">
-        <Avatar nombre={p.nombre} tamano={72} />
+        <CambiarFoto
+          propietarioId={p.id}
+          organizacionId={usuario.organizacionId}
+          nombre={p.nombre}
+          url={p.avatarPath ? (await enlacesDeAvatares([p.avatarPath])).get(p.avatarPath) ?? null : null}
+          tieneFoto={Boolean(p.avatarPath)}
+        />
         <div className="ficha-datos">
           <h1>{p.nombre}</h1>
           <p className="muted">
