@@ -1,4 +1,5 @@
-import type { Moneda } from "./dinero";
+import { z } from "zod";
+import { aCentavos, type Moneda } from "./dinero";
 
 export type EstadoObligacion = "a_completar" | "pendiente" | "vencida" | "pagada" | "anulada";
 export type Responsable = "propietario" | "inquilino";
@@ -177,3 +178,57 @@ export function siguienteAGenerar(
   const siguiente = proximoPeriodo(o.periodo, o.frecuencia);
   return periodosExistentes.includes(siguiente) ? null : siguiente;
 }
+
+const FRECUENCIAS = ["mensual", "bimestral", "trimestral", "cuatrimestral", "semestral", "anual"] as const;
+const requerido = z.string({ error: "validacion.dato_obligatorio" }).trim().min(1, { error: "validacion.dato_obligatorio" });
+const opcional = z.string().trim().optional().transform((v) => (v ? v : null));
+
+/** Alta y edición de una obligación (P-27). El período llega como AAAA-MM y se guarda como AAAA-MM-01. */
+export const esquemaObligacion = z
+  .object({
+    bienId: requerido,
+    bienServicioId: opcional,
+    conceptoId: requerido,
+    periodo: z
+      .string({ error: "validacion.dato_obligatorio" })
+      .trim()
+      .regex(/^\d{4}-(0[1-9]|1[0-2])$/, { error: "validacion.periodo_invalido" })
+      .transform((v) => `${v}-01`),
+    esRecurrente: z.boolean().default(false),
+    frecuencia: z.enum(FRECUENCIAS).nullable().default(null),
+    monto: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v, ctx) => {
+        if (!v) return null;
+        const centavos = aCentavos(v);
+        if (centavos === null || centavos <= 0) {
+          ctx.addIssue({ code: "custom", message: "validacion.importe_invalido" });
+          return z.NEVER;
+        }
+        return centavos;
+      }),
+    moneda: z.enum(["ARS", "USD"]).default("ARS"),
+    responsable: z.enum(["propietario", "inquilino"], { error: "validacion.dato_obligatorio" }),
+    vencimiento: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => (v ? v : null))
+      .refine((v) => v === null || /^\d{4}-\d{2}-\d{2}$/.test(v), { error: "validacion.fecha_invalida" }),
+    descripcion: opcional,
+    codigoPago: opcional,
+    observaciones: opcional,
+  })
+  .superRefine((d, ctx) => {
+    // OBL-04: un gasto suelto (sin servicio) lleva descripción.
+    if (d.bienServicioId === null && d.descripcion === null) {
+      ctx.addIssue({ code: "custom", path: ["descripcion"], message: "validacion.descripcion_obligatoria" });
+    }
+    // Una obligación recurrente indica con qué frecuencia.
+    if (d.esRecurrente && d.frecuencia === null) {
+      ctx.addIssue({ code: "custom", path: ["frecuencia"], message: "validacion.dato_obligatorio" });
+    }
+  });
+export type DatosObligacion = z.output<typeof esquemaObligacion>;

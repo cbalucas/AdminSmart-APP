@@ -1,5 +1,5 @@
 import { cache } from "react";
-import type { EstadoObligacion } from "@ai/domain";
+import { generarUuidV7, siguienteAGenerar, type EstadoObligacion, type Frecuencia } from "@ai/domain";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 
 export interface FilaObligacion {
@@ -50,3 +50,66 @@ export const listarObligaciones = cache(async (): Promise<FilaObligacion[]> => {
     estado: estadoDe.get(o.id as string) ?? "pendiente",
   }));
 });
+
+export const fechaHoy = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Argentina/Cordoba" }).format(new Date());
+
+/** Clave que identifica "el mismo gasto" a lo largo de los períodos: el servicio, o bien + concepto + descripción. */
+export const claveObligacion = (o: { bien_servicio_id: unknown; bien_id: unknown; concepto_id: unknown; descripcion: unknown }) =>
+  o.bien_servicio_id ? `s:${o.bien_servicio_id}` : `g:${o.bien_id}|${o.concepto_id}|${String(o.descripcion ?? "").trim().toLowerCase()}`;
+
+// OBL-05, OBL-09: crea las ocurrencias siguientes que falten (sin monto ni vencimiento, A completar).
+// Se ejecuta al abrir Obligaciones o el Inicio, sin proceso programado. Devuelve cuántas creó.
+export async function generarOcurrenciasPendientes(organizacionId: string): Promise<number> {
+  const supabase = await crearClienteServidor();
+  const hoy = fechaHoy();
+  let creadas = 0;
+  for (let vuelta = 0; vuelta < 24; vuelta++) {
+    const { data } = await supabase.from("obligacion").select("*").is("deleted_at", null).eq("anulada", false);
+    const todas = data ?? [];
+    const periodosPorClave = new Map<string, string[]>();
+    for (const o of todas) {
+      const c = claveObligacion(o);
+      periodosPorClave.set(c, [...(periodosPorClave.get(c) ?? []), o.periodo as string]);
+    }
+    const nuevas: Record<string, unknown>[] = [];
+    const yaPlanificadas = new Set<string>();
+    for (const o of todas) {
+      const clave = claveObligacion(o);
+      const periodo = siguienteAGenerar(
+        { periodo: o.periodo as string, esRecurrente: Boolean(o.es_recurrente), frecuencia: (o.frecuencia as Frecuencia | null) ?? null, anulada: false },
+        periodosPorClave.get(clave) ?? [],
+        hoy,
+      );
+      if (!periodo || yaPlanificadas.has(`${clave}@${periodo}`)) continue;
+      yaPlanificadas.add(`${clave}@${periodo}`);
+      nuevas.push({
+        id: generarUuidV7(),
+        organizacion_id: organizacionId,
+        bien_servicio_id: o.bien_servicio_id,
+        bien_id: o.bien_id,
+        concepto_id: o.concepto_id,
+        periodo,
+        es_recurrente: true,
+        frecuencia: o.frecuencia,
+        monto: null,
+        moneda: o.moneda,
+        responsable: o.responsable,
+        vencimiento: null,
+        descripcion: o.descripcion,
+        codigo_pago: o.codigo_pago,
+      });
+    }
+    if (nuevas.length === 0) break;
+    // Una por una: si otra visita ya la creó, la base la rechaza (OBL-03) y se sigue con las demás.
+    let alguna = false;
+    for (const fila of nuevas) {
+      const { error } = await supabase.from("obligacion").insert(fila);
+      if (!error) {
+        creadas++;
+        alguna = true;
+      }
+    }
+    if (!alguna) break;
+  }
+  return creadas;
+}

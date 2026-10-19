@@ -373,3 +373,6 @@ a { color: var(--accent); }
 
 .tabla .nowrap, .tabla td .estado { white-space: nowrap; }
 .filtros-separados { margin-top: 16px; }
+
+.formulario-ancho .campo input[type="month"], .formulario-ancho .campo input[type="date"] { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.formulario-ancho .campo .etiqueta-lista { font-weight: 500; }

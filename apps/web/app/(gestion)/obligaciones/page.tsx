@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
-import { formatearImporte, formatearPeriodo, TIPOS_BIEN, type EstadoObligacion } from "@ai/domain";
+import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIEN, type EstadoObligacion } from "@ai/domain";
 import { listarBienes, titularesDe } from "@/lib/bienes";
-import { listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
+import { generarOcurrenciasPendientes, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
 
@@ -32,6 +32,8 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   if (!usuario || !esGestion(usuario.roles)) notFound();
   const f = await searchParams;
 
+  // OBL-05, OBL-09: al abrir la pantalla se crean las ocurrencias siguientes que falten.
+  await generarOcurrenciasPendientes(usuario.organizacionId);
   const [todas, bienes] = await Promise.all([listarObligaciones(), listarBienes()]);
   const titulares = await titularesDe(bienes.map((b) => b.id));
   const bienDe = new Map(bienes.map((b) => [b.id, b]));
@@ -92,6 +94,13 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
         <td className="nowrap">
           <span className={CLASE_ESTADO[o.estado]}>{t(`obligaciones.estado_${o.estado}`)}</span>
         </td>
+        <td>
+          {puedeModificarObligacion({ pagada: o.estado === "pagada", anulada: o.estado === "anulada" }) && (
+            <div className="acciones-fila">
+              <Link className="boton-texto" href={`/obligaciones/${o.id}/editar`}>{t("app.editar")}</Link>
+            </div>
+          )}
+        </td>
       </tr>
     );
   };
@@ -103,6 +112,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           <p className="muted">{t("obligaciones.subtitulo")}</p>
           <h1>{t("obligaciones.titulo")}</h1>
         </div>
+        <Link href="/obligaciones/nueva" className="boton">{t("obligaciones.nueva")}</Link>
       </div>
 
       {porCompletar > 0 && (
@@ -187,6 +197,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
                   <th className="num">{t("obligaciones.col_monto")}</th>
                   <th>{t("obligaciones.col_responsable")}</th>
                   <th>{t("obligaciones.col_estado")}</th>
+                  <th />
                 </tr>
               </thead>
               <tbody>{lista.map(fila)}</tbody>

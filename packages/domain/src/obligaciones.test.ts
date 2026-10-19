@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatearPeriodo, periodoDeFecha, puedeModificarObligacion, siguienteAGenerar } from "./obligaciones";
+import { esquemaObligacion, formatearPeriodo, periodoDeFecha, puedeModificarObligacion, siguienteAGenerar } from "./obligaciones";
 
 describe("Períodos de obligaciones", () => {
   it("OBL-05: el período de una fecha es el primer día de su mes", () => {
@@ -45,5 +45,36 @@ describe("Generación de la ocurrencia siguiente", () => {
   });
   it("OBL-10: una obligación anulada no genera otra", () => {
     expect(siguienteAGenerar({ ...base, anulada: true }, [], "2026-10-19")).toBeNull();
+  });
+});
+
+describe("Alta de obligación", () => {
+  const valida = { bienId: "b", bienServicioId: "s", conceptoId: "c", periodo: "2026-10", responsable: "propietario" };
+  it("OBL-05: el período se guarda como primer día del mes y el monto puede quedar vacío", () => {
+    const r = esquemaObligacion.parse(valida);
+    expect(r.periodo).toBe("2026-10-01");
+    expect(r.monto).toBeNull();
+  });
+  it("OBL-04: un gasto suelto exige descripción", () => {
+    const r = esquemaObligacion.safeParse({ ...valida, bienServicioId: "" });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0]?.message).toBe("validacion.descripcion_obligatoria");
+  });
+  it("OBL-04: un gasto suelto con descripción es válido", () => {
+    expect(esquemaObligacion.safeParse({ ...valida, bienServicioId: "", descripcion: "Reparación de calefón" }).success).toBe(true);
+  });
+  it("OBL-05: una obligación recurrente exige frecuencia", () => {
+    expect(esquemaObligacion.safeParse({ ...valida, esRecurrente: true }).success).toBe(false);
+    expect(esquemaObligacion.safeParse({ ...valida, esRecurrente: true, frecuencia: "mensual" }).success).toBe(true);
+  });
+  it("OBL-05: el monto se guarda en centavos", () => {
+    expect(esquemaObligacion.parse({ ...valida, monto: "41.300,50" }).monto).toBe(4130050);
+  });
+  it("OBL-05: rechaza un monto no válido o en cero", () => {
+    expect(esquemaObligacion.safeParse({ ...valida, monto: "abc" }).success).toBe(false);
+    expect(esquemaObligacion.safeParse({ ...valida, monto: "0" }).success).toBe(false);
+  });
+  it("OBL-05: rechaza un período mal escrito", () => {
+    expect(esquemaObligacion.safeParse({ ...valida, periodo: "2026-13" }).success).toBe(false);
   });
 });
