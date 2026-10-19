@@ -581,5 +581,21 @@
   "obligaciones.no_encontrada": "No encontramos esa obligación.",
   "validacion.periodo_invalido": "El período no es válido.",
   "validacion.fecha_invalida": "La fecha no es válida.",
-  "validacion.descripcion_obligatoria": "Un gasto suelto necesita una descripción."
+  "validacion.descripcion_obligatoria": "Un gasto suelto necesita una descripción.",
+  "obligaciones.completar_ahora": "Completar ahora",
+  "ventana.titulo": "Completar gastos de {mes}",
+  "ventana.ayuda": "Estos gastos recurrentes se generaron sin monto. Cargá el monto y el vencimiento de cada uno. Los que dejes vacíos siguen como A completar y te los volveremos a pedir.",
+  "ventana.progreso": "{hechos} de {total} completos",
+  "ventana.periodo": "Período {periodo}",
+  "ventana.anterior": "Anterior: {monto}",
+  "ventana.monto": "Monto",
+  "ventana.vencimiento": "Vencimiento",
+  "ventana.usar_anterior": "Usar monto anterior",
+  "ventana.dejar_de_repetir": "Dejar de repetir",
+  "ventana.mas_tarde": "Recordar más tarde",
+  "ventana.guardar": "Guardar {cantidad} gastos",
+  "ventana.guardar_uno": "Guardar 1 gasto",
+  "ventana.pie": "Se guarda solo lo que tenga monto. Se puede editar después en Obligaciones.",
+  "ventana.error_guardar": "No pudimos completar esa acción. Probá de nuevo.",
+  "ventana.error_algunos": "Algunos gastos no se pudieron guardar. Revisá el monto y la fecha."
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esquemaObligacion, formatearPeriodo, periodoDeFecha, puedeModificarObligacion, siguienteAGenerar } from "./obligaciones";
+import { enVentanaDeFinDeMes, esquemaObligacion, pendientesDeLaVentana, periodoDelMesSiguiente, formatearPeriodo, periodoDeFecha, puedeModificarObligacion, siguienteAGenerar } from "./obligaciones";
 
 describe("Períodos de obligaciones", () => {
   it("OBL-05: el período de una fecha es el primer día de su mes", () => {
@@ -76,5 +76,35 @@ describe("Alta de obligación", () => {
   });
   it("OBL-05: rechaza un período mal escrito", () => {
     expect(esquemaObligacion.safeParse({ ...valida, periodo: "2026-13" }).success).toBe(false);
+  });
+});
+
+describe("Ventana de fin de mes", () => {
+  it("OBL-08: aparece en los últimos 5 días del mes", () => {
+    expect(enVentanaDeFinDeMes("2026-10-27", 5)).toBe(true);
+    expect(enVentanaDeFinDeMes("2026-10-31", 5)).toBe(true);
+  });
+  it("OBL-08: no aparece antes de los últimos 5 días", () => {
+    expect(enVentanaDeFinDeMes("2026-10-26", 5)).toBe(false);
+  });
+  it("OBL-08: respeta los días de aviso configurados y los meses cortos", () => {
+    expect(enVentanaDeFinDeMes("2026-02-24", 5)).toBe(true);
+    expect(enVentanaDeFinDeMes("2026-02-23", 5)).toBe(false);
+    expect(enVentanaDeFinDeMes("2026-10-29", 3)).toBe(true);
+    expect(enVentanaDeFinDeMes("2026-10-28", 3)).toBe(false);
+  });
+  it("OBL-08: el período de la ventana es el mes siguiente, también en diciembre", () => {
+    expect(periodoDelMesSiguiente("2026-10-30")).toBe("2026-11-01");
+    expect(periodoDelMesSiguiente("2026-12-30")).toBe("2027-01-01");
+  });
+  it("OBL-08, OBL-11: pide las A completar del mes siguiente y las anteriores sin monto, no las pagadas ni las de más adelante", () => {
+    const lista = [
+      { id: "a", periodo: "2026-11-01", estado: "a_completar" as const },
+      { id: "b", periodo: "2026-10-01", estado: "a_completar" as const },
+      { id: "c", periodo: "2026-11-01", estado: "pendiente" as const },
+      { id: "d", periodo: "2026-12-01", estado: "a_completar" as const },
+      { id: "e", periodo: "2026-11-01", estado: "pagada" as const },
+    ];
+    expect(pendientesDeLaVentana(lista, "2026-10-28").map((o) => o.id)).toEqual(["a", "b"]);
   });
 });

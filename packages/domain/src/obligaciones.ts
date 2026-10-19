@@ -232,3 +232,29 @@ export const esquemaObligacion = z
     }
   });
 export type DatosObligacion = z.output<typeof esquemaObligacion>;
+
+/** Cantidad de días del mes de una fecha AAAA-MM-DD. */
+function diasDelMes(fecha: string): number {
+  const [a, m] = fecha.split("-").map(Number);
+  return new Date(Date.UTC(a, m, 0)).getUTCDate();
+}
+
+/** OBL-08: ¿estamos en los últimos `diasAviso` días del mes (el último día incluido)? */
+export function enVentanaDeFinDeMes(hoy: string, diasAviso: number): boolean {
+  const dia = Number(hoy.slice(8, 10));
+  return dia > diasDelMes(hoy) - diasAviso;
+}
+
+/** OBL-08: período del mes siguiente a una fecha. */
+export function periodoDelMesSiguiente(hoy: string): string {
+  return proximoPeriodo(periodoDeFecha(hoy), "mensual");
+}
+
+/**
+ * OBL-08, OBL-11: obligaciones que la ventana de fin de mes pide completar: las A completar
+ * del mes siguiente y también las de meses anteriores que siguen sin monto.
+ */
+export function pendientesDeLaVentana<T extends { periodo: string; estado: EstadoObligacion }>(obligaciones: readonly T[], hoy: string): T[] {
+  const limite = periodoDelMesSiguiente(hoy);
+  return obligaciones.filter((o) => o.estado === "a_completar" && o.periodo <= limite);
+}

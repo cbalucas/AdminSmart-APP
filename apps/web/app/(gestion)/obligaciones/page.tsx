@@ -1,13 +1,17 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIEN, type EstadoObligacion } from "@ai/domain";
 import { listarBienes, titularesDe } from "@/lib/bienes";
 import { generarOcurrenciasPendientes, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
+import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
+import { configVentana, itemsDeVentana } from "@/lib/ventana";
 
 interface Filtros {
+  completar?: string;
   estado?: string;
   propietario?: string;
   tipo?: string;
@@ -52,6 +56,9 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   const lista = sinEstado
     .filter((o) => !f.estado || o.estado === f.estado)
     .sort((a, b) => a.periodo.localeCompare(b.periodo) || (a.vencimiento ?? "9999").localeCompare(b.vencimiento ?? "9999"));
+
+  // "Completar ahora": si hoy no es época de la ventana, se abre a pedido. En época, ya la muestra el marco.
+  const abrirVentana = f.completar === "1" && !(await configVentana()).enVentana ? await itemsDeVentana() : null;
 
   const hayFiltros = Boolean(f.propietario || f.tipo || f.responsable || f.periodo);
   const porCompletar = todas.filter((o) => o.estado === "a_completar").length;
@@ -118,6 +125,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
       {porCompletar > 0 && (
         <p className="aviso-advertencia" role="status">
           {porCompletar === 1 ? t("obligaciones.aviso_a_completar_uno") : t("obligaciones.aviso_a_completar", { cantidad: String(porCompletar) })}
+          <Link href="/obligaciones?completar=1" className="boton-texto">{t("obligaciones.completar_ahora")}</Link>
         </p>
       )}
 
@@ -205,6 +213,11 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           </div>
         )}
       </section>
+    {abrirVentana && abrirVentana.items.length > 0 && (
+        <Suspense>
+          <VentanaFinDeMes items={abrirVentana.items} mes={abrirVentana.mes} />
+        </Suspense>
+      )}
     </>
   );
 }

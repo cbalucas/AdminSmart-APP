@@ -1,8 +1,11 @@
 import Image from "next/image";
+import { Suspense } from "react";
 import { t } from "@ai/i18n";
 import { MarcoGestion } from "@/components/MarcoGestion";
-import { menuPara } from "@/lib/menu";
+import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
+import { esGestion, menuPara } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
+import { configVentana, itemsDeVentana } from "@/lib/ventana";
 import { cerrarSesion } from "./acciones";
 
 // Todas las pantallas con sesión comparten este marco. Una cuenta sin usuario activo no entra.
@@ -27,10 +30,18 @@ export default async function LayoutGestion({ children }: { children: React.Reac
     );
   }
 
+  // OBL-08: en los últimos días del mes, al ingresar aparece la ventana para completar los gastos del mes siguiente.
+  const ventana = esGestion(usuario.roles) && (await configVentana()).enVentana ? await itemsDeVentana() : null;
+
   const roles = usuario.roles.map((r) => t(`rol.${r}`)).join(", ");
   return (
     <MarcoGestion items={menuPara(usuario.roles)} nombre={usuario.nombre} rol={roles}>
       {children}
+      {ventana && ventana.items.length > 0 && (
+        <Suspense>
+          <VentanaFinDeMes items={ventana.items} mes={ventana.mes} />
+        </Suspense>
+      )}
     </MarcoGestion>
   );
 }

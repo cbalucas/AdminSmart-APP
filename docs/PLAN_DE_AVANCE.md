@@ -10,7 +10,7 @@ Se actualiza al terminar cada paso. Estado: ✅ hecho · 🔄 en curso · ⏳ po
 | 3 | Propietarios | ✅ | Listado, ficha, alta y edición, desactivar, Gastos varios automático, cuentas bancarias (alias o CBU, compartidas, predeterminada por moneda) y avatar con foto (recorte, 512 px) |
 | 4 | Bienes y titulares | ✅ | Listado con filtros y agrupación por edificio, alta y edición por tipo, edificio opcional, titulares con porcentaje (puede sumar menos de 100 %), tres formas de liquidar y cambio de estado con PROP-03. **Pospuesto:** marcar el punto en el mapa de Google (falta la clave de Google Maps, que pide una tarjeta); el botón "Ver en Google Maps" ya funciona |
 | 5 | Catálogo de conceptos y servicios del bien | ✅ | Catálogo de conceptos en Configuración (P-42) y pestaña Servicios e impuestos de cada bien (P-19), con los 8 servicios del Excel cargados |
-| 6 | Obligaciones y gastos recurrentes | 🔄 | 6a listado y reglas ✅ · 6b alta y edición ✅ · 6c ventana de fin de mes ⏳ · 6d adjuntar boleta (foto o PDF) ⏳ |
+| 6 | Obligaciones y gastos recurrentes | 🔄 | 6a listado y reglas ✅ · 6b alta y edición ✅ · 6c ventana de fin de mes ✅ · 6d adjuntar boleta (foto o PDF) ⏳ |
 | 7 | Pagos y anulaciones | ⏳ | Pago por obligación, contramovimiento, pago directo, con comprobante (foto o PDF) |
 | 8 | Cuenta corriente | ⏳ | Depósitos, ajustes, traspasos, saldo en pesos y dólares |
 | 9 | Resumen de depósito en PDF | ⏳ | Cálculo, PDF (DEP-AAAA-NNNN), envío por email y WhatsApp |
