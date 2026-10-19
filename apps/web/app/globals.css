@@ -427,3 +427,5 @@ a { color: var(--accent); }
 .tabla-compacta { font-size: 0.92rem; }
 .tabla-compacta th, .tabla-compacta td { padding: 10px 8px; }
 .tabla-compacta .acciones-fila { flex-direction: column; align-items: flex-start; gap: 2px; }
+
+.formulario-ancho .campo input.campo-calculado { background: var(--surface2); border-style: dashed; }

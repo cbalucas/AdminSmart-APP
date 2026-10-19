@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 import { t } from "@ai/i18n";
-import { aCentavos, formatearImporte, TIPOS_MOVIMIENTO_MANUAL, tipoDeCambioDelTraspaso, type Moneda } from "@ai/domain";
+import { aCentavos, completarTraspaso, parsearCotizacion, TIPOS_MOVIMIENTO_MANUAL, type Moneda } from "@ai/domain";
 import { CampoAdjuntos } from "@/components/CampoAdjuntos";
 import type { EstadoFormularioMovimiento } from "@/lib/formulario-movimiento";
 
@@ -155,17 +155,65 @@ export function FormularioMovimiento({
   );
 }
 
-// MOV-04 Traspaso entre pesos y dólares: importe de origen, importe de destino y tipo de cambio resultante.
+type CampoCambio = "cotizacion" | "montoPesos" | "montoDolares";
+
+// Centavos a texto es-AR editable: 12505000 → "125050"; 10050 → "100,5".
+const centavosATexto = (centavos: number) => {
+  const [enteros, decimales] = (centavos / 100).toFixed(2).split(".") as [string, string];
+  return decimales === "00" ? enteros : `${enteros},${decimales.endsWith("0") ? decimales.slice(0, 1) : decimales}`;
+};
+const cotizacionATexto = (n: number) => n.toFixed(6).replace(".", ",").replace(/0+$/, "").replace(/,$/, "");
+
+// MOV-04 Traspaso entre pesos y dólares: cotización, monto en pesos y monto en dólares. Alcanza con dos:
+// el tercero se calcula solo. Se calcula el que se tocó hace más tiempo; si se escribe en el calculado,
+// pasa a ser un dato y se recalcula otro.
 export function FormularioTraspaso({ accion, propietario, bienes, hoy, cancelarHref, monedaInicial }: Comun & { monedaInicial: Moneda }) {
   const { estado, enviando, error, alEnviar } = usarFormulario(accion);
   const [origen, setOrigen] = useState<Moneda>(monedaInicial);
-  const [importeOrigen, setImporteOrigen] = useState("");
-  const [importeDestino, setImporteDestino] = useState("");
-  const destino: Moneda = origen === "ARS" ? "USD" : "ARS";
+  const [escritos, setEscritos] = useState<Record<CampoCambio, string>>({ cotizacion: "", montoPesos: "", montoDolares: "" });
+  const [tocados, setTocados] = useState<CampoCambio[]>([]);
 
-  const o = aCentavos(importeOrigen);
-  const d = aCentavos(importeDestino);
-  const cambio = o && d && o > 0 && d > 0 ? tipoDeCambioDelTraspaso({ moneda: origen, centavos: o }, { moneda: destino, centavos: d }) : null;
+  function cambiar(campo: CampoCambio, valor: string) {
+    setEscritos((e) => ({ ...e, [campo]: valor }));
+    setTocados((t) => {
+      const sin = t.filter((x) => x !== campo);
+      return valor.trim() === "" ? sin : [...sin, campo];
+    });
+  }
+
+  // El campo calculado es el que no está entre los dos últimos tocados.
+  const datos = tocados.slice(-2);
+  const calculado: CampoCambio | null =
+    datos.length === 2 ? (["cotizacion", "montoPesos", "montoDolares"] as const).find((c) => !datos.includes(c)) ?? null : null;
+  let textoCalculado = "";
+  if (calculado) {
+    const leer = (c: CampoCambio) => escritos[c];
+    const r = completarTraspaso({
+      cotizacion: datos.includes("cotizacion") ? parsearCotizacion(leer("cotizacion")) : null,
+      pesos: datos.includes("montoPesos") ? aCentavos(leer("montoPesos")) : null,
+      dolares: datos.includes("montoDolares") ? aCentavos(leer("montoDolares")) : null,
+    });
+    if (r) textoCalculado = calculado === "cotizacion" ? cotizacionATexto(r.cotizacion) : centavosATexto(calculado === "montoPesos" ? r.pesos : r.dolares);
+  }
+  const valorDe = (c: CampoCambio) => (c === calculado ? textoCalculado : escritos[c]);
+
+  const campo = (c: CampoCambio, etiqueta: string) => (
+    <div className="campo">
+      <label htmlFor={c}>{etiqueta}</label>
+      <input
+        id={c}
+        name={c}
+        type="text"
+        inputMode="decimal"
+        value={valorDe(c)}
+        onChange={(e) => cambiar(c, e.target.value)}
+        className={c === calculado ? "campo-calculado" : undefined}
+        aria-invalid={Boolean(estado.errores?.[c])}
+      />
+      {c === calculado && <span className="muted">{t("cuentas.calculado")}</span>}
+      {error(c)}
+    </div>
+  );
 
   return (
     <form onSubmit={alEnviar} className="formulario-ancho" noValidate>
@@ -175,33 +223,20 @@ export function FormularioTraspaso({ accion, propietario, bienes, hoy, cancelarH
       <fieldset className="grupo">
         <legend>{t("cuentas.seccion_traspaso")}</legend>
         <p className="muted">{t("cuentas.de_propietario", { nombre: propietario.nombre })}</p>
-        <div className="fila fila-2">
-          <div className="campo">
-            <label htmlFor="monedaOrigen">{t("cuentas.sale_de")}</label>
-            <select id="monedaOrigen" name="monedaOrigen" value={origen} onChange={(e) => setOrigen(e.target.value as Moneda)}>
-              <option value="ARS">{t("cuentas.pesos")}</option>
-              <option value="USD">{t("cuentas.dolares")}</option>
-            </select>
-          </div>
-          <CampoBien bienes={bienes} conSelector={false} error={error("bienId")} invalido={Boolean(estado.errores?.bienId)} />
+        <div className="campo">
+          <label htmlFor="monedaOrigen">{t("cuentas.sale_de")}</label>
+          <select id="monedaOrigen" name="monedaOrigen" value={origen} onChange={(e) => setOrigen(e.target.value as Moneda)}>
+            <option value="ARS">{t("cuentas.pesos")}</option>
+            <option value="USD">{t("cuentas.dolares")}</option>
+          </select>
         </div>
-        <div className="fila fila-2">
-          <div className="campo">
-            <label htmlFor="importeOrigen">{t("cuentas.importe_origen", { moneda: origen })}</label>
-            <input id="importeOrigen" name="importeOrigen" type="text" inputMode="decimal" value={importeOrigen} onChange={(e) => setImporteOrigen(e.target.value)} aria-invalid={Boolean(estado.errores?.importeOrigen)} />
-            {error("importeOrigen")}
-          </div>
-          <div className="campo">
-            <label htmlFor="importeDestino">{t("cuentas.importe_destino", { moneda: destino })}</label>
-            <input id="importeDestino" name="importeDestino" type="text" inputMode="decimal" value={importeDestino} onChange={(e) => setImporteDestino(e.target.value)} aria-invalid={Boolean(estado.errores?.importeDestino)} />
-            {error("importeDestino")}
-          </div>
+        <CampoBien bienes={bienes} conSelector={false} error={error("bienId")} invalido={Boolean(estado.errores?.bienId)} />
+        <p className="muted">{t("cuentas.ayuda_traspaso")}</p>
+        <div className="fila fila-3">
+          {campo("montoPesos", t("cuentas.monto_pesos"))}
+          {campo("cotizacion", t("cuentas.cotizacion"))}
+          {campo("montoDolares", t("cuentas.monto_dolares"))}
         </div>
-        <p className="tipo-cambio">
-          {cambio === null
-            ? t("cuentas.tipo_cambio_ayuda")
-            : t("cuentas.tipo_cambio", { cambio: formatearImporte(Math.round(cambio * 100), "ARS") })}
-        </p>
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="fecha">{t("pagos.campo_fecha")}</label>

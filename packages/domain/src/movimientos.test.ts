@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { conSaldoAcumulado, esquemaMovimientoManual, esquemaTraspaso, ladoDelMovimiento, sePuedeAnularMovimiento, tipoDeCambioDelTraspaso } from "./movimientos";
+import { completarTraspaso, conSaldoAcumulado, esquemaMovimientoManual, esquemaTraspaso, ladoDelMovimiento, parsearCotizacion, sePuedeAnularMovimiento, tipoDeCambioDelTraspaso } from "./movimientos";
 
 const base = { propietarioId: "p", bienId: "b", tipo: "deposito_propietario", moneda: "ARS", fecha: "2026-10-19", importe: "100.000", descripcion: "Depósito de octubre" };
 
@@ -28,13 +28,52 @@ describe("Movimientos manuales", () => {
 });
 
 describe("Traspaso entre monedas", () => {
-  const traspaso = { propietarioId: "p", bienId: "b", monedaOrigen: "ARS", importeOrigen: "1.250.000", importeDestino: "1.000", fecha: "2026-10-19" };
-  it("MOV-04: la moneda de destino es la otra", () => {
-    expect(esquemaTraspaso.parse(traspaso).monedaDestino).toBe("USD");
-    expect(esquemaTraspaso.parse({ ...traspaso, monedaOrigen: "USD" }).monedaDestino).toBe("ARS");
+  const traspaso = { propietarioId: "p", bienId: "b", monedaOrigen: "ARS", fecha: "2026-10-19" };
+  it("MOV-04: con monto en pesos y monto en dólares calcula la cotización", () => {
+    const r = esquemaTraspaso.parse({ ...traspaso, montoPesos: "1.250.000", montoDolares: "1.000" });
+    expect(r.tipoCambio).toBe(1250);
+    expect(r.importeOrigen).toBe(125000000);
+    expect(r.importeDestino).toBe(100000);
   });
-  it("MOV-04: exige los dos importes", () => {
-    expect(esquemaTraspaso.safeParse({ ...traspaso, importeDestino: "" }).success).toBe(false);
+  it("MOV-04: con cotización y monto en dólares calcula el monto en pesos", () => {
+    const r = esquemaTraspaso.parse({ ...traspaso, cotizacion: "1.250,50", montoDolares: "100" });
+    expect(r.importeOrigen).toBe(12505000);
+    expect(r.importeDestino).toBe(10000);
+    expect(r.tipoCambio).toBe(1250.5);
+  });
+  it("MOV-04: con cotización y monto en pesos calcula el monto en dólares", () => {
+    const r = esquemaTraspaso.parse({ ...traspaso, cotizacion: "1.250", montoPesos: "125.000" });
+    expect(r.importeDestino).toBe(10000);
+  });
+  it("MOV-04: la moneda de origen decide cuál importe sale y cuál entra", () => {
+    const r = esquemaTraspaso.parse({ ...traspaso, monedaOrigen: "USD", cotizacion: "1.250", montoDolares: "100" });
+    expect(r.monedaDestino).toBe("ARS");
+    expect(r.importeOrigen).toBe(10000);
+    expect(r.importeDestino).toBe(12500000);
+  });
+  it("MOV-04: exige al menos dos de los tres datos", () => {
+    const r = esquemaTraspaso.safeParse({ ...traspaso, montoPesos: "125.000" });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0]?.message).toBe("validacion.traspaso_dos_datos");
+    expect(esquemaTraspaso.safeParse(traspaso).success).toBe(false);
+  });
+  it("MOV-04: rechaza un dato mal escrito o en cero", () => {
+    expect(esquemaTraspaso.safeParse({ ...traspaso, cotizacion: "abc", montoPesos: "125.000" }).success).toBe(false);
+    expect(esquemaTraspaso.safeParse({ ...traspaso, montoPesos: "0", montoDolares: "100" }).success).toBe(false);
+  });
+  it("MOV-04: si vienen los tres datos y son coherentes conserva la cotización escrita", () => {
+    expect(completarTraspaso({ cotizacion: 1250.5, pesos: 12505000, dolares: 10000 })?.cotizacion).toBe(1250.5);
+  });
+  it("MOV-04: la cotización escrita se conserva aunque el redondeo del centavo de dólar mueva los pesos", () => {
+    expect(completarTraspaso({ cotizacion: 1300, pesos: 13050000, dolares: 10038 })?.cotizacion).toBe(1300);
+  });
+  it("MOV-04: si vienen los tres y no son coherentes mandan los montos", () => {
+    expect(completarTraspaso({ cotizacion: 900, pesos: 12500000, dolares: 10000 })?.cotizacion).toBe(1250);
+  });
+  it("MOV-04: la cotización se lee con formato es-AR", () => {
+    expect(parsearCotizacion("1.250,5")).toBe(1250.5);
+    expect(parsearCotizacion("0")).toBeNull();
+    expect(parsearCotizacion("abc")).toBeNull();
   });
   it("MOV-04: el tipo de cambio sale de los dos importes, en pesos por dólar", () => {
     expect(tipoDeCambioDelTraspaso({ moneda: "ARS", centavos: 125000000 }, { moneda: "USD", centavos: 100000 })).toBe(1250);

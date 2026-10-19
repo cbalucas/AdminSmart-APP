@@ -88,6 +88,7 @@ export async function registrarTraspaso(_a: EstadoFormularioMovimiento, formular
     p_importe_destino: d.importeDestino,
     p_fecha: d.fecha,
     p_descripcion: d.descripcion,
+    p_tipo_cambio: d.tipoCambio,
   });
   if (error) return { error: "cuentas.error_guardar" };
 

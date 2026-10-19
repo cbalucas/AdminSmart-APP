@@ -732,5 +732,11 @@
   "cuentas.ayuda_anular_traspaso": "Es un traspaso: se anulan juntos los dos movimientos (el que sale y el que entra).",
   "cuentas.general": "General",
   "cuentas.general_opcion": "General (sin un bien en particular)",
-  "cuentas.ayuda_bien": "Elegí un bien solo si el gasto o el ajuste corresponde a uno en particular."
+  "cuentas.ayuda_bien": "Elegí un bien solo si el gasto o el ajuste corresponde a uno en particular.",
+  "cuentas.monto_pesos": "Monto en pesos (ARS)",
+  "cuentas.monto_dolares": "Monto en dólares (USD)",
+  "cuentas.cotizacion": "Cotización (pesos por dólar)",
+  "cuentas.calculado": "Se calcula con los otros dos datos",
+  "cuentas.ayuda_traspaso": "Completá dos de los tres datos: el tercero se calcula solo. Si preferís cargar otro, escribilo y se vuelve a calcular el que quedó sin completar.",
+  "validacion.traspaso_dos_datos": "Completá al menos dos de los tres datos: cotización, monto en pesos o monto en dólares."
 }

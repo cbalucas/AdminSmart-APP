@@ -5,6 +5,8 @@
 
 -- MOV-04: un traspaso genera dos movimientos enlazados por `traspaso_id`: un débito en la moneda de
 -- origen y un crédito en la de destino, con el tipo de cambio aplicado (pesos por dólar).
+drop function if exists public.registrar_traspaso(uuid, uuid, uuid, public.moneda, bigint, bigint, date, text);
+
 create or replace function public.registrar_traspaso(
   p_organizacion uuid,
   p_propietario uuid,
@@ -13,7 +15,8 @@ create or replace function public.registrar_traspaso(
   p_importe_origen bigint,
   p_importe_destino bigint,
   p_fecha date,
-  p_descripcion text
+  p_descripcion text,
+  p_tipo_cambio numeric default null
 ) returns uuid
 language plpgsql security invoker set search_path = ''
 as $$
@@ -28,7 +31,8 @@ begin
   if p_importe_origen <= 0 or p_importe_destino <= 0 then
     raise exception 'MOV-04: los dos importes del traspaso deben ser mayores a cero.' using errcode = 'P0001';
   end if;
-  v_cambio := round(v_pesos::numeric / v_dolares::numeric, 6);
+  -- El tipo de cambio escrito por el administrador se conserva; si no hay, sale de los dos importes.
+  v_cambio := coalesce(round(p_tipo_cambio, 6), round(v_pesos::numeric / v_dolares::numeric, 6));
   v_texto := 'Traspaso ' || p_moneda_origen || ' → ' || v_destino || ' (tipo de cambio ' || v_cambio || ')'
              || coalesce(' · ' || nullif(trim(p_descripcion), ''), '');
 
@@ -74,5 +78,5 @@ begin
 end;
 $$;
 
-grant execute on function public.registrar_traspaso(uuid, uuid, uuid, public.moneda, bigint, bigint, date, text) to authenticated;
+grant execute on function public.registrar_traspaso(uuid, uuid, uuid, public.moneda, bigint, bigint, date, text, numeric) to authenticated;
 grant execute on function public.anular_movimiento(uuid) to authenticated;
