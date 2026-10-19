@@ -8,7 +8,7 @@ Se actualiza al terminar cada paso. Estado: ✅ hecho · 🔄 en curso · ⏳ po
 | 1 | Reglas de dominio y pruebas | ✅ | Importes en centavos, estado de obligación, saldo, monto a depositar, pago promedio, reparto de condominio (48 pruebas) |
 | 2 | Inicio de gestión y navegación | ✅ | Menú, estructura de pantallas, modo claro/oscuro, textos en es-AR.json |
 | 3 | Propietarios | ✅ | Listado, ficha, alta y edición, desactivar, Gastos varios automático, cuentas bancarias (alias o CBU, compartidas, predeterminada por moneda) y avatar con foto (recorte, 512 px) |
-| 4 | Bienes y titulares | 🔄 | Inmuebles, terrenos, vehículos y otros; titulares con porcentaje (puede sumar menos de 100 %: solo se cargan los titulares que se administran); ubicación en Google Maps; edificio como dato opcional del bien con filtro y agrupación en el listado |
+| 4 | Bienes y titulares | 🔄 | 4a ✅ listado con filtros y agrupación por edificio, alta y edición por tipo, edificio opcional, primer titular · 4b ⏳ titulares en la ficha (agregar, quitar, porcentaje, representante, modo de liquidación) y cambio de estado · 4c ⏳ ubicación en el mapa (necesita la clave de Google Maps) |
 | 5 | Catálogo de conceptos y servicios del bien | ⏳ | Conceptos, servicios, periodicidad |
 | 6 | Obligaciones y gastos recurrentes | ⏳ | Alta, estados, recurrencia, ventana de fin de mes |
 | 7 | Pagos y anulaciones | ⏳ | Pago por obligación, contramovimiento, pago directo |

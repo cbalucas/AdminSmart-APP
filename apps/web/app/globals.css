@@ -319,3 +319,21 @@ a { color: var(--accent); }
 .recorte label { display: flex; flex-direction: column; gap: 4px; width: 100%; font-size: 0.9rem; font-weight: 500; }
 .recorte input[type="range"] { width: 100%; accent-color: var(--accent); }
 .ficha-avatar { position: relative; display: flex; flex-direction: column; align-items: flex-start; }
+
+/* Bienes */
+.fila-calle { grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); }
+@media (max-width: 640px) { .fila-calle { grid-template-columns: minmax(0, 1fr); } }
+.aviso-info { margin: 0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; color: var(--neutral); background: var(--neutralBg); }
+.celda-bien { display: flex; flex-direction: column; gap: 2px; color: var(--text); text-decoration: none; }
+.celda-bien:hover strong { text-decoration: underline; }
+.filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end; }
+.filtros .filtro-buscar { grid-column: 1 / -1; }
+.filtros .campo input[type="search"], .filtros .campo select { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.filtros-opciones { display: flex; gap: 18px; flex-wrap: wrap; grid-column: 1 / -1; }
+.filtros .acciones { grid-column: 1 / -1; margin-top: 0; align-items: center; }
+.grupo-edificio { display: flex; flex-direction: column; gap: 8px; }
+.grupo-edificio h2 { font-size: 1.1rem; padding-top: 6px; }
+.formulario-ancho .campo input[readonly] { background: var(--surface2); color: var(--muted); }
+.filtros-pie { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.filtros-pie .filtros-opciones { grid-column: auto; }
+.filtros-pie .acciones { grid-column: auto; margin-top: 0; }
