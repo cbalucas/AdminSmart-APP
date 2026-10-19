@@ -185,8 +185,8 @@
   "propietarios.campo_apoderado_nombre": "Nombre del apoderado",
   "propietarios.campo_apoderado_contacto": "Contacto del apoderado",
   "propietarios.campo_periodicidad": "Periodicidad de la liquidación",
-  "propietarios.campo_dia": "Día de liquidación (opcional)",
-  "propietarios.campo_horizonte": "Horizonte del resumen de depósito (días)",
+  "propietarios.campo_dia": "Día de liquidación",
+  "propietarios.campo_horizonte": "Horizonte del resumen (días)",
   "propietarios.campo_fondo_ars": "Fondo de reserva en pesos (opcional)",
   "propietarios.campo_fondo_usd": "Fondo de reserva en dólares (opcional)",
   "propietarios.campo_observaciones": "Observaciones",
@@ -253,7 +253,7 @@
   "cuentas.campo_moneda": "Moneda",
   "cuentas.campo_cbu": "CBU o CVU (22 números)",
   "cuentas.campo_alias": "Alias",
-  "cuentas.campo_titular": "Titular, como figura en el banco",
+  "cuentas.campo_titular": "Nombre del titular, como figura en el banco",
   "cuentas.tipo_caja_ahorro": "Caja de ahorro",
   "cuentas.tipo_cuenta_corriente": "Cuenta corriente",
   "cuentas.tipo_billetera": "Billetera",
@@ -281,5 +281,8 @@
   "cuentas.campo_entidad": "Banco o billetera",
   "cuentas.entidad_banco": "Banco",
   "cuentas.entidad_billetera": "Billetera virtual",
-  "cuentas.ayuda_identificacion": "Cargá el alias, el CBU o CVU, o los dos. Alcanza con uno."
+  "cuentas.ayuda_identificacion": "Cargá el alias, el CBU o CVU, o los dos. Alcanza con uno.",
+  "cuentas.seccion_cuenta": "Cuenta",
+  "cuentas.seccion_identificacion": "Cómo se identifica la cuenta",
+  "cuentas.seccion_titular": "Titular"
 }

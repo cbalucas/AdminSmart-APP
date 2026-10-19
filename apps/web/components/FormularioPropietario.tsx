@@ -77,7 +77,7 @@ export function FormularioPropietario({
 
       <fieldset className="grupo">
         <legend>{t("propietarios.seccion_datos")}</legend>
-        <div className="rejilla">
+        <div className="fila fila-tipo-nombre">
           <div className="campo">
             <label htmlFor="tipoPersona">{t("propietarios.campo_tipo")}</label>
             <select id="tipoPersona" name="tipoPersona" defaultValue={valores.tipoPersona}>
@@ -85,7 +85,7 @@ export function FormularioPropietario({
               <option value="juridica">{t("propietarios.tipo_juridica")}</option>
             </select>
           </div>
-          <div className="campo ancho">
+          <div className="campo">
             <label htmlFor="nombre">{t("propietarios.campo_nombre")}</label>
             <input id="nombre" name="nombre" type="text" defaultValue={valores.nombre} aria-invalid={Boolean(errores.nombre)} required />
             {error("nombre")}
@@ -151,7 +151,7 @@ export function FormularioPropietario({
 
       <fieldset className="grupo">
         <legend>{t("propietarios.seccion_apoderado")}</legend>
-        <div className="rejilla">
+        <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="apoderadoNombre">{t("propietarios.campo_apoderado_nombre")}</label>
             <input id="apoderadoNombre" name="apoderadoNombre" type="text" defaultValue={valores.apoderadoNombre} />
@@ -165,7 +165,7 @@ export function FormularioPropietario({
 
       <fieldset className="grupo">
         <legend>{t("propietarios.seccion_liquidacion")}</legend>
-        <div className="rejilla">
+        <div className="fila fila-3">
           <div className="campo">
             <label htmlFor="periodicidadLiquidacion">{t("propietarios.campo_periodicidad")}</label>
             <select id="periodicidadLiquidacion" name="periodicidadLiquidacion" defaultValue={valores.periodicidadLiquidacion}>
@@ -184,6 +184,8 @@ export function FormularioPropietario({
             <input id="horizonteResumenDias" name="horizonteResumenDias" type="number" min={1} defaultValue={valores.horizonteResumenDias} />
             {error("horizonteResumenDias")}
           </div>
+        </div>
+        <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="fondoReservaArs">{t("propietarios.campo_fondo_ars")}</label>
             <input id="fondoReservaArs" name="fondoReservaArs" type="text" inputMode="decimal" defaultValue={valores.fondoReservaArs} />

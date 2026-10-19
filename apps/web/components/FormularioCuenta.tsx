@@ -52,8 +52,8 @@ export function FormularioCuenta({
     <form action={enviar} className="formulario-ancho" noValidate>
       {estado.error && <p className="aviso-error" role="alert">{t(estado.error)}</p>}
       <fieldset className="grupo">
-        <legend>{t("cuentas.titulo")}</legend>
-        <div className="rejilla">
+        <legend>{t("cuentas.seccion_cuenta")}</legend>
+        <div className={esBilletera ? "fila fila-2" : "fila fila-3"}>
           <div className="campo">
             <label htmlFor="entidad">{t("cuentas.campo_entidad")}</label>
             <select id="entidad" value={esBilletera ? "billetera" : "banco"} onChange={(e) => setEsBilletera(e.target.value === "billetera")}>
@@ -73,10 +73,6 @@ export function FormularioCuenta({
             </div>
           )}
           <div className="campo">
-            <label htmlFor="banco">{t("cuentas.campo_banco")}</label>
-            <input id="banco" name="banco" type="text" defaultValue={valores.banco} />
-          </div>
-          <div className="campo">
             <label htmlFor="moneda">{t("cuentas.campo_moneda")}</label>
             {editando ? (
               <>
@@ -90,24 +86,39 @@ export function FormularioCuenta({
               </select>
             )}
           </div>
-          <p className="muted ancho">{t("cuentas.ayuda_identificacion")}</p>
-          <div className="campo ancho">
+        </div>
+        <div className="campo">
+          <label htmlFor="banco">{t("cuentas.campo_banco")}</label>
+          <input id="banco" name="banco" type="text" defaultValue={valores.banco} />
+        </div>
+      </fieldset>
+
+      <fieldset className="grupo">
+        <legend>{t("cuentas.seccion_identificacion")}</legend>
+        <p className="muted">{t("cuentas.ayuda_identificacion")}</p>
+        <div className="fila fila-2">
+          <div className="campo">
             <label htmlFor="alias">{t("cuentas.campo_alias")}</label>
             <input id="alias" name="alias" type="text" autoCapitalize="none" defaultValue={valores.alias} aria-invalid={Boolean(errores.alias)} />
             {error("alias")}
           </div>
-          <div className="campo ancho">
+          <div className="campo">
             <label htmlFor="cbuCvu">{t("cuentas.campo_cbu")}</label>
             <input id="cbuCvu" name="cbuCvu" type="text" inputMode="numeric" defaultValue={valores.cbuCvu} aria-invalid={Boolean(errores.cbuCvu)} />
             {error("cbuCvu")}
           </div>
-          <div className="campo ancho">
-            <label htmlFor="titular">{t("cuentas.campo_titular")}</label>
-            <input id="titular" name="titular" type="text" defaultValue={valores.titular} aria-invalid={Boolean(errores.titular)} />
-            {error("titular")}
-          </div>
         </div>
       </fieldset>
+
+      <fieldset className="grupo">
+        <legend>{t("cuentas.seccion_titular")}</legend>
+        <div className="campo">
+          <label htmlFor="titular">{t("cuentas.campo_titular")}</label>
+          <input id="titular" name="titular" type="text" defaultValue={valores.titular} aria-invalid={Boolean(errores.titular)} />
+          {error("titular")}
+        </div>
+      </fieldset>
+
       <div className="acciones">
         <Link href={cancelarHref} className="boton boton-secundario">{t("app.cancelar")}</Link>
         <button type="submit" className="boton" disabled={pendiente}>{t("app.guardar")}</button>
