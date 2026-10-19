@@ -3,21 +3,32 @@ import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, type TipoBien } from "@ai/domain";
 import { CambiarEstadoBien } from "@/components/CambiarEstadoBien";
+import { SeccionServicios } from "@/components/SeccionServicios";
 import { SeccionTitulares } from "@/components/SeccionTitulares";
 import { listarEdificios, obtenerBien, titularesDe } from "@/lib/bienes";
 import { esGestion } from "@/lib/menu";
+import { serviciosDelBien } from "@/lib/servicios";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
 
 const PESTANAS = ["datos", "servicios", "obligaciones", "documentos"] as const;
+const HABILITADAS: readonly string[] = ["datos", "servicios"];
 
-// P-16 Ficha del bien. Los titulares se editan en el paso siguiente (P-18).
-export default async function FichaBien({ params }: { params: Promise<{ id: string }> }) {
+// P-16 Ficha del bien: datos y titulares (P-18), y servicios e impuestos (P-19).
+export default async function FichaBien({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { usuario } = await usuarioActual();
   if (!usuario || !esGestion(usuario.roles)) notFound();
   const { id } = await params;
   const bien = await obtenerBien(id);
   if (!bien) notFound();
+  const { tab = "datos" } = await searchParams;
+  const pestana = HABILITADAS.includes(tab) ? tab : "datos";
 
   const titulares = (await titularesDe([bien.id])).get(bien.id) ?? [];
   const edificio = bien.edificioId ? (await listarEdificios()).find((e) => e.id === bien.edificioId) : undefined;
@@ -83,14 +94,25 @@ export default async function FichaBien({ params }: { params: Promise<{ id: stri
 
       <nav className="pestanas" aria-label={t("bienes.titulo")}>
         {PESTANAS.map((clave) =>
-          clave === "datos" ? (
-            <span key={clave} className="pestana activa" aria-current="page">{t("bienes.tab_datos")}</span>
+          HABILITADAS.includes(clave) ? (
+            <Link
+              key={clave}
+              href={`/bienes/${bien.id}?tab=${clave}`}
+              className={pestana === clave ? "pestana activa" : "pestana"}
+              aria-current={pestana === clave ? "page" : undefined}
+            >
+              {t(`bienes.tab_${clave}`)}
+            </Link>
           ) : (
             <span key={clave} className="pestana deshabilitada" title={t("bienes.tab_proximamente")}>{t(`bienes.tab_${clave}`)}</span>
           ),
         )}
       </nav>
 
+      {pestana === "servicios" && <SeccionServicios bienId={bien.id} servicios={await serviciosDelBien(bien.id)} />}
+
+      {pestana === "datos" && (
+        <>
       <section className="panel">
         <dl className="datos datos-ancho">
           {direccion && (
@@ -140,6 +162,8 @@ export default async function FichaBien({ params }: { params: Promise<{ id: stri
         propietarioLiquidacionId={bien.propietarioLiquidacionId}
         puedeEditar={esAdmin && !bien.esGastosVarios}
       />
+        </>
+      )}
     </>
   );
 }
