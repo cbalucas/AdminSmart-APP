@@ -7,11 +7,13 @@ import { listarBienes, titularesDe } from "@/lib/bienes";
 import { generarOcurrenciasPendientes, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
+import { pagosVigentesDe } from "@/lib/pagos";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
 import { configVentana, itemsDeVentana } from "@/lib/ventana";
 
 interface Filtros {
+  aviso?: string;
   completar?: string;
   estado?: string;
   propietario?: string;
@@ -40,7 +42,12 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   // OBL-05, OBL-09: al abrir la pantalla se crean las ocurrencias siguientes que falten.
   await generarOcurrenciasPendientes(usuario.organizacionId);
   const [todas, bienes] = await Promise.all([listarObligaciones(), listarBienes()]);
-  const [titulares, boletas] = await Promise.all([titularesDe(bienes.map((b) => b.id)), documentosDe("obligacion", todas.map((o) => o.id), "boleta")]);
+  const [titulares, boletas, pagos] = await Promise.all([
+    titularesDe(bienes.map((b) => b.id)),
+    documentosDe("obligacion", todas.map((o) => o.id), "boleta"),
+    pagosVigentesDe(todas.filter((o) => o.estado === "pagada").map((o) => o.id)),
+  ]);
+  const esAdmin = usuario.roles.includes("administrador");
   const bienDe = new Map(bienes.map((b) => [b.id, b]));
 
   const propietarios = new Map<string, string>();
@@ -101,6 +108,11 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
         <td>{t(`obligaciones.responsable_${o.responsable}`)}</td>
         <td className="nowrap">
           <span className={CLASE_ESTADO[o.estado]}>{t(`obligaciones.estado_${o.estado}`)}</span>
+          {pagos.get(o.id) && (
+            <span className="linea muted">
+              {fechaCorta((pagos.get(o.id) as { fecha: string }).fecha)} · {t(`pagos.quien_${(pagos.get(o.id) as { pagadoPor: string }).pagadoPor}`)}
+            </span>
+          )}
         </td>
         <td>
           {(boletas.get(o.id) ?? []).length > 0 && (
@@ -112,6 +124,16 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
                   </a>
                 ) : null,
               )}
+            </div>
+          )}
+          {o.estado !== "pagada" && o.estado !== "anulada" && (
+            <div className="acciones-fila">
+              <Link className="boton-texto" href={`/obligaciones/${o.id}/pagar`}>{t("pagos.registrar")}</Link>
+            </div>
+          )}
+          {o.estado === "pagada" && esAdmin && (
+            <div className="acciones-fila">
+              <Link className="boton-texto" href={`/obligaciones/${o.id}/anular-pago`}>{t("pagos.anular_pago")}</Link>
             </div>
           )}
           {puedeModificarObligacion({ pagada: o.estado === "pagada", anulada: o.estado === "anulada" }) && (
@@ -131,9 +153,13 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           <p className="muted">{t("obligaciones.subtitulo")}</p>
           <h1>{t("obligaciones.titulo")}</h1>
         </div>
-        <Link href="/obligaciones/nueva" className="boton">{t("obligaciones.nueva")}</Link>
+        <div className="acciones">
+          <Link href="/obligaciones/pago-directo" className="boton boton-secundario">{t("pagos.registrar_directo")}</Link>
+          <Link href="/obligaciones/nueva" className="boton">{t("obligaciones.nueva")}</Link>
+        </div>
       </div>
 
+      {f.aviso === "comprobante" && <p className="aviso-advertencia" role="status">{t("adjuntos.error_registrar_pago")}</p>}
       {porCompletar > 0 && (
         <p className="aviso-advertencia" role="status">
           {porCompletar === 1 ? t("obligaciones.aviso_a_completar_uno") : t("obligaciones.aviso_a_completar", { cantidad: String(porCompletar) })}
