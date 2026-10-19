@@ -6,6 +6,7 @@ import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIE
 import { listarBienes, titularesDe } from "@/lib/bienes";
 import { generarOcurrenciasPendientes, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
+import { documentosDe, type DocumentoFila } from "@/lib/documentos";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
 import { configVentana, itemsDeVentana } from "@/lib/ventana";
@@ -39,7 +40,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   // OBL-05, OBL-09: al abrir la pantalla se crean las ocurrencias siguientes que falten.
   await generarOcurrenciasPendientes(usuario.organizacionId);
   const [todas, bienes] = await Promise.all([listarObligaciones(), listarBienes()]);
-  const titulares = await titularesDe(bienes.map((b) => b.id));
+  const [titulares, boletas] = await Promise.all([titularesDe(bienes.map((b) => b.id)), documentosDe("obligacion", todas.map((o) => o.id), "boleta")]);
   const bienDe = new Map(bienes.map((b) => [b.id, b]));
 
   const propietarios = new Map<string, string>();
@@ -102,6 +103,17 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           <span className={CLASE_ESTADO[o.estado]}>{t(`obligaciones.estado_${o.estado}`)}</span>
         </td>
         <td>
+          {(boletas.get(o.id) ?? []).length > 0 && (
+            <div className="acciones-fila">
+              {(boletas.get(o.id) as DocumentoFila[]).map((b, i) =>
+                b.url ? (
+                  <a key={b.id} className="boton-texto" href={b.url} target="_blank" rel="noreferrer">
+                    {i === 0 ? t("obligaciones.ver_boleta") : t("obligaciones.ver_boleta_n", { n: i + 1 })}
+                  </a>
+                ) : null,
+              )}
+            </div>
+          )}
           {puedeModificarObligacion({ pagada: o.estado === "pagada", anulada: o.estado === "anulada" }) && (
             <div className="acciones-fila">
               <Link className="boton-texto" href={`/obligaciones/${o.id}/editar`}>{t("app.editar")}</Link>

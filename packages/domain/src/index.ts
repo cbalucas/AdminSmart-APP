@@ -8,3 +8,4 @@ export * from "./propietarios";
 export * from "./imagen";
 export * from "./bienes";
 export * from "./servicios";
+export * from "./documentos";

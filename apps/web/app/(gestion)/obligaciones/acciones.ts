@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { generarUuidV7, proximoPeriodo, puedeModificarObligacion, type Frecuencia } from "@ai/domain";
 import { leerFormularioObligacion, type EstadoFormularioObligacion } from "@/lib/formulario-obligacion";
+import { leerAdjuntos, registrarDocumentos } from "@/lib/documentos";
 import { claveObligacion, generarOcurrenciasPendientes } from "@/lib/obligaciones";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -30,8 +31,11 @@ export async function crearObligacion(_a: EstadoFormularioObligacion, formulario
     if (data?.length) return { errores: { periodo: "obligaciones.periodo_repetido" } };
   }
 
+  // El id lo genera el formulario para poder subir la boleta antes de guardar (UUID v7 en el cliente).
+  const idForm = String(formulario.get("id") ?? "");
+  const id = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idForm) ? idForm : generarUuidV7();
   const { error } = await supabase.from("obligacion").insert({
-    id: generarUuidV7(),
+    id,
     organizacion_id: usuario.organizacionId,
     bien_servicio_id: d.bienServicioId,
     bien_id: d.bienId,
@@ -49,9 +53,11 @@ export async function crearObligacion(_a: EstadoFormularioObligacion, formulario
   });
   if (error) return { error: "obligaciones.error_guardar" };
 
+  const adjuntos = await registrarDocumentos(usuario.organizacionId, "obligacion", id, leerAdjuntos(formulario));
   await generarOcurrenciasPendientes(usuario.organizacionId);
   revalidatePath("/obligaciones");
-  redirect("/obligaciones");
+  // La obligación ya está guardada: si falló el registro de la boleta, se la ofrece de nuevo desde la edición.
+  redirect(adjuntos.error ? `/obligaciones/${id}/editar` : "/obligaciones");
 }
 
 // P-27 Edición. Bien, servicio, concepto y período quedan fijos; una obligación pagada no se modifica (OBL-06).
@@ -115,6 +121,8 @@ export async function actualizarObligacion(
     .eq("id", id);
   if (error) return { error: "obligaciones.error_guardar" };
 
+  const adjuntos = await registrarDocumentos(usuario.organizacionId, "obligacion", id, leerAdjuntos(formulario));
+  if (adjuntos.error) return { error: adjuntos.error };
   await generarOcurrenciasPendientes(usuario.organizacionId);
   revalidatePath("/obligaciones");
   redirect("/obligaciones");

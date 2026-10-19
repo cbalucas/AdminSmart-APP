@@ -395,3 +395,9 @@ a { color: var(--accent); }
 .ventana-pie p { margin: 0; max-width: 340px; font-size: 0.85rem; }
 .ventana .aviso-error { margin: 8px 24px 0; }
 @media (max-width: 720px) { .ventana-fila { grid-template-columns: 1fr 1fr; } .ventana-dato, .ventana-acciones { grid-column: 1 / -1; } }
+
+.adjuntos { display: flex; flex-direction: column; gap: 10px; }
+.adjuntos-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.adjuntos-lista li { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 8px 12px; background: var(--surface2); border-radius: 8px; }
+.adjuntos-lista li > span { flex: 1; min-width: 200px; }
+.adjuntos p { margin: 6px 0 0; font-size: 0.85rem; }

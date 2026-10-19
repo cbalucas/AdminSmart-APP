@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { generarUuidV7 } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { FormularioObligacion } from "@/components/FormularioObligacion";
 import { esGestion } from "@/lib/menu";
@@ -26,6 +27,7 @@ export default async function NuevaObligacion({ searchParams }: { searchParams: 
         servicios={o.servicios}
         conceptos={o.conceptos}
         cancelarHref="/obligaciones"
+        adjuntos={{ organizacionId: usuario.organizacionId, obligacionId: generarUuidV7(), existentes: [] }}
         valores={{
           bienId: o.bienes.some((b) => b.id === bien) ? (bien as string) : "",
           bienServicioId: "",

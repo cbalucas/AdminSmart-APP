@@ -597,5 +597,20 @@
   "ventana.guardar_uno": "Guardar 1 gasto",
   "ventana.pie": "Se guarda solo lo que tenga monto. Se puede editar después en Obligaciones.",
   "ventana.error_guardar": "No pudimos completar esa acción. Probá de nuevo.",
-  "ventana.error_algunos": "Algunos gastos no se pudieron guardar. Revisá el monto y la fecha."
+  "ventana.error_algunos": "Algunos gastos no se pudieron guardar. Revisá el monto y la fecha.",
+  "obligaciones.seccion_boleta": "Boleta",
+  "obligaciones.campo_boleta": "Boleta (foto o PDF)",
+  "obligaciones.ver_boleta": "Ver boleta",
+  "obligaciones.ver_boleta_n": "Boleta {n}",
+  "adjuntos.agregar": "Agregar foto o PDF",
+  "adjuntos.subiendo": "Subiendo…",
+  "adjuntos.listo": "listo para guardar",
+  "adjuntos.ayuda": "Foto (JPG, PNG o WebP) o PDF, de hasta 25 MB. Solo se adjunta: no se lee automáticamente.",
+  "adjuntos.visible": "visible para el propietario",
+  "adjuntos.visible_propietario": "Visible para el propietario",
+  "adjuntos.error_subir": "No pudimos subir el archivo. Probá de nuevo.",
+  "adjuntos.error_registrar": "La obligación se guardó, pero no pudimos registrar el archivo. Volvé a adjuntarlo.",
+  "validacion.archivo_tipo": "Solo se aceptan fotos (JPG, PNG o WebP) y archivos PDF.",
+  "validacion.archivo_tamano": "El archivo supera los 25 MB.",
+  "validacion.archivo_vacio": "El archivo está vacío."
 }

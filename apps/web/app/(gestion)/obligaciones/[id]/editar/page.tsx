@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { formatearPeriodo, puedeModificarObligacion } from "@ai/domain";
 import { FormularioObligacion } from "@/components/FormularioObligacion";
+import { documentosDe } from "@/lib/documentos";
 import { esGestion } from "@/lib/menu";
 import { listarObligaciones } from "@/lib/obligaciones";
 import { opcionesObligacion } from "@/lib/opciones-obligacion";
@@ -28,6 +29,7 @@ export default async function EditarObligacion({ params }: { params: Promise<{ i
     opcionesObligacion(),
   ]);
   if (!o || !fila) notFound();
+  const boletas = (await documentosDe("obligacion", [id], "boleta")).get(id) ?? [];
 
   // OBL-06: una obligación pagada o anulada no se modifica.
   if (!puedeModificarObligacion({ pagada: fila.estado === "pagada", anulada: fila.estado === "anulada" })) {
@@ -53,6 +55,7 @@ export default async function EditarObligacion({ params }: { params: Promise<{ i
         servicios={opciones.servicios}
         conceptos={opciones.conceptosTodos}
         cancelarHref="/obligaciones"
+        adjuntos={{ organizacionId: usuario.organizacionId, obligacionId: id, existentes: boletas }}
         fijos={{
           bien: opciones.bienes.find((b) => b.id === fila.bienId)?.nombre ?? "—",
           concepto: fila.concepto,

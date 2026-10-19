@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 import { t } from "@ai/i18n";
 import { formatearImporte, PERIODICIDADES_SERVICIO, resolverResponsable } from "@ai/domain";
+import { CampoAdjuntos } from "@/components/CampoAdjuntos";
+import type { DocumentoFila } from "@/lib/documentos";
 import type { EstadoFormularioObligacion } from "@/lib/formulario-obligacion";
 
 export interface BienOpcion {
@@ -50,6 +52,7 @@ export function FormularioObligacion({
   conceptos,
   cancelarHref,
   fijos,
+  adjuntos,
 }: {
   accion: Accion;
   valores: ValoresObligacion;
@@ -59,6 +62,8 @@ export function FormularioObligacion({
   cancelarHref: string;
   /** Edición: texto de lo que no se puede cambiar. */
   fijos?: { bien: string; concepto: string; periodo: string };
+  /** Boleta: id de la obligación (nueva o existente) y las boletas ya cargadas. */
+  adjuntos: { organizacionId: string; obligacionId: string; existentes: DocumentoFila[] };
 }) {
   const [estado, enviar, enviando] = useActionState(accion, {} as EstadoFormularioObligacion);
   const [, iniciar] = useTransition();
@@ -260,6 +265,19 @@ export function FormularioObligacion({
             {error("frecuencia")}
           </div>
         </div>
+      </fieldset>
+
+      <fieldset className="grupo">
+        <legend>{t("obligaciones.seccion_boleta")}</legend>
+        {!editando && <input type="hidden" name="id" value={adjuntos.obligacionId} />}
+        <CampoAdjuntos
+          organizacionId={adjuntos.organizacionId}
+          entidad="obligacion"
+          entidadId={adjuntos.obligacionId}
+          tipo="boleta"
+          existentes={adjuntos.existentes}
+          etiqueta={t("obligaciones.campo_boleta")}
+        />
       </fieldset>
 
       <fieldset className="grupo">
