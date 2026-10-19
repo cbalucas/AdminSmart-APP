@@ -429,3 +429,29 @@ a { color: var(--accent); }
 .tabla-compacta .acciones-fila { flex-direction: column; align-items: flex-start; gap: 2px; }
 
 .formulario-ancho .campo input.campo-calculado { background: var(--surface2); border-style: dashed; }
+
+.segmento { text-decoration: none; }
+.resumen-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.resumen-titulo { display: flex; align-items: center; gap: 14px; }
+.resumen-titulo h1 { margin: 0; }
+.resumen-titulo p { margin: 0; }
+.resumen-controles { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.resumen-fecha { display: flex; align-items: center; gap: 8px; }
+.resumen-fecha input[type="date"] { padding: 8px 10px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.resumen-fecha .etiqueta-activa { font-weight: 600; }
+.resumen-columnas { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .resumen-columnas { grid-template-columns: minmax(0, 1fr); } }
+.resumen-principal, .resumen-lateral { display: flex; flex-direction: column; gap: 16px; }
+.resumen-importe { padding: 20px 24px; border: 1px solid var(--accent); border-radius: 12px; background: var(--accentBg, var(--surface2)); }
+.resumen-importe p { margin: 0; }
+.resumen-importe .cifra { display: block; font-family: var(--fuente-titulo), serif; font-size: 2.6rem; margin: 6px 0; }
+.resumen-calculo { margin: 12px 0 0; padding-top: 8px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.resumen-calculo div { display: flex; justify-content: space-between; gap: 16px; }
+.resumen-calculo dt, .resumen-calculo dd { margin: 0; }
+.resumen-calculo-total { font-weight: 600; color: var(--accent); padding-top: 6px; border-top: 1px solid var(--lineSoft); }
+.resumen-lista { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.resumen-lista li { display: flex; justify-content: space-between; gap: 16px; }
+.mensaje-previo { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--okBg); color: var(--text); }
+
+.segmento { white-space: nowrap; flex: none; padding: 9px 16px; }
+.resumen-lateral .acciones-fila { flex-wrap: wrap; }

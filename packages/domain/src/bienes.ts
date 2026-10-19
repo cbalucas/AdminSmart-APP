@@ -251,3 +251,32 @@ export function impedimentosDeVenta(m: {
   if (m.contratosVigentes > 0) motivos.push("contrato");
   return motivos;
 }
+
+export interface TitularDeImputacion {
+  propietarioId: string;
+  porcentaje: number;
+  esRepresentante: boolean;
+}
+
+/**
+ * CON-02, CON-04: a quién se imputan los movimientos de un bien y con qué porcentaje.
+ * Por separado: cada titular con su porcentaje (la parte de cotitulares no cargados no se imputa a nadie).
+ * Al representante o a un propietario elegido: el 100 % va a la cuenta de ese propietario.
+ * Si el bien no tiene representante o el elegido ya no es titular, se imputa por separado.
+ */
+export function imputacionDelBien(
+  modo: ModoLiquidacion,
+  titulares: readonly TitularDeImputacion[],
+  propietarioElegidoId: string | null,
+): { propietarioId: string; porcentaje: number }[] {
+  const porSeparado = titulares.map((t) => ({ propietarioId: t.propietarioId, porcentaje: t.porcentaje }));
+  if (modo === "al_representante") {
+    const r = titulares.find((t) => t.esRepresentante);
+    return r ? [{ propietarioId: r.propietarioId, porcentaje: 100 }] : porSeparado;
+  }
+  if (modo === "a_propietario") {
+    const e = titulares.find((t) => t.propietarioId === propietarioElegidoId);
+    return e ? [{ propietarioId: e.propietarioId, porcentaje: 100 }] : porSeparado;
+  }
+  return porSeparado;
+}

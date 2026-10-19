@@ -8,9 +8,11 @@ import {
   esquemaAnulacion,
   exigirConfirmacionDeDiferencia,
   generarUuidV7,
+  imputacionDelBien,
   leyendaDeDiferencia,
   validarPago,
   type DebitoDelPago,
+  type ModoLiquidacion,
   type Moneda,
   type PagadoPor,
   type Responsable,
@@ -31,12 +33,16 @@ async function prepararDebitos(args: {
   moneda: Moneda;
 }): Promise<{ debitos: DebitoDelPago[]; deudores: string[] }> {
   const supabase = await crearClienteServidor();
-  const { data: vinculos } = await supabase
-    .from("bien_propietario")
-    .select("propietario_id, porcentaje")
-    .eq("bien_id", args.bienId)
-    .is("deleted_at", null);
-  const titulares = (vinculos ?? []).map((v) => ({ propietarioId: v.propietario_id as string, porcentaje: Number(v.porcentaje) }));
+  const [{ data: vinculos }, { data: bien }] = await Promise.all([
+    supabase.from("bien_propietario").select("propietario_id, porcentaje, es_representante").eq("bien_id", args.bienId).is("deleted_at", null),
+    supabase.from("bien").select("modo_liquidacion, propietario_liquidacion_id").eq("id", args.bienId).maybeSingle(),
+  ]);
+  // CON-02, CON-04: por separado, cada titular con su porcentaje; al representante o a un propietario elegido, el 100 %.
+  const titulares = imputacionDelBien(
+    ((bien?.modo_liquidacion as ModoLiquidacion | undefined) ?? "por_separado"),
+    (vinculos ?? []).map((v) => ({ propietarioId: v.propietario_id as string, porcentaje: Number(v.porcentaje), esRepresentante: Boolean(v.es_representante) })),
+    (bien?.propietario_liquidacion_id as string | null | undefined) ?? null,
+  );
   const debitos = debitosDelPago({ pagadoPor: args.pagadoPor, responsable: args.responsable, importe: args.importe, titulares });
   if (debitos.length === 0) return { debitos, deudores: [] };
 

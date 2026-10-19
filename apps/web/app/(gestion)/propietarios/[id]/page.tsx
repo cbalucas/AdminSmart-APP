@@ -8,6 +8,7 @@ import { SeccionCuentas } from "@/components/SeccionCuentas";
 import { enlacesDeAvatares } from "@/lib/avatares";
 import { esGestion } from "@/lib/menu";
 import { obtenerPropietario } from "@/lib/propietarios";
+import { calcularResumenDelPropietario } from "@/lib/resumen-deposito";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
 
@@ -64,6 +65,10 @@ export default async function FichaPropietario({
       hoy,
     );
 
+  // "A depositar" con el horizonte del propietario (30 días por defecto).
+  const resumenInicial = await calcularResumenDelPropietario(id);
+  const aDepositar = resumenInicial?.resumenes.filter((x) => x.aDepositar > 0).map((x) => formatearImporte(x.aDepositar, x.moneda)).join(" y ");
+
   const bienIds = (vinculos ?? []).map((v) => v.bien_id as string);
   const { data: bienes } = bienIds.length
     ? await supabase.from("bien").select("id, alias, tipo_bien, estado, es_gastos_varios").in("id", bienIds).is("deleted_at", null)
@@ -110,6 +115,7 @@ export default async function FichaPropietario({
         </div>
         <div className="acciones-rapidas">
           <Link href={`/propietarios/${p.id}/editar`} className="boton boton-secundario">{t("app.editar")}</Link>
+          <Link href={`/propietarios/${p.id}/resumen-deposito`} className="boton boton-secundario">{t("propietarios.ver_resumen")}</Link>
           <BotonEstadoPropietario id={p.id} activo={activo} />
         </div>
       </div>
@@ -125,7 +131,11 @@ export default async function FichaPropietario({
           formatearImporte(saldoDe("USD"), "USD"),
           !hayMovimientos("USD") ? t("propietarios.saldo_sin_movimientos") : saldoDe("USD") < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor"),
         )}
-        {tarjeta(t("propietarios.a_depositar"), "—", t("propietarios.a_depositar_nota"))}
+        {tarjeta(
+          t("propietarios.a_depositar"),
+          aDepositar ?? formatearImporte(0, "ARS"),
+          resumenInicial ? t("propietarios.a_depositar_hasta", { fecha: resumenInicial.fechaLimite.split("-").reverse().join("/") }) : t("propietarios.a_depositar_nota"),
+        )}
         {tarjeta(t("propietarios.pago_promedio"), formatearImporte(promedio("ARS"), "ARS"), t("propietarios.pago_promedio_nota"))}
       </section>
 

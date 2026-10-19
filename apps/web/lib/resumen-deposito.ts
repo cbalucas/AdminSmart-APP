@@ -1,0 +1,141 @@
+import {
+  armarResumenDeposito,
+  fechaLimiteDelHorizonte,
+  formatearImporte,
+  imputacionDelBien,
+  parteDelPropietario,
+  type Horizonte,
+  type ModoLiquidacion,
+  type Moneda,
+  type ObligacionParaResumen,
+  type ResumenDeposito,
+} from "@ai/domain";
+import { t } from "@ai/i18n";
+import { titularesDe } from "@/lib/bienes";
+import { fechaHoy, listarObligaciones } from "@/lib/obligaciones";
+import { obtenerPropietario } from "@/lib/propietarios";
+import { crearClienteServidor } from "@/lib/supabase/servidor";
+
+export interface DatosDeposito {
+  administracion: string;
+  banco: string | null;
+  titular: string | null;
+  cbu: string | null;
+  alias: string | null;
+}
+
+export interface ResumenDelPropietario {
+  propietarioId: string;
+  nombre: string;
+  telefono: string | null;
+  emailPrincipal: string | null;
+  hoy: string;
+  horizonte: Horizonte;
+  fechaLimite: string;
+  /** Un resumen por moneda con datos (ARS siempre; USD si hay obligaciones o movimientos en dólares). */
+  resumenes: ResumenDeposito[];
+  deposito: DatosDeposito;
+}
+
+const MONEDAS: Moneda[] = ["ARS", "USD"];
+
+/** Horizonte desde los parámetros de la dirección: días del propietario (por defecto), fin de mes o fecha a elección. */
+export function leerHorizonte(h: string | undefined, fecha: string | undefined, diasDelPropietario: number): Horizonte {
+  if (h === "fin_de_mes") return { tipo: "fin_de_mes" };
+  if (h === "fecha" && fecha && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { tipo: "fecha", fecha };
+  return { tipo: "dias", dias: diasDelPropietario };
+}
+
+// RN-02, RN-15, sección 4.5: obligaciones a cargo del propietario (su parte según el modo de liquidación de cada bien),
+// su saldo y el fondo de reserva, por moneda.
+export async function calcularResumenDelPropietario(propietarioId: string, horizonte?: Horizonte): Promise<ResumenDelPropietario | null> {
+  const propietario = await obtenerPropietario(propietarioId);
+  if (!propietario) return null;
+  const hoy = fechaHoy();
+  const h: Horizonte = horizonte ?? { tipo: "dias", dias: propietario.horizonteResumenDias };
+  const fechaLimite = fechaLimiteDelHorizonte(h, hoy);
+
+  const supabase = await crearClienteServidor();
+  const { data: vinculos } = await supabase.from("bien_propietario").select("bien_id").eq("propietario_id", propietarioId).is("deleted_at", null);
+  const bienIds = [...new Set((vinculos ?? []).map((v) => v.bien_id as string))];
+
+  const [{ data: bienes }, titulares, todas, { data: saldos }, { data: org }] = await Promise.all([
+    bienIds.length
+      ? supabase.from("bien").select("id, alias, es_gastos_varios, modo_liquidacion, propietario_liquidacion_id").in("id", bienIds).is("deleted_at", null)
+      : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+    titularesDe(bienIds),
+    listarObligaciones(),
+    supabase.from("saldo_propietario").select("moneda, saldo").eq("propietario_id", propietarioId),
+    supabase.from("organizacion").select("nombre, cuenta_deposito_banco, cuenta_deposito_titular, cuenta_deposito_cbu, cuenta_deposito_alias").limit(1).maybeSingle(),
+  ]);
+
+  const bienDe = new Map((bienes ?? []).map((b) => [b.id as string, b]));
+  const paraResumen: ObligacionParaResumen[] = [];
+  for (const o of todas) {
+    const bien = bienDe.get(o.bienId);
+    if (!bien || o.responsable !== "propietario") continue;
+    const imputacion = imputacionDelBien(
+      bien.modo_liquidacion as ModoLiquidacion,
+      (titulares.get(o.bienId) ?? []).map((x) => ({ propietarioId: x.propietarioId, porcentaje: x.porcentaje, esRepresentante: x.esRepresentante })),
+      (bien.propietario_liquidacion_id as string | null) ?? null,
+    );
+    const suParte = imputacion.find((x) => x.propietarioId === propietarioId);
+    if (!suParte) continue;
+    paraResumen.push({
+      id: o.id,
+      bien: bien.es_gastos_varios ? t("bienes.gastos_varios") : (bien.alias as string),
+      concepto: o.concepto,
+      descripcion: o.descripcion,
+      periodo: o.periodo,
+      vencimiento: o.vencimiento,
+      monto: o.monto === null ? null : parteDelPropietario(o.monto, imputacion, propietarioId),
+      moneda: o.moneda,
+      estado: o.estado,
+      porcentaje: suParte.porcentaje,
+    });
+  }
+
+  const saldoDe = (m: Moneda) => Number(saldos?.find((s) => s.moneda === m)?.saldo ?? 0);
+  const hayDolares = paraResumen.some((o) => o.moneda === "USD") || saldos?.some((s) => s.moneda === "USD");
+  const resumenes = MONEDAS.filter((m) => m === "ARS" || hayDolares).map((m) =>
+    armarResumenDeposito({
+      obligaciones: paraResumen,
+      moneda: m,
+      saldoDisponible: saldoDe(m),
+      fondoReserva: m === "ARS" ? propietario.fondoReservaArs : propietario.fondoReservaUsd,
+      fechaLimite,
+      hoy,
+    }),
+  );
+
+  return {
+    propietarioId,
+    nombre: propietario.nombre,
+    telefono: propietario.telefonos[0]?.numero ?? null,
+    emailPrincipal: (propietario.emails.find((e) => e.principal) ?? propietario.emails[0])?.email ?? null,
+    hoy,
+    horizonte: h,
+    fechaLimite,
+    resumenes,
+    deposito: {
+      administracion: (org?.nombre as string | undefined) ?? "",
+      banco: (org?.cuenta_deposito_banco as string | null | undefined) ?? null,
+      titular: (org?.cuenta_deposito_titular as string | null | undefined) ?? null,
+      cbu: (org?.cuenta_deposito_cbu as string | null | undefined) ?? null,
+      alias: (org?.cuenta_deposito_alias as string | null | undefined) ?? null,
+    },
+  };
+}
+
+const fechaCorta = (f: string) => f.split("-").reverse().join("/");
+
+/** Texto del mensaje de WhatsApp del resumen (plantilla por defecto, 06-textos-de-envio). */
+export function mensajeWhatsApp(r: ResumenDelPropietario): string {
+  const aDepositar = r.resumenes.filter((x) => x.aDepositar > 0);
+  const nombre = r.nombre;
+  const administracion = r.deposito.administracion;
+  const limite = fechaCorta(r.fechaLimite);
+  if (aDepositar.length === 0) return t("resumen.wa_sin_deposito", { nombre, fecha_limite: limite, administracion });
+  const monto = aDepositar.map((x) => formatearImporte(x.aDepositar, x.moneda)).join(" y ");
+  return t("resumen.wa_texto", { nombre, fecha_limite: limite, monto, administracion });
+}
