@@ -77,13 +77,20 @@ export async function propietariosParaCuenta(): Promise<PropietarioOpcion[]> {
 }
 
 // Bienes del propietario (para el filtro y para el formulario de movimientos): incluye Gastos varios.
-export async function bienesDelPropietario(propietarioId: string): Promise<{ id: string; nombre: string }[]> {
+export interface BienDeCuenta {
+  id: string;
+  nombre: string;
+  /** Gastos varios: el bien "general" donde se imputa lo que no es de un bien en particular. */
+  esGeneral: boolean;
+}
+
+export async function bienesDelPropietario(propietarioId: string): Promise<BienDeCuenta[]> {
   const supabase = await crearClienteServidor();
   const { data: vinculos } = await supabase.from("bien_propietario").select("bien_id").eq("propietario_id", propietarioId).is("deleted_at", null);
   const ids = (vinculos ?? []).map((v) => v.bien_id as string);
   if (ids.length === 0) return [];
   const { data } = await supabase.from("bien").select("id, alias, es_gastos_varios").in("id", ids).is("deleted_at", null).order("alias");
-  return (data ?? []).map((b) => ({ id: b.id as string, nombre: b.alias as string }));
+  return (data ?? []).map((b) => ({ id: b.id as string, nombre: b.alias as string, esGeneral: Boolean(b.es_gastos_varios) }));
 }
 
 // PRO-07: la cuenta en dólares se habilita sola cuando hay movimientos u obligaciones en dólares.

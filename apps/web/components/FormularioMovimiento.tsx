@@ -12,7 +12,7 @@ type Accion = (anterior: EstadoFormularioMovimiento, formulario: FormData) => Pr
 interface Comun {
   accion: Accion;
   propietario: { id: string; nombre: string };
-  bienes: { id: string; nombre: string }[];
+  bienes: { id: string; nombre: string; esGeneral: boolean }[];
   hoy: string;
   cancelarHref: string;
 }
@@ -34,6 +34,34 @@ function usarFormulario(accion: Accion) {
     iniciar(() => enviar(datos));
   };
   return { estado, enviando, error, alEnviar };
+}
+
+// El depósito, la transferencia y el traspaso son del propietario y no de un bien: se imputan al bien
+// general (Gastos varios). Solo el gasto extraordinario y el ajuste permiten elegir un bien.
+function CampoBien({
+  bienes, conSelector, error, invalido,
+}: {
+  bienes: { id: string; nombre: string; esGeneral: boolean }[];
+  conSelector: boolean;
+  error: React.ReactNode;
+  invalido: boolean;
+}) {
+  const general = bienes.find((b) => b.esGeneral);
+  if (general && !conSelector) return <input type="hidden" name="bienId" value={general.id} />;
+  const ordenados = [...bienes].sort((a, b) => Number(b.esGeneral) - Number(a.esGeneral));
+  return (
+    <div className="campo">
+      <label htmlFor="bienId">{t("cuentas.bien")}</label>
+      <select id="bienId" name="bienId" defaultValue={ordenados[0]?.id ?? ""} aria-invalid={invalido}>
+        {general ? null : <option value="">—</option>}
+        {ordenados.map((b) => (
+          <option key={b.id} value={b.id}>{b.esGeneral ? t("cuentas.general_opcion") : b.nombre}</option>
+        ))}
+      </select>
+      {conSelector && <span className="muted">{t("cuentas.ayuda_bien")}</span>}
+      {error}
+    </div>
+  );
 }
 
 function AvisoExceso({ saldo, etiqueta }: { saldo: string; etiqueta: string }) {
@@ -85,24 +113,13 @@ export function FormularioMovimiento({
             <div />
           )}
         </div>
-        <div className="fila fila-2">
-          <div className="campo">
-            <label htmlFor="bienId">{t("cuentas.bien")}</label>
-            <select id="bienId" name="bienId" defaultValue={bienes[0]?.id ?? ""} aria-invalid={Boolean(estado.errores?.bienId)}>
-              <option value="">—</option>
-              {bienes.map((b) => (
-                <option key={b.id} value={b.id}>{b.nombre}</option>
-              ))}
-            </select>
-            {error("bienId")}
-          </div>
-          <div className="campo">
-            <label htmlFor="moneda">{t("obligaciones.campo_moneda")}</label>
-            <select id="moneda" name="moneda" defaultValue={monedaInicial}>
-              <option value="ARS">ARS</option>
-              <option value="USD">USD</option>
-            </select>
-          </div>
+        <CampoBien bienes={bienes} conSelector={tipo === "gasto_extraordinario" || tipo === "ajuste_manual"} error={error("bienId")} invalido={Boolean(estado.errores?.bienId)} />
+        <div className="campo">
+          <label htmlFor="moneda">{t("obligaciones.campo_moneda")}</label>
+          <select id="moneda" name="moneda" defaultValue={monedaInicial}>
+            <option value="ARS">ARS</option>
+            <option value="USD">USD</option>
+          </select>
         </div>
         <div className="fila fila-2">
           <div className="campo">
@@ -166,16 +183,7 @@ export function FormularioTraspaso({ accion, propietario, bienes, hoy, cancelarH
               <option value="USD">{t("cuentas.dolares")}</option>
             </select>
           </div>
-          <div className="campo">
-            <label htmlFor="bienId">{t("cuentas.bien")}</label>
-            <select id="bienId" name="bienId" defaultValue={bienes[0]?.id ?? ""} aria-invalid={Boolean(estado.errores?.bienId)}>
-              <option value="">—</option>
-              {bienes.map((b) => (
-                <option key={b.id} value={b.id}>{b.nombre}</option>
-              ))}
-            </select>
-            {error("bienId")}
-          </div>
+          <CampoBien bienes={bienes} conSelector={false} error={error("bienId")} invalido={Boolean(estado.errores?.bienId)} />
         </div>
         <div className="fila fila-2">
           <div className="campo">

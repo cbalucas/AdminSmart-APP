@@ -729,5 +729,8 @@
   "cuentas.periodo_liquidado": "El movimiento pertenece a una liquidación emitida: no se puede anular.",
   "cuentas.titulo_anular": "Anular movimiento",
   "cuentas.ayuda_anular": "El movimiento no se borra: queda anulado y se genera un contramovimiento que lo invierte.",
-  "cuentas.ayuda_anular_traspaso": "Es un traspaso: se anulan juntos los dos movimientos (el que sale y el que entra)."
+  "cuentas.ayuda_anular_traspaso": "Es un traspaso: se anulan juntos los dos movimientos (el que sale y el que entra).",
+  "cuentas.general": "General",
+  "cuentas.general_opcion": "General (sin un bien en particular)",
+  "cuentas.ayuda_bien": "Elegí un bien solo si el gasto o el ajuste corresponde a uno en particular."
 }

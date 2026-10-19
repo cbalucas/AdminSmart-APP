@@ -42,7 +42,8 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
     libroDelPropietario({ propietarioId: propietario.id, moneda, bienId: f.bien || undefined, desde: f.desde || undefined, hasta: f.hasta || undefined }),
   ]);
   const comprobantes = await documentosDe("movimiento", libro.filas.map((m) => m.id));
-  const nombreBien = new Map(bienes.map((b) => [b.id, b.nombre]));
+  const etiquetaBien = (b: { nombre: string; esGeneral: boolean }) => (b.esGeneral ? t("cuentas.general") : b.nombre);
+  const nombreBien = new Map(bienes.map((b) => [b.id, etiquetaBien(b)]));
 
   const enlace = (cambios: Partial<Filtros>) => {
     const q = new URLSearchParams();
@@ -83,7 +84,7 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
             <select id="c-bien" name="bien" defaultValue={f.bien ?? ""}>
               <option value="">{t("cuentas.todos_bienes")}</option>
               {bienes.map((b) => (
-                <option key={b.id} value={b.id}>{b.nombre}</option>
+                <option key={b.id} value={b.id}>{etiquetaBien(b)}</option>
               ))}
             </select>
           </div>
