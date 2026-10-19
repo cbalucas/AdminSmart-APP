@@ -4,6 +4,7 @@ import { t } from "@ai/i18n";
 import { calcularPagoPromedio, formatearImporte, type Moneda } from "@ai/domain";
 import { Avatar } from "@/components/Avatar";
 import { BotonEstadoPropietario } from "@/components/BotonEstadoPropietario";
+import { SeccionCuentas } from "@/components/SeccionCuentas";
 import { esGestion } from "@/lib/menu";
 import { obtenerPropietario } from "@/lib/propietarios";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
@@ -137,6 +138,7 @@ export default async function FichaPropietario({
       </nav>
 
       {pestana === "datos" && (
+        <>
         <section className="panel">
           <dl className="datos datos-ancho">
             <dt>{t("propietarios.campo_telefonos")}</dt>
@@ -175,6 +177,8 @@ export default async function FichaPropietario({
             <dd>{p.observaciones ?? vacio}</dd>
           </dl>
         </section>
+        {usuario.roles.includes("administrador") && <SeccionCuentas propietarioId={p.id} />}
+        </>
       )}
 
       {pestana === "bienes" && (

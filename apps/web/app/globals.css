@@ -289,3 +289,13 @@ a { color: var(--accent); }
 .fila-lista input[type="tel"], .fila-lista input[type="email"] { flex: 1; min-width: 180px; width: auto; }
 .fila-lista .casilla input { width: auto; }
 .campo select:focus-visible, .campo textarea:focus-visible, .fila-lista input:focus-visible, .fila-lista select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Cuentas bancarias */
+.lista-cuentas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.cuenta { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface2); }
+.cuenta-datos { display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
+.cuenta-datos p { margin: 0; }
+.cuenta-cbu { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.acciones-cuenta { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: flex-start; }
+.vincular { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; border-top: 1px solid var(--lineSoft); }
+.panel .encabezado h2 { font-size: 1.2rem; }
