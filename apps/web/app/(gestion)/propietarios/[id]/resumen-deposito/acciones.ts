@@ -2,23 +2,17 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { generarUuidV7 } from "@ai/domain";
-import { generarPdfResumen } from "@/lib/pdf/generar";
-import { obtenerPropietario } from "@/lib/propietarios";
-import { calcularResumenDelPropietario, leerHorizonte } from "@/lib/resumen-deposito";
+import { elegirTelefonoWhatsApp, enlaceWhatsApp, generarUuidV7 } from "@ai/domain";
 import { esGestion } from "@/lib/menu";
+import { obtenerPropietario } from "@/lib/propietarios";
+import { calcularResumenDelPropietario, leerHorizonte, mensajeWhatsApp } from "@/lib/resumen-deposito";
+import { crearResumenOficial, resumenOficialVigente } from "@/lib/resumen-oficial";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const dias = (desde: string, hasta: string) => Math.round((Date.parse(`${hasta}T00:00:00Z`) - Date.parse(`${desde}T00:00:00Z`)) / 86_400_000);
-
-/**
- * LIQ-08: genera el resumen de depósito oficial. Registra el resumen con su número DEP-AAAA-NNNN y los montos por
- * moneda, arma el PDF, lo guarda en el almacén privado y vuelve a la pantalla con el aviso de descarga.
- * El número se consume solo acá: la vista previa no lo usa.
- */
+/** LIQ-08: genera el resumen de depósito oficial y vuelve a la pantalla con el aviso de descarga. */
 export async function generarResumenOficial(propietarioId: string, h: string, fecha: string, _formulario: FormData): Promise<void> {
   const { usuario } = await usuarioActual();
   if (!usuario || !esGestion(usuario.roles) || !UUID.test(propietarioId)) redirect(`/propietarios/${propietarioId}/resumen-deposito`);
@@ -35,40 +29,62 @@ export async function generarResumenOficial(propietarioId: string, h: string, fe
   const r = await calcularResumenDelPropietario(propietarioId, leerHorizonte(h, fecha, p.horizonteResumenDias));
   if (!r) redirect(volver("error"));
 
-  const supabase = await crearClienteServidor();
-  const id = generarUuidV7();
-  const { data: registro, error } = await supabase.rpc("registrar_resumen_deposito", {
-    p_organizacion: usuario.organizacionId,
-    p_propietario: propietarioId,
-    p_fecha: r.hoy,
-    p_horizonte_dias: dias(r.hoy, r.fechaLimite),
-    p_fecha_limite: r.fechaLimite,
-    p_montos: r.resumenes.map((x) => ({
-      moneda: x.moneda,
-      obligaciones_pendientes: x.sumaObligaciones,
-      saldo_disponible: x.saldoDisponible,
-      reposicion_fondo: x.reposicionFondo,
-      a_depositar: x.aDepositar,
-      saldo_a_transferir: x.saldoATransferir,
-    })),
-    p_id: id,
-  });
-  if (error || !registro) redirect(volver("error"));
-  const numero = (registro as { numero: string }).numero;
+  const resultado = await crearResumenOficial(r, usuario.organizacionId);
+  if (!resultado.ok) redirect(volver(resultado.motivo));
+  revalidatePath(`/propietarios/${propietarioId}/resumen-deposito`);
+  redirect(volver(resultado.id));
+}
 
-  // PDF: se guarda con su propio nombre (el número no se reutiliza) y se enlaza al registro.
-  const ruta = `${usuario.organizacionId}/resumenes/${propietarioId}/${numero}.pdf`;
-  try {
-    const pdf = await generarPdfResumen(r, numero);
-    const { error: errorSubida } = await supabase.storage.from("informes").upload(ruta, pdf, { contentType: "application/pdf" });
-    if (errorSubida) throw errorSubida;
-    const { error: errorEnlace } = await supabase.from("resumen_deposito").update({ pdf_path: ruta }).eq("id", id);
-    if (errorEnlace) throw errorEnlace;
-  } catch {
-    // El resumen quedó registrado con su número pero sin PDF: se avisa para volver a generarlo.
-    redirect(volver("sin_pdf"));
-  }
+export interface ResultadoWhatsApp {
+  error?: string;
+  /** Enlace que abre la conversación de WhatsApp con el texto. */
+  url?: string;
+  /** Descarga del PDF para adjuntarlo en la conversación. */
+  pdfUrl?: string;
+  numero?: string;
+}
+
+/**
+ * Envío por WhatsApp desde la web: deja listo el resumen oficial (reutiliza el de hoy si es el mismo), registra el
+ * envío con su texto y devuelve el enlace de la conversación y la descarga del PDF. WhatsApp no deja adjuntar un
+ * archivo desde un enlace: el PDF se descarga para adjuntarlo a mano (la app móvil lo adjunta sola).
+ */
+export async function prepararEnvioWhatsApp(propietarioId: string, h: string, fecha: string, texto: string): Promise<ResultadoWhatsApp> {
+  const { usuario } = await usuarioActual();
+  if (!usuario || !esGestion(usuario.roles) || !UUID.test(propietarioId)) return { error: "resumen.error_enviar" };
+  const p = await obtenerPropietario(propietarioId);
+  if (!p) return { error: "resumen.error_enviar" };
+  const r = await calcularResumenDelPropietario(propietarioId, leerHorizonte(h, fecha, p.horizonteResumenDias));
+  if (!r) return { error: "resumen.error_enviar" };
+
+  const telefono = elegirTelefonoWhatsApp(r.telefonos);
+  if (!telefono) return { error: "resumen.sin_telefono" };
+  const mensaje = texto.trim() || mensajeWhatsApp(r);
+  const url = enlaceWhatsApp(telefono.numero, mensaje);
+  if (!url) return { error: "resumen.telefono_invalido" };
+
+  const existente = await resumenOficialVigente(r);
+  const oficial = existente ? { ok: true as const, ...existente } : await crearResumenOficial(r, usuario.organizacionId);
+  if (!oficial.ok) return { error: oficial.motivo === "sin_pdf" ? "resumen.error_pdf" : "resumen.error_enviar" };
+
+  // LIQ-07: cada envío queda registrado con fecha, canal, destinatario, texto y usuario.
+  const supabase = await crearClienteServidor();
+  const { data: sesion } = await supabase.auth.getUser();
+  if (!sesion.user) return { error: "resumen.error_enviar" };
+  const { error } = await supabase.from("envio").insert({
+    id: generarUuidV7(),
+    organizacion_id: usuario.organizacionId,
+    documento_tipo: "resumen_deposito",
+    documento_id: oficial.id,
+    canal: "whatsapp",
+    destinatario: telefono.numero,
+    idioma: "es",
+    texto: mensaje,
+    estado: "abierto_whatsapp",
+    usuario_id: sesion.user.id,
+  });
+  if (error) return { error: "resumen.error_registrar_envio" };
 
   revalidatePath(`/propietarios/${propietarioId}/resumen-deposito`);
-  redirect(volver(id));
+  return { url, pdfUrl: `/propietarios/${propietarioId}/resumen-deposito/pdf/${oficial.id}`, numero: oficial.numero };
 }

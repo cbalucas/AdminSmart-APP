@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatearImporte, type Moneda } from "@ai/domain";
+import { elegirTelefonoWhatsApp, formatearImporte, numeroParaWhatsApp, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { Avatar } from "@/components/Avatar";
+import { EnviarWhatsApp } from "@/components/EnviarWhatsApp";
 import { esGestion } from "@/lib/menu";
 import { obtenerPropietario } from "@/lib/propietarios";
-import { calcularResumenDelPropietario, historialDeResumenes, leerHorizonte, mensajeWhatsApp } from "@/lib/resumen-deposito";
+import { calcularResumenDelPropietario, historialDeResumenes, leerHorizonte, mensajeWhatsApp, ultimoEnvioDeResumen } from "@/lib/resumen-deposito";
 import { usuarioActual } from "@/lib/usuario-actual";
 import { generarResumenOficial } from "./acciones";
 
@@ -31,6 +32,7 @@ export default async function ResumenDeposito({ params, searchParams }: { params
   const horizonte = leerHorizonte(f.h, f.fecha, p.horizonteResumenDias);
   const [r, historial] = await Promise.all([calcularResumenDelPropietario(id, horizonte), historialDeResumenes(id)]);
   if (!r) notFound();
+  const ultimoEnvio = await ultimoEnvioDeResumen(historial);
 
   const hayUsd = r.resumenes.some((x) => x.moneda === "USD");
   const moneda: Moneda = f.moneda === "USD" && hayUsd ? "USD" : "ARS";
@@ -49,6 +51,8 @@ export default async function ResumenDeposito({ params, searchParams }: { params
   const parametrosPdf = new URLSearchParams();
   if (f.h) parametrosPdf.set("h", f.h);
   if (f.fecha) parametrosPdf.set("fecha", f.fecha);
+  const telefonoWa = elegirTelefonoWhatsApp(r.telefonos);
+  const motivoWa = !telefonoWa ? t("resumen.sin_telefono") : !numeroParaWhatsApp(telefonoWa.numero) ? t("resumen.telefono_invalido") : null;
   const generado = f.generado ? historial.find((x) => x.id === f.generado) : undefined;
   const vacio = t("resumen.sin_dato");
   const total = (n: number) => formatearImporte(n, moneda);
@@ -203,15 +207,29 @@ export default async function ResumenDeposito({ params, searchParams }: { params
             <h2>{t("resumen.enviar")}</h2>
             <div className="acciones-fila">
               <a href={`/propietarios/${id}/resumen-deposito/pdf?${parametrosPdf.toString()}`} target="_blank" rel="noreferrer" className="boton boton-secundario">{t("resumen.ver_pdf")}</a>
-              <button type="button" className="boton" disabled title={t("resumen.proximamente")}>{t("resumen.enviar_email")}</button>
-              <button type="button" className="boton" disabled title={t("resumen.proximamente")}>{t("resumen.enviar_whatsapp")}</button>
+              <button type="button" className="boton boton-secundario" disabled title={t("resumen.email_proximamente")}>{t("resumen.enviar_email")}</button>
             </div>
             <form action={generarResumenOficial.bind(null, id, f.h ?? "", f.fecha ?? "")}>
               <button type="submit" className="boton">{t("resumen.generar_oficial")}</button>
             </form>
             <p className="muted">{t("resumen.ayuda_oficial")}</p>
-            <p className="muted">{t("resumen.vista_previa_whatsapp")}</p>
-            <p className="mensaje-previo">{mensajeWhatsApp(r)}</p>
+            <EnviarWhatsApp
+              propietarioId={id}
+              h={f.h ?? ""}
+              fecha={f.fecha ?? ""}
+              textoInicial={mensajeWhatsApp(r)}
+              telefono={telefonoWa?.numero ?? null}
+              motivoDeshabilitado={motivoWa}
+            />
+            {ultimoEnvio && (
+              <p className="muted">
+                {t("resumen.ultimo_envio", {
+                  fecha: new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Argentina/Cordoba" }).format(new Date(ultimoEnvio.fecha)),
+                  canal: t(`resumen.canal_${ultimoEnvio.canal}`),
+                  numero: ultimoEnvio.numero,
+                })}
+              </p>
+            )}
           </section>
         </aside>
       </div>

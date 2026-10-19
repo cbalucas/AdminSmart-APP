@@ -837,5 +837,21 @@
   "resumen.col_numero": "Número",
   "resumen.col_fecha": "Fecha",
   "resumen.col_horizonte": "Hasta",
-  "resumen.col_a_depositar": "A depositar"
+  "resumen.col_a_depositar": "A depositar",
+  "resumen.mensaje_whatsapp": "Mensaje de WhatsApp (podés corregirlo antes de enviar)",
+  "resumen.se_envia_a": "Se envía al {telefono}",
+  "resumen.preparando": "Preparando…",
+  "resumen.restaurar_texto": "Restaurar el texto original",
+  "resumen.whatsapp_listo": "Se abrió WhatsApp y se descargó el PDF {numero}: adjuntalo en la conversación antes de enviar.",
+  "resumen.abrir_whatsapp": "Abrir WhatsApp de nuevo",
+  "resumen.sin_telefono": "Este propietario no tiene un celular cargado: agregalo en su ficha para enviar por WhatsApp.",
+  "resumen.telefono_invalido": "El teléfono cargado no se puede usar en WhatsApp. Revisalo en la ficha del propietario.",
+  "resumen.error_enviar": "No pudimos preparar el envío. Probá de nuevo.",
+  "resumen.error_pdf": "El resumen se registró pero no se pudo guardar el PDF. Probá de nuevo.",
+  "resumen.error_registrar_envio": "No pudimos registrar el envío. Probá de nuevo.",
+  "resumen.email_proximamente": "El envío por email llegará en una versión próxima, con la cuenta de correo conectada.",
+  "resumen.ultimo_envio": "Último envío: {fecha} por {canal} ({numero})",
+  "resumen.canal_whatsapp": "WhatsApp",
+  "resumen.canal_email": "email",
+  "resumen.canal_descarga": "descarga"
 }

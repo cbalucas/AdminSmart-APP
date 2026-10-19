@@ -455,3 +455,6 @@ a { color: var(--accent); }
 
 .segmento { white-space: nowrap; flex: none; padding: 9px 16px; }
 .resumen-lateral .acciones-fila { flex-wrap: wrap; }
+
+.enviar-whatsapp { display: flex; flex-direction: column; gap: 10px; }
+.enviar-whatsapp textarea { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }

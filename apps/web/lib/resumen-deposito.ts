@@ -28,6 +28,7 @@ export interface ResumenDelPropietario {
   propietarioId: string;
   nombre: string;
   telefono: string | null;
+  telefonos: { tipo: string; numero: string }[];
   emailPrincipal: string | null;
   hoy: string;
   horizonte: Horizonte;
@@ -112,6 +113,7 @@ export async function calcularResumenDelPropietario(propietarioId: string, horiz
     propietarioId,
     nombre: propietario.nombre,
     telefono: propietario.telefonos[0]?.numero ?? null,
+    telefonos: propietario.telefonos,
     emailPrincipal: (propietario.emails.find((e) => e.principal) ?? propietario.emails[0])?.email ?? null,
     hoy,
     horizonte: h,
@@ -175,4 +177,32 @@ export async function historialDeResumenes(propietarioId: string): Promise<FilaH
       .map((m) => ({ moneda: m.moneda as Moneda, aDepositar: Number(m.a_depositar) }))
       .sort((a, b) => a.moneda.localeCompare(b.moneda)),
   }));
+}
+
+export interface UltimoEnvio {
+  fecha: string;
+  canal: string;
+  estado: string;
+  numero: string;
+}
+
+// Último envío de un resumen de este propietario (LIQ-07: fecha, canal y estado).
+export async function ultimoEnvioDeResumen(historial: FilaHistorial[]): Promise<UltimoEnvio | null> {
+  if (historial.length === 0) return null;
+  const supabase = await crearClienteServidor();
+  const { data } = await supabase
+    .from("envio")
+    .select("documento_id, canal, estado, fecha")
+    .eq("documento_tipo", "resumen_deposito")
+    .in("documento_id", historial.map((h) => h.id))
+    .order("fecha", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return null;
+  return {
+    fecha: data.fecha as string,
+    canal: data.canal as string,
+    estado: data.estado as string,
+    numero: historial.find((h) => h.id === data.documento_id)?.numero ?? "",
+  };
 }

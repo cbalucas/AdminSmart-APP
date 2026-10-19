@@ -13,7 +13,7 @@ Se actualiza al terminar cada paso. Estado: ✅ hecho · 🔄 en curso · ⏳ po
 | 6 | Obligaciones y gastos recurrentes | ✅ | 6a listado y reglas ✅ · 6b alta y edición ✅ · 6c ventana de fin de mes ✅ · 6d adjuntar boleta (foto o PDF) ✅ |
 | 7 | Pagos y anulaciones | ✅ | Pago por obligación, contramovimiento, pago directo, con comprobante (foto o PDF) |
 | 8 | Cuenta corriente | ✅ | Depósitos, ajustes, traspasos, saldo en pesos y dólares |
-| 9 | Resumen de depósito en PDF | 🔄 | 9a cálculo y pantalla ✅ · 9b PDF e historial (DEP-AAAA-NNNN) ✅ · 9c envío por WhatsApp y email ⏳ |
+| 9 | Resumen de depósito en PDF | ✅ | 9a cálculo y pantalla ✅ · 9b PDF e historial (DEP-AAAA-NNNN) ✅ · 9c envío por WhatsApp ✅ (el envío por email queda para el final o una versión nueva con validación de Gmail y autorización de envío) |
 | 10 | Datos de la administración y plantillas de envío | ⏳ | Logo, plantillas editables |
 | 11 | Inicio del propietario | ⏳ | Vista de solo lectura para cada propietario |
 | 12 | Auditoría y cierre de la fase | ⏳ | Pantalla de auditoría, revisión de pruebas y cobertura |
