@@ -16,7 +16,6 @@ const MENU_GESTION: ItemMenu[] = [
   { clave: "inicio", ruta: "/inicio", icono: "inicio" },
   { clave: "propietarios", ruta: "/propietarios", icono: "propietarios" },
   { clave: "bienes", ruta: "/bienes", icono: "bienes" },
-  { clave: "edificios", ruta: "/edificios", icono: "edificios" },
   { clave: "inquilinos", ruta: "/inquilinos", icono: "inquilinos" },
   { clave: "contratos", ruta: "/contratos", icono: "contratos" },
   { clave: "obligaciones", ruta: "/obligaciones", icono: "obligaciones" },
