@@ -10,3 +10,4 @@ export * from "./bienes";
 export * from "./servicios";
 export * from "./documentos";
 export * from "./pagos";
+export * from "./movimientos";

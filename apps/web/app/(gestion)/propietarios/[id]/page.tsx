@@ -34,23 +34,27 @@ export default async function FichaPropietario({
 
   const supabase = await crearClienteServidor();
   const hoy = fechaHoy();
-  const [{ data: saldos }, { data: depositos }, { data: vinculos }, { data: usuarioVinculado }] = await Promise.all([
+  const [{ data: saldos }, { data: depositos }, { data: anulaciones }, { data: vinculos }, { data: usuarioVinculado }] = await Promise.all([
     supabase.from("saldo_propietario").select("moneda, saldo").eq("propietario_id", id),
     supabase
       .from("movimiento")
-      .select("fecha, haber, moneda")
+      .select("id, fecha, haber, moneda")
       .eq("propietario_id", id)
       .eq("tipo", "deposito_propietario")
       .is("deleted_at", null),
+    supabase.from("movimiento").select("contramovimiento_de_id").eq("propietario_id", id).not("contramovimiento_de_id", "is", null),
     supabase.from("bien_propietario").select("bien_id, porcentaje").eq("propietario_id", id).is("deleted_at", null),
     supabase.from("usuario").select("id").eq("propietario_id", id).maybeSingle(),
   ]);
 
+  const anulados = new Set((anulaciones ?? []).map((a) => a.contramovimiento_de_id as string));
   const saldoDe = (moneda: Moneda) => Number(saldos?.find((s) => s.moneda === moneda)?.saldo ?? 0);
   const hayMovimientos = (moneda: Moneda) => Boolean(saldos?.some((s) => s.moneda === moneda));
   const promedio = (moneda: Moneda) =>
     calcularPagoPromedio(
-      (depositos ?? []).map((d) => ({
+      (depositos ?? [])
+        .filter((d) => !anulados.has(d.id as string))
+        .map((d) => ({
         fecha: d.fecha as string,
         centavos: Number(d.haber),
         moneda: d.moneda as Moneda,
@@ -127,7 +131,11 @@ export default async function FichaPropietario({
 
       <nav className="pestanas" aria-label={t("propietarios.titulo")}>
         {PESTANAS.map((clave) =>
-          HABILITADAS.includes(clave) ? (
+          clave === "cuenta" ? (
+          <Link key={clave} href={`/cuentas-corrientes?propietario=${p.id}`} className="pestana">
+            {t(`propietarios.tab_${clave}`)}
+          </Link>
+        ) : HABILITADAS.includes(clave) ? (
             <Link
               key={clave}
               href={`/propietarios/${p.id}?tab=${clave}`}

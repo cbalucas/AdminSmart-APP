@@ -12,7 +12,7 @@ Se actualiza al terminar cada paso. Estado: ✅ hecho · 🔄 en curso · ⏳ po
 | 5 | Catálogo de conceptos y servicios del bien | ✅ | Catálogo de conceptos en Configuración (P-42) y pestaña Servicios e impuestos de cada bien (P-19), con los 8 servicios del Excel cargados |
 | 6 | Obligaciones y gastos recurrentes | ✅ | 6a listado y reglas ✅ · 6b alta y edición ✅ · 6c ventana de fin de mes ✅ · 6d adjuntar boleta (foto o PDF) ✅ |
 | 7 | Pagos y anulaciones | ✅ | Pago por obligación, contramovimiento, pago directo, con comprobante (foto o PDF) |
-| 8 | Cuenta corriente | ⏳ | Depósitos, ajustes, traspasos, saldo en pesos y dólares |
+| 8 | Cuenta corriente | ✅ | Depósitos, ajustes, traspasos, saldo en pesos y dólares |
 | 9 | Resumen de depósito en PDF | ⏳ | Cálculo, PDF (DEP-AAAA-NNNN), envío por email y WhatsApp |
 | 10 | Datos de la administración y plantillas de envío | ⏳ | Logo, plantillas editables |
 | 11 | Inicio del propietario | ⏳ | Vista de solo lectura para cada propietario |

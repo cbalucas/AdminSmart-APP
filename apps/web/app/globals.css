@@ -413,3 +413,17 @@ a { color: var(--accent); }
 
 .aviso-advertencia .campo { width: 100%; }
 .aviso-advertencia .campo input[type="text"] { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+
+.saldo-resumen { margin: 16px 0 8px; font-size: 1.05rem; }
+.saldo-resumen strong { font-family: var(--fuente-titulo), serif; font-size: 1.5rem; }
+.saldo-deudor { color: var(--danger); }
+.fila-anulada td { color: var(--muted); }
+.fila-anulada td:not(:last-child) { text-decoration: line-through; text-decoration-color: var(--line); }
+.fila-anulada .estado { text-decoration: none; display: inline-block; }
+.fila-saldo-anterior td { color: var(--muted); font-style: italic; background: var(--surface2); }
+.tipo-cambio { margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--neutralBg); color: var(--neutral); font-size: 0.9rem; }
+
+.filtros .campo input[type="date"] { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.tabla-compacta { font-size: 0.92rem; }
+.tabla-compacta th, .tabla-compacta td { padding: 10px 8px; }
+.tabla-compacta .acciones-fila { flex-direction: column; align-items: flex-start; gap: 2px; }
