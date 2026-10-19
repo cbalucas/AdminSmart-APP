@@ -4,6 +4,7 @@ import {
   aCentavos,
   formatearFecha,
   formatearImporte,
+  parteSinAsignar,
   repartirPorPorcentaje,
   sumarImportes,
 } from "./dinero";
@@ -63,8 +64,26 @@ describe("CON-01: reparto de condominio por porcentaje", () => {
   it("CON-01: el centavo sobrante va a quien tiene mayor resto", () => {
     expect(repartirPorPorcentaje(101, [50, 50])).toEqual([51, 50]);
   });
-  it("CON-01: rechaza porcentajes que no suman 100", () => {
-    expect(() => repartirPorPorcentaje(1000, [60, 30])).toThrow(/CON-01/);
+  it("CON-01: rechaza porcentajes que suman más de 100 %", () => {
+    expect(() => repartirPorPorcentaje(1000, [60, 50])).toThrow(/CON-01/);
+  });
+  it("CON-01: acepta porcentajes que suman menos de 100 %: cada titular paga solo su parte", () => {
+    // Caseros: 50 % + 25 % + 10 % = 85 %; el 15 % restante no está cargado.
+    expect(repartirPorPorcentaje(100000, [50, 25, 10])).toEqual([50000, 25000, 10000]);
+    expect(parteSinAsignar(100000, [50, 25, 10])).toBe(15000);
+  });
+  it("CON-01: un solo titular con menos de 100 % paga solo su parte", () => {
+    expect(repartirPorPorcentaje(100000, [40])).toEqual([40000]);
+  });
+  it("CON-01: la parte asignada se reparte sin perder centavos cuando no suma 100 %", () => {
+    const partes = repartirPorPorcentaje(1001, [33.3333, 33.3333]);
+    expect(partes.reduce((a, b) => a + b, 0)).toBe(Math.round(1001 * 0.666666));
+  });
+  it("CON-01: cada porcentaje debe ser mayor a cero", () => {
+    expect(() => repartirPorPorcentaje(1000, [100, 0])).toThrow(/CON-01/);
+  });
+  it("CON-01: con el 100 % cargado no queda nada sin asignar", () => {
+    expect(parteSinAsignar(101, [50, 50])).toBe(0);
   });
   it("CON-01: un contramovimiento negativo reparte con signo", () => {
     expect(repartirPorPorcentaje(-101, [50, 50])).toEqual([-51, -50]);

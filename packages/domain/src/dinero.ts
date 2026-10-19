@@ -59,28 +59,38 @@ export function formatearFecha(iso: string): string {
 }
 
 /**
- * Reparte un importe entre titulares según sus porcentajes (condominio, sección 4.4).
- * Usa aritmética entera: la suma de las partes es siempre igual al total, y los
- * centavos sobrantes van a quienes tienen mayor resto (empate: el primero).
- * Los porcentajes deben sumar exactamente 100 (hasta 4 decimales).
+ * Reparte un importe entre los titulares cargados según su porcentaje (condominio, sección 4.4).
+ * Los porcentajes no pueden superar 100 %. Pueden sumar menos: la parte que falta corresponde a
+ * cotitulares que no se administran, no se imputa a nadie y se obtiene con `parteSinAsignar`.
+ * Usa aritmética entera: la suma de las partes es siempre igual a la parte asignada del total
+ * (total × suma de porcentajes), y los centavos sobrantes van a quienes tienen mayor resto
+ * (empate: el primero).
  */
 export function repartirPorPorcentaje(totalCentavos: number, porcentajes: readonly number[]): number[] {
   exigirEntero(totalCentavos);
   if (porcentajes.length === 0) throw new Error("CON-01: falta al menos un titular");
   const pesos = porcentajes.map((p) => BigInt(Math.round(p * 10000)));
+  if (pesos.some((w) => w <= 0n)) throw new Error("CON-01: cada porcentaje debe ser mayor a cero");
   const sumaPesos = pesos.reduce((a, b) => a + b, 0n);
-  if (sumaPesos !== 1_000_000n) throw new Error("CON-01: los porcentajes deben sumar 100 %");
+  if (sumaPesos > 1_000_000n) throw new Error("CON-01: los porcentajes no pueden superar 100 %");
 
   const total = BigInt(Math.abs(totalCentavos));
   const partes = pesos.map((w) => (total * w) / 1_000_000n);
   const restos = pesos.map((w, i) => ({ i, resto: (total * w) % 1_000_000n }));
-  let faltante = total - partes.reduce((a, b) => a + b, 0n);
+  // Lo que corresponde asignar en total: total × suma de porcentajes, redondeado al centavo.
+  const asignado = (total * sumaPesos + 500_000n) / 1_000_000n;
+  let faltante = asignado - partes.reduce((a, b) => a + b, 0n);
   restos.sort((a, b) => (a.resto === b.resto ? a.i - b.i : a.resto > b.resto ? -1 : 1));
   for (const r of restos) {
-    if (faltante === 0n) break;
+    if (faltante <= 0n) break;
     partes[r.i] += 1n;
     faltante -= 1n;
   }
   const signo = totalCentavos < 0 ? -1 : 1;
   return partes.map((p) => signo * Number(p));
+}
+
+/** Parte del importe que corresponde a cotitulares no cargados (no se imputa a nadie). */
+export function parteSinAsignar(totalCentavos: number, porcentajes: readonly number[]): number {
+  return totalCentavos - repartirPorPorcentaje(totalCentavos, porcentajes).reduce((a, b) => a + b, 0);
 }
