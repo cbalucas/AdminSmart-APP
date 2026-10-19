@@ -139,3 +139,40 @@ export function mensajeWhatsApp(r: ResumenDelPropietario): string {
   const monto = aDepositar.map((x) => formatearImporte(x.aDepositar, x.moneda)).join(" y ");
   return t("resumen.wa_texto", { nombre, fecha_limite: limite, monto, administracion });
 }
+
+export interface FilaHistorial {
+  id: string;
+  numero: string;
+  fecha: string;
+  horizonteDias: number;
+  fechaLimite: string;
+  tienePdf: boolean;
+  montos: { moneda: Moneda; aDepositar: number }[];
+}
+
+// LIQ-08: historial de resúmenes generados de un propietario, del más nuevo al más viejo.
+export async function historialDeResumenes(propietarioId: string): Promise<FilaHistorial[]> {
+  const supabase = await crearClienteServidor();
+  const { data } = await supabase
+    .from("resumen_deposito")
+    .select("id, numero, fecha, horizonte_dias, fecha_limite, pdf_path, created_at")
+    .eq("propietario_id", propietarioId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+  const filas = data ?? [];
+  const { data: montos } = filas.length
+    ? await supabase.from("resumen_deposito_monto").select("resumen_deposito_id, moneda, a_depositar").in("resumen_deposito_id", filas.map((f) => f.id as string)).is("deleted_at", null)
+    : { data: [] as Record<string, unknown>[] };
+  return filas.map((f) => ({
+    id: f.id as string,
+    numero: f.numero as string,
+    fecha: f.fecha as string,
+    horizonteDias: Number(f.horizonte_dias),
+    fechaLimite: f.fecha_limite as string,
+    tienePdf: Boolean(f.pdf_path),
+    montos: (montos ?? [])
+      .filter((m) => m.resumen_deposito_id === f.id)
+      .map((m) => ({ moneda: m.moneda as Moneda, aDepositar: Number(m.a_depositar) }))
+      .sort((a, b) => a.moneda.localeCompare(b.moneda)),
+  }));
+}

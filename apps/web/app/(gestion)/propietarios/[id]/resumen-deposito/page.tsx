@@ -5,13 +5,15 @@ import { t } from "@ai/i18n";
 import { Avatar } from "@/components/Avatar";
 import { esGestion } from "@/lib/menu";
 import { obtenerPropietario } from "@/lib/propietarios";
-import { calcularResumenDelPropietario, leerHorizonte, mensajeWhatsApp } from "@/lib/resumen-deposito";
+import { calcularResumenDelPropietario, historialDeResumenes, leerHorizonte, mensajeWhatsApp } from "@/lib/resumen-deposito";
 import { usuarioActual } from "@/lib/usuario-actual";
+import { generarResumenOficial } from "./acciones";
 
 interface Filtros {
   h?: string;
   fecha?: string;
   moneda?: string;
+  generado?: string;
 }
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
@@ -27,7 +29,7 @@ export default async function ResumenDeposito({ params, searchParams }: { params
   if (!p) notFound();
 
   const horizonte = leerHorizonte(f.h, f.fecha, p.horizonteResumenDias);
-  const r = await calcularResumenDelPropietario(id, horizonte);
+  const [r, historial] = await Promise.all([calcularResumenDelPropietario(id, horizonte), historialDeResumenes(id)]);
   if (!r) notFound();
 
   const hayUsd = r.resumenes.some((x) => x.moneda === "USD");
@@ -44,6 +46,10 @@ export default async function ResumenDeposito({ params, searchParams }: { params
   const etiquetaHorizonte =
     tipo === "dias" ? t("resumen.horizonte_dias", { dias: horizonte.dias, fecha: fechaCorta(r.fechaLimite) }) : tipo === "fin_de_mes" ? t("resumen.horizonte_fin_mes", { fecha: fechaCorta(r.fechaLimite) }) : t("resumen.horizonte_fecha", { fecha: fechaCorta(r.fechaLimite) });
   const d = r.deposito;
+  const parametrosPdf = new URLSearchParams();
+  if (f.h) parametrosPdf.set("h", f.h);
+  if (f.fecha) parametrosPdf.set("fecha", f.fecha);
+  const generado = f.generado ? historial.find((x) => x.id === f.generado) : undefined;
   const vacio = t("resumen.sin_dato");
   const total = (n: number) => formatearImporte(n, moneda);
 
@@ -85,6 +91,15 @@ export default async function ResumenDeposito({ params, searchParams }: { params
           )}
         </div>
       </div>
+
+      {generado && (
+        <p className="aviso-ok" role="status">
+          {t("resumen.generado", { numero: generado.numero })}{" "}
+          <a href={`/propietarios/${id}/resumen-deposito/pdf/${generado.id}`}>{t("resumen.descargar")}</a>
+        </p>
+      )}
+      {f.generado === "error" && <p className="aviso-error" role="alert">{t("resumen.error_generar")}</p>}
+      {f.generado === "sin_pdf" && <p className="aviso-error" role="alert">{t("resumen.sin_pdf", { numero: historial.find((x) => !x.tienePdf)?.numero ?? "" })}</p>}
 
       <div className="resumen-columnas">
         <div className="resumen-principal">
@@ -187,15 +202,57 @@ export default async function ResumenDeposito({ params, searchParams }: { params
           <section className="panel">
             <h2>{t("resumen.enviar")}</h2>
             <div className="acciones-fila">
-              <button type="button" className="boton boton-secundario" disabled title={t("resumen.proximamente")}>{t("resumen.ver_pdf")}</button>
+              <a href={`/propietarios/${id}/resumen-deposito/pdf?${parametrosPdf.toString()}`} target="_blank" rel="noreferrer" className="boton boton-secundario">{t("resumen.ver_pdf")}</a>
               <button type="button" className="boton" disabled title={t("resumen.proximamente")}>{t("resumen.enviar_email")}</button>
               <button type="button" className="boton" disabled title={t("resumen.proximamente")}>{t("resumen.enviar_whatsapp")}</button>
             </div>
+            <form action={generarResumenOficial.bind(null, id, f.h ?? "", f.fecha ?? "")}>
+              <button type="submit" className="boton">{t("resumen.generar_oficial")}</button>
+            </form>
+            <p className="muted">{t("resumen.ayuda_oficial")}</p>
             <p className="muted">{t("resumen.vista_previa_whatsapp")}</p>
             <p className="mensaje-previo">{mensajeWhatsApp(r)}</p>
           </section>
         </aside>
       </div>
+
+      <section className="panel">
+        <h2>{t("resumen.historial")}</h2>
+        {historial.length === 0 ? (
+          <p className="muted">{t("resumen.sin_historial")}</p>
+        ) : (
+          <div className="tabla-envoltorio">
+            <table className="tabla tabla-compacta">
+              <thead>
+                <tr>
+                  <th>{t("resumen.col_numero")}</th>
+                  <th>{t("resumen.col_fecha")}</th>
+                  <th>{t("resumen.col_horizonte")}</th>
+                  <th className="num">{t("resumen.col_a_depositar")}</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {historial.map((h) => (
+                  <tr key={h.id}>
+                    <td className="nowrap"><strong>{h.numero}</strong></td>
+                    <td className="nowrap">{fechaCorta(h.fecha)}</td>
+                    <td className="nowrap">{fechaCorta(h.fechaLimite)}</td>
+                    <td className="num">{h.montos.map((m) => formatearImporte(m.aDepositar, m.moneda)).join(" · ")}</td>
+                    <td>
+                      {h.tienePdf ? (
+                        <a className="boton-texto" href={`/propietarios/${id}/resumen-deposito/pdf/${h.id}`}>{t("resumen.descargar")}</a>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </>
   );
 }
