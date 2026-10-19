@@ -3,3 +3,5 @@ export * from "./autenticacion";
 export * from "./dinero";
 export * from "./cuentaCorriente";
 export * from "./obligaciones";
+export * from "./uuid";
+export * from "./propietarios";

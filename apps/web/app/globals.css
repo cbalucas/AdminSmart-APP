@@ -232,3 +232,60 @@ a { color: var(--accent); }
   .usuario-texto { display: none; }
   .pagina { padding: 16px 12px; }
 }
+
+/* Listados, fichas y formularios de gestión */
+.avatar-color { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: #FFFFFF; font-weight: 600; flex-shrink: 0; }
+.migas { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.barra-filtros { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.barra-filtros input[type="search"] { flex: 1; min-width: 200px; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.enlace-filtro { font-size: 0.9rem; }
+
+.tabla-envoltorio { overflow-x: auto; }
+.tabla { width: 100%; border-collapse: collapse; }
+.tabla th { text-align: left; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tabla td { padding: 12px; border-bottom: 1px solid var(--lineSoft); vertical-align: middle; }
+.tabla tbody tr:last-child td { border-bottom: none; }
+.tabla tbody tr:hover { background: var(--surface2); }
+.tabla .num { text-align: right; white-space: nowrap; }
+.celda-persona { display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; }
+.celda-persona:hover strong { text-decoration: underline; }
+
+.estado { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+.estado-ok { color: var(--ok); background: var(--okBg); }
+.estado-neutro { color: var(--neutral); background: var(--neutralBg); }
+.estado-vencida { color: var(--danger); background: var(--dangerBg); }
+
+.ficha-cabecera { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.ficha-datos { flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 6px; }
+.ficha-datos h1 { font-size: 1.9rem; }
+.insignias { display: flex; gap: 8px; flex-wrap: wrap; margin: 0; }
+.estado-propietario { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+
+.pestanas { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.pestana { padding: 10px 14px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap; margin-bottom: -1px; }
+.pestana.activa { color: var(--text); font-weight: 600; border-bottom-color: var(--accent); }
+.pestana.deshabilitada { opacity: 0.5; cursor: default; }
+.datos-ancho { grid-template-columns: 220px 1fr; gap: 12px 18px; }
+.linea { display: block; }
+
+.aviso-advertencia { color: var(--warn); background: var(--warnBg); border: 1px solid var(--warnLine); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.aviso-advertencia p, .aviso-advertencia ul { margin: 0; }
+.aviso-advertencia ul { padding-left: 18px; }
+
+.formulario-ancho { display: flex; flex-direction: column; gap: 18px; max-width: 860px; }
+.grupo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.grupo legend { font-family: var(--fuente-titulo), serif; font-size: 1.1rem; font-weight: 600; padding: 0 6px; }
+.rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.rejilla .ancho { grid-column: span 2; }
+@media (max-width: 600px) { .rejilla .ancho { grid-column: auto; } }
+.formulario-ancho .campo select, .formulario-ancho .campo textarea, .formulario-ancho .campo input[type="number"], .fila-lista input, .fila-lista select {
+  width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px;
+}
+.formulario-ancho .campo input[type="text"], .formulario-ancho .campo input[type="number"] { width: 100%; }
+.lista-campos { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.etiqueta-lista { margin: 0; font-size: 0.9rem; font-weight: 500; }
+.fila-lista { display: flex; gap: 10px; align-items: center; width: 100%; flex-wrap: wrap; }
+.fila-lista select { width: 130px; flex-shrink: 0; }
+.fila-lista input[type="tel"], .fila-lista input[type="email"] { flex: 1; min-width: 180px; width: auto; }
+.fila-lista .casilla input { width: auto; }
+.campo select:focus-visible, .campo textarea:focus-visible, .fila-lista input:focus-visible, .fila-lista select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

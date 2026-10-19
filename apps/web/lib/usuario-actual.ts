@@ -13,7 +13,7 @@ export const usuarioActual = cache(async () => {
 
   const { data: usuario } = await supabase
     .from("usuario")
-    .select("nombre, roles, estado")
+    .select("nombre, roles, estado, organizacion_id")
     .eq("id", sesion.user.id)
     .maybeSingle();
 
@@ -21,7 +21,12 @@ export const usuarioActual = cache(async () => {
     email: sesion.user.email ?? "",
     proveedores: (sesion.user.app_metadata?.providers as string[] | undefined) ?? [],
     usuario: usuario
-      ? { nombre: usuario.nombre as string, roles: usuario.roles as Rol[], estado: usuario.estado as string }
+      ? {
+          nombre: usuario.nombre as string,
+          roles: usuario.roles as Rol[],
+          estado: usuario.estado as string,
+          organizacionId: usuario.organizacion_id as string,
+        }
       : null,
   };
 });
