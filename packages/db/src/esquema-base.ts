@@ -138,17 +138,19 @@ export const cuentaBancaria = pgTable(
   {
     ...columnasBase(),
     organizacionId: organizacionId(),
-    banco: text("banco").notNull(),
+    banco: text("banco"),
     tipoCuenta: tipoCuenta("tipo_cuenta").notNull(),
     moneda: moneda("moneda").notNull().default("ARS"),
-    cbuCvu: text("cbu_cvu").notNull(),
+    cbuCvu: text("cbu_cvu"),
     alias: text("alias"),
     titular: text("titular").notNull(),
     estado: estadoActivo("estado").notNull().default("activo"),
   },
   (t) => [
     index("cuenta_bancaria_organizacion_idx").on(t.organizacionId),
-    check("cuenta_bancaria_cbu_ck", sql`${t.cbuCvu} ~ '^[0-9]{22}$'`),
+    check("cuenta_bancaria_cbu_ck", sql`${t.cbuCvu} is null or ${t.cbuCvu} ~ '^[0-9]{22}$'`),
+    check("cuenta_bancaria_alias_ck", sql`${t.alias} is null or ${t.alias} ~ '^[a-z0-9.-]{6,20}$'`),
+    check("cuenta_bancaria_identificacion_ck", sql`${t.cbuCvu} is not null or ${t.alias} is not null`),
   ],
 );
 

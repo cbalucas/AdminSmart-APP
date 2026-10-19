@@ -22,10 +22,14 @@ export async function SeccionCuentas({ propietarioId }: { propietarioId: string 
           <li key={c.vinculoId} className="cuenta">
             <div className="cuenta-datos">
               <p className="cuenta-titulo">
-                <strong>{c.banco}</strong>
+                <strong>{c.banco ?? t(c.tipoCuenta === "billetera" ? "cuentas.entidad_billetera" : "cuentas.entidad_banco")}</strong>
                 <span className="muted"> · {t(`cuentas.tipo_${c.tipoCuenta}`)} · {c.moneda}</span>
               </p>
-              <p className="cuenta-cbu">{formatearCbu(c.cbuCvu)}{c.alias && <span className="muted"> · {c.alias}</span>}</p>
+              <p className="cuenta-cbu">
+                {c.alias && <strong>{c.alias}</strong>}
+                {c.alias && c.cbuCvu && <span className="muted"> · </span>}
+                {c.cbuCvu && formatearCbu(c.cbuCvu)}
+              </p>
               <p className="muted">{c.titular}</p>
               <p className="insignias">
                 {c.predeterminada && <span className="estado estado-ok">{t("cuentas.predeterminada", { moneda: c.moneda })}</span>}

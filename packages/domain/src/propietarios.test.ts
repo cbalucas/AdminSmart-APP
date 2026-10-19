@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  esAliasValido,
   esCbuValido,
   esquemaCuentaBancaria,
   esquemaPropietario,
@@ -133,8 +134,37 @@ describe("diccionario 1.1: cuenta bancaria", () => {
       expect(r.data.alias).toBeNull();
     }
   });
-  it("diccionario 1.1: el titular y el banco son obligatorios", () => {
+  it("diccionario 1.1: alcanza con el alias, sin CBU", () => {
+    const r = esquemaCuentaBancaria.safeParse({
+      banco: "Mercado Pago", tipoCuenta: "billetera", cbuCvu: "", alias: "Carlos.Paez.MP", titular: "Carlos José Paez Allende",
+    });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.cbuCvu).toBeNull();
+      expect(r.data.alias).toBe("carlos.paez.mp");
+    }
+  });
+  it("diccionario 1.1: alcanza con el CBU, sin alias", () => {
+    const r = esquemaCuentaBancaria.safeParse({ banco: "B", tipoCuenta: "caja_ahorro", cbuCvu: cbu, alias: "", titular: "T" });
+    expect(r.success).toBe(true);
+  });
+  it("diccionario 1.1: exige al menos el alias o el CBU", () => {
+    const r = esquemaCuentaBancaria.safeParse({ banco: "B", tipoCuenta: "caja_ahorro", cbuCvu: "", alias: "", titular: "T" });
+    expect(mensajes(r)).toEqual(["validacion.cuenta_cbu_o_alias"]);
+  });
+  it("diccionario 1.1: el alias lleva de 6 a 20 caracteres entre letras, números, punto y guion", () => {
+    expect(esAliasValido("mi.alias-01")).toBe(true);
+    expect(esAliasValido("corto")).toBe(false);
+    expect(esAliasValido("esteAliasEsDemasiadoLargo")).toBe(false);
+    expect(esAliasValido("con espacio")).toBe(false);
+    expect(esAliasValido("con_guion_bajo")).toBe(false);
+  });
+  it("diccionario 1.1: el titular es obligatorio", () => {
     const r = esquemaCuentaBancaria.safeParse({ banco: "", tipoCuenta: "caja_ahorro", cbuCvu: cbu, titular: "" });
-    expect(mensajes(r)).toEqual(["validacion.nombre_obligatorio", "validacion.nombre_obligatorio"]);
+    expect(mensajes(r)).toEqual(["validacion.nombre_obligatorio"]);
+  });
+  it("diccionario 1.1: el nombre del banco o billetera es opcional", () => {
+    const r = esquemaCuentaBancaria.safeParse({ banco: "", tipoCuenta: "billetera", cbuCvu: "", alias: "carlos.paez.mp", titular: "T" });
+    expect(r.success && r.data.banco).toBeNull();
   });
 });

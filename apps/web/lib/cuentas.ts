@@ -6,10 +6,10 @@ export interface CuentaDelPropietario {
   vinculoId: string;
   cuentaId: string;
   predeterminada: boolean;
-  banco: string;
+  banco: string | null;
   tipoCuenta: string;
   moneda: "ARS" | "USD";
-  cbuCvu: string;
+  cbuCvu: string | null;
   alias: string | null;
   titular: string;
   estado: string;
@@ -66,10 +66,10 @@ export const obtenerCuentas = cache(async (propietarioId: string) => {
         vinculoId: v.id as string,
         cuentaId: c.id as string,
         predeterminada: Boolean(v.predeterminada),
-        banco: c.banco as string,
+        banco: (c.banco as string | null) ?? null,
         tipoCuenta: c.tipo_cuenta as string,
         moneda: c.moneda as "ARS" | "USD",
-        cbuCvu: c.cbu_cvu as string,
+        cbuCvu: (c.cbu_cvu as string | null) ?? null,
         alias: (c.alias as string | null) ?? null,
         titular: c.titular as string,
         estado: c.estado as string,
@@ -80,13 +80,13 @@ export const obtenerCuentas = cache(async (propietarioId: string) => {
       };
     })
     .filter((x): x is CuentaDelPropietario => x !== null)
-    .sort((a, b) => a.moneda.localeCompare(b.moneda) || a.banco.localeCompare(b.banco));
+    .sort((a, b) => a.moneda.localeCompare(b.moneda) || (a.banco ?? "").localeCompare(b.banco ?? ""));
 
   const disponibles: CuentaDisponible[] = (todas ?? [])
     .filter((c) => !ids.includes(c.id as string))
     .map((c) => ({
       id: c.id as string,
-      etiqueta: `${c.banco} · ${c.alias ?? `…${String(c.cbu_cvu).slice(-6)}`} · ${c.titular} (${c.moneda})`,
+      etiqueta: `${[c.banco, c.alias ?? (c.cbu_cvu ? `…${String(c.cbu_cvu).slice(-6)}` : null)].filter(Boolean).join(" · ")} · ${c.titular} (${c.moneda})`,
     }));
 
   return { cuentas: lista, disponibles };

@@ -40,6 +40,20 @@ function leer(formulario: FormData) {
   return { ok: false as const, errores };
 }
 
+// Otra cuenta con el mismo alias o CBU/CVU (se vincula, no se duplica).
+async function hayDuplicada(cbu: string | null, alias: string | null, excluirId?: string) {
+  const supabase = await crearClienteServidor();
+  const errores: Record<string, string> = {};
+  for (const [campo, columna, valor] of [["cbuCvu", "cbu_cvu", cbu], ["alias", "alias", alias]] as const) {
+    if (!valor) continue;
+    let consulta = supabase.from("cuenta_bancaria").select("id").eq(columna, valor).is("deleted_at", null);
+    if (excluirId) consulta = consulta.neq("id", excluirId);
+    const { data } = await consulta.limit(1);
+    if (data?.length) errores[campo] = "cuentas.ya_existe";
+  }
+  return errores;
+}
+
 const refrescar = (propietarioId: string) => {
   revalidatePath(`/propietarios/${propietarioId}`);
   revalidatePath("/propietarios");
@@ -88,10 +102,10 @@ export async function crearCuenta(propietarioId: string, _a: EstadoCuenta, formu
   const leido = leer(formulario);
   if (!leido.ok) return { errores: leido.errores };
 
-  const supabase = await crearClienteServidor();
-  const { data: igual } = await supabase.from("cuenta_bancaria").select("id").eq("cbu_cvu", leido.datos.cbuCvu).is("deleted_at", null).maybeSingle();
-  if (igual) return { errores: { cbuCvu: "cuentas.ya_existe" } };
+  const duplicadas = await hayDuplicada(leido.datos.cbuCvu, leido.datos.alias);
+  if (Object.keys(duplicadas).length) return { errores: duplicadas };
 
+  const supabase = await crearClienteServidor();
   const id = generarUuidV7();
   const { error } = await supabase.from("cuenta_bancaria").insert({
     id,
@@ -122,16 +136,10 @@ export async function actualizarCuenta(
   const leido = leer(formulario);
   if (!leido.ok) return { errores: leido.errores };
 
-  const supabase = await crearClienteServidor();
-  const { data: igual } = await supabase
-    .from("cuenta_bancaria")
-    .select("id")
-    .eq("cbu_cvu", leido.datos.cbuCvu)
-    .neq("id", cuentaId)
-    .is("deleted_at", null)
-    .maybeSingle();
-  if (igual) return { errores: { cbuCvu: "cuentas.ya_existe" } };
+  const duplicadas = await hayDuplicada(leido.datos.cbuCvu, leido.datos.alias, cuentaId);
+  if (Object.keys(duplicadas).length) return { errores: duplicadas };
 
+  const supabase = await crearClienteServidor();
   const { error } = await supabase
     .from("cuenta_bancaria")
     .update({

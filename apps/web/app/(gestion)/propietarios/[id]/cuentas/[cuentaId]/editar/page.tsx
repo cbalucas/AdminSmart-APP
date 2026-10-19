@@ -29,10 +29,10 @@ export default async function EditarCuenta({ params }: { params: Promise<{ id: s
         editando
         accion={actualizarCuenta.bind(null, p.id, cuenta.cuentaId)}
         valores={{
-          banco: cuenta.banco,
+          banco: cuenta.banco ?? "",
           tipoCuenta: cuenta.tipoCuenta,
           moneda: cuenta.moneda,
-          cbuCvu: cuenta.cbuCvu,
+          cbuCvu: cuenta.cbuCvu ?? "",
           alias: cuenta.alias ?? "",
           titular: cuenta.titular,
         }}

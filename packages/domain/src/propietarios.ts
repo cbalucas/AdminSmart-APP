@@ -96,16 +96,41 @@ export function esCbuValido(valor: string): boolean {
 
 export const TIPOS_CUENTA = ["caja_ahorro", "cuenta_corriente", "billetera"] as const;
 
-export const esquemaCuentaBancaria = z.object({
-  banco: texto.min(1, { error: "validacion.nombre_obligatorio" }),
-  tipoCuenta: z.enum(TIPOS_CUENTA),
-  moneda: z.enum(["ARS", "USD"]).default("ARS"),
-  cbuCvu: texto
-    .transform((v) => v.replace(/\s/g, ""))
-    .refine(esCbuValido, { error: "validacion.cbu_invalido" }),
-  alias: textoOpcional,
-  titular: texto.min(1, { error: "validacion.nombre_obligatorio" }),
-});
+/**
+ * Alias de CBU/CVU: de 6 a 20 caracteres entre letras, números, punto y guion.
+ * No distingue mayúsculas: se guarda en minúsculas.
+ */
+export const PATRON_ALIAS = /^[a-z0-9.-]{6,20}$/;
+
+export function esAliasValido(valor: string): boolean {
+  return PATRON_ALIAS.test(valor.trim().toLowerCase());
+}
+
+const aliasOpcional = texto
+  .optional()
+  .transform((v) => (v ? v.toLowerCase() : null))
+  .refine((v) => v === null || PATRON_ALIAS.test(v), { error: "validacion.alias_invalido" });
+
+const cbuOpcional = texto
+  .optional()
+  .transform((v) => (v ? v.replace(/\s/g, "") : null))
+  .refine((v) => v === null || esCbuValido(v), { error: "validacion.cbu_invalido" });
+
+// La cuenta se identifica por su alias, por su CBU/CVU o por ambos: alcanza con uno.
+export const esquemaCuentaBancaria = z
+  .object({
+    // Nombre del banco o de la billetera: opcional (el tipo de cuenta ya dice cuál es).
+    banco: textoOpcional,
+    tipoCuenta: z.enum(TIPOS_CUENTA),
+    moneda: z.enum(["ARS", "USD"]).default("ARS"),
+    cbuCvu: cbuOpcional,
+    alias: aliasOpcional,
+    titular: texto.min(1, { error: "validacion.nombre_obligatorio" }),
+  })
+  .refine((c) => c.cbuCvu !== null || c.alias !== null, {
+    path: ["alias"],
+    error: "validacion.cuenta_cbu_o_alias",
+  });
 
 export type DatosCuentaBancaria = z.output<typeof esquemaCuentaBancaria>;
 

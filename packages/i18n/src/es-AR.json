@@ -248,11 +248,11 @@
   "cuentas.alta_titulo": "Nueva cuenta bancaria",
   "cuentas.edicion_titulo": "Editar cuenta bancaria",
   "cuentas.edicion_compartida": "Esta cuenta también pertenece a: {nombres}. Los cambios valen para todos.",
-  "cuentas.campo_banco": "Banco o billetera",
+  "cuentas.campo_banco": "Nombre del banco o de la billetera (opcional)",
   "cuentas.campo_tipo": "Tipo de cuenta",
   "cuentas.campo_moneda": "Moneda",
-  "cuentas.campo_cbu": "CBU o CVU (22 números)",
-  "cuentas.campo_alias": "Alias (opcional)",
+  "cuentas.campo_cbu": "CBU o CVU, 22 números (opcional si cargás el alias)",
+  "cuentas.campo_alias": "Alias (opcional si cargás el CBU o CVU)",
   "cuentas.campo_titular": "Titular, como figura en el banco",
   "cuentas.tipo_caja_ahorro": "Caja de ahorro",
   "cuentas.tipo_cuenta_corriente": "Cuenta corriente",
@@ -274,6 +274,11 @@
   "cuentas.vincular_ayuda": "Sirve para cuentas compartidas entre cotitulares.",
   "cuentas.error_guardar": "No se pudo guardar la cuenta. Revisá los datos e intentá de nuevo.",
   "cuentas.error_accion": "No se pudo completar la acción. Intentá de nuevo.",
-  "cuentas.ya_existe": "Ya existe una cuenta con ese CBU o CVU. Usá “Vincular una cuenta que ya existe”.",
-  "cuentas.sin_permiso": "Solo el administrador gestiona las cuentas bancarias."
+  "cuentas.ya_existe": "Ya existe una cuenta con ese alias o CBU/CVU. Usá “Vincular una cuenta que ya existe”.",
+  "cuentas.sin_permiso": "Solo el administrador gestiona las cuentas bancarias.",
+  "validacion.alias_invalido": "El alias debe tener de 6 a 20 caracteres: letras, números, punto o guion.",
+  "validacion.cuenta_cbu_o_alias": "Cargá el alias, el CBU o CVU, o ambos.",
+  "cuentas.campo_entidad": "Banco o billetera",
+  "cuentas.entidad_banco": "Banco",
+  "cuentas.entidad_billetera": "Billetera virtual"
 }

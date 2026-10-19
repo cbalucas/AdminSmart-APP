@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { t } from "@ai/i18n";
-import { TIPOS_CUENTA } from "@ai/domain";
 import type { EstadoCuenta } from "@/app/(gestion)/propietarios/[id]/cuentas/acciones";
 
 export interface ValoresCuenta {
@@ -27,6 +26,7 @@ export const CUENTA_NUEVA: ValoresCuenta = {
 type Accion = (anterior: EstadoCuenta, formulario: FormData) => Promise<EstadoCuenta>;
 
 // P-14 Cuenta bancaria: alta y edición. En la edición la moneda no se cambia.
+// "Banco o billetera" es un combo; si es un banco se elige además caja de ahorro o cuenta corriente.
 export function FormularioCuenta({
   accion,
   valores,
@@ -39,6 +39,7 @@ export function FormularioCuenta({
   editando?: boolean;
 }) {
   const [estado, enviar, pendiente] = useActionState(accion, {} as EstadoCuenta);
+  const [esBilletera, setEsBilletera] = useState(valores.tipoCuenta === "billetera");
   const errores = estado.errores ?? {};
   const error = (campo: string) =>
     errores[campo] ? (
@@ -54,17 +55,26 @@ export function FormularioCuenta({
         <legend>{t("cuentas.titulo")}</legend>
         <div className="rejilla">
           <div className="campo">
-            <label htmlFor="banco">{t("cuentas.campo_banco")}</label>
-            <input id="banco" name="banco" type="text" defaultValue={valores.banco} aria-invalid={Boolean(errores.banco)} />
-            {error("banco")}
-          </div>
-          <div className="campo">
-            <label htmlFor="tipoCuenta">{t("cuentas.campo_tipo")}</label>
-            <select id="tipoCuenta" name="tipoCuenta" defaultValue={valores.tipoCuenta}>
-              {TIPOS_CUENTA.map((tipo) => (
-                <option key={tipo} value={tipo}>{t(`cuentas.tipo_${tipo}`)}</option>
-              ))}
+            <label htmlFor="entidad">{t("cuentas.campo_entidad")}</label>
+            <select id="entidad" value={esBilletera ? "billetera" : "banco"} onChange={(e) => setEsBilletera(e.target.value === "billetera")}>
+              <option value="banco">{t("cuentas.entidad_banco")}</option>
+              <option value="billetera">{t("cuentas.entidad_billetera")}</option>
             </select>
+          </div>
+          {esBilletera ? (
+            <input type="hidden" name="tipoCuenta" value="billetera" />
+          ) : (
+            <div className="campo">
+              <label htmlFor="tipoCuenta">{t("cuentas.campo_tipo")}</label>
+              <select id="tipoCuenta" name="tipoCuenta" defaultValue={valores.tipoCuenta === "cuenta_corriente" ? "cuenta_corriente" : "caja_ahorro"}>
+                <option value="caja_ahorro">{t("cuentas.tipo_caja_ahorro")}</option>
+                <option value="cuenta_corriente">{t("cuentas.tipo_cuenta_corriente")}</option>
+              </select>
+            </div>
+          )}
+          <div className="campo">
+            <label htmlFor="banco">{t("cuentas.campo_banco")}</label>
+            <input id="banco" name="banco" type="text" defaultValue={valores.banco} />
           </div>
           <div className="campo">
             <label htmlFor="moneda">{t("cuentas.campo_moneda")}</label>
@@ -81,13 +91,14 @@ export function FormularioCuenta({
             )}
           </div>
           <div className="campo ancho">
+            <label htmlFor="alias">{t("cuentas.campo_alias")}</label>
+            <input id="alias" name="alias" type="text" autoCapitalize="none" defaultValue={valores.alias} aria-invalid={Boolean(errores.alias)} />
+            {error("alias")}
+          </div>
+          <div className="campo ancho">
             <label htmlFor="cbuCvu">{t("cuentas.campo_cbu")}</label>
             <input id="cbuCvu" name="cbuCvu" type="text" inputMode="numeric" defaultValue={valores.cbuCvu} aria-invalid={Boolean(errores.cbuCvu)} />
             {error("cbuCvu")}
-          </div>
-          <div className="campo">
-            <label htmlFor="alias">{t("cuentas.campo_alias")}</label>
-            <input id="alias" name="alias" type="text" defaultValue={valores.alias} />
           </div>
           <div className="campo ancho">
             <label htmlFor="titular">{t("cuentas.campo_titular")}</label>
