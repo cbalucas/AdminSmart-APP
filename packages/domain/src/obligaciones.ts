@@ -143,3 +143,37 @@ export function impactoDelPago(pagadoPor: PagadoPor, responsable: Responsable): 
   if (pagadoPor !== "administracion") return "solo_historial";
   return responsable === "propietario" ? "debito_propietario" : "deuda_inquilino";
 }
+
+/** Período (AAAA-MM-01) al que pertenece una fecha AAAA-MM-DD. */
+export function periodoDeFecha(fecha: string): string {
+  return `${fecha.slice(0, 7)}-01`;
+}
+
+const MESES_CORTOS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+/** "2026-10-01" → "oct 2026". */
+export function formatearPeriodo(periodo: string): string {
+  const [a, m] = periodo.split("-").map(Number);
+  return `${MESES_CORTOS[m - 1]} ${a}`;
+}
+
+/** OBL-06: una obligación pagada o anulada no se modifica; primero hay que anular su pago. */
+export function puedeModificarObligacion(o: { pagada: boolean; anulada: boolean }): boolean {
+  return !o.pagada && !o.anulada;
+}
+
+/**
+ * OBL-05, OBL-09: período de la ocurrencia que hay que generar a partir de una obligación, o null.
+ * Se genera cuando la obligación es recurrente, su período ya comenzó y todavía no existe la siguiente;
+ * así cada gasto recurrente conserva una sola ocurrencia futura.
+ */
+export function siguienteAGenerar(
+  o: { periodo: string; esRecurrente: boolean; frecuencia: Frecuencia | null; anulada: boolean },
+  periodosExistentes: readonly string[],
+  hoy: string,
+): string | null {
+  if (!o.esRecurrente || o.frecuencia === null || o.anulada) return null;
+  if (o.periodo > periodoDeFecha(hoy)) return null;
+  const siguiente = proximoPeriodo(o.periodo, o.frecuencia);
+  return periodosExistentes.includes(siguiente) ? null : siguiente;
+}

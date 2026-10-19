@@ -361,3 +361,15 @@ a { color: var(--accent); }
 .fila-inactiva { opacity: 0.65; }
 
 .tabla td .estado { margin-left: 8px; }
+
+.estado-ambar { color: var(--warn); background: var(--warnBg); }
+.pildoras { display: flex; gap: 8px; flex-wrap: wrap; }
+.pildora { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; color: var(--text); text-decoration: none; background: var(--surface); }
+.pildora.activa { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pildora .contador { font-size: 0.75rem; padding: 1px 7px; border-radius: 999px; background: var(--neutralBg); color: var(--neutral); }
+.pildora.activa .contador { background: rgba(255, 255, 255, 0.22); color: #fff; }
+.resumen-lista { margin: 0; color: var(--muted); font-size: 0.9rem; text-align: right; }
+.falta-monto { font-style: italic; color: var(--warn); }
+
+.tabla .nowrap, .tabla td .estado { white-space: nowrap; }
+.filtros-separados { margin-top: 16px; }
