@@ -26,7 +26,7 @@ export const estadoBien = pgEnum("estado_bien", [
   "activo",
   "de_baja",
 ]);
-export const modoLiquidacion = pgEnum("modo_liquidacion", ["por_separado", "al_representante"]);
+export const modoLiquidacion = pgEnum("modo_liquidacion", ["por_separado", "al_representante", "a_propietario"]);
 export const modoHonorarios = pgEnum("modo_honorarios", [
   "sobre_parte_de_cada_titular",
   "sobre_total_al_representante",

@@ -137,3 +137,88 @@ describe("CON-01: titularidad del bien", () => {
     expect(esquemaTitular.safeParse({ propietarioId: "", porcentaje: 50 }).success).toBe(false);
   });
 });
+
+import {
+  contratoVigente,
+  impedimentosDeVenta,
+  puedeQuitarTitular,
+  representanteTrasQuitar,
+  validarModoLiquidacion,
+  validarPorcentajeTitular,
+} from "./bienes";
+
+const t = (id: string, porcentaje: number, esRepresentante = false) => ({ id, porcentaje, esRepresentante });
+
+describe("CON-01: alta y cambio de titulares (P-18)", () => {
+  it("CON-01: acepta un nuevo titular mientras la suma no pase de 100 %", () => {
+    expect(validarPorcentajeTitular([t("a", 50)], 25)).toBeNull();
+    expect(validarPorcentajeTitular([t("a", 50), t("b", 25)], 25)).toBeNull();
+  });
+  it("CON-01: rechaza un titular que haría superar 100 %", () => {
+    expect(validarPorcentajeTitular([t("a", 50), t("b", 25)], 30)).toBe("excede");
+  });
+  it("CON-01: al cambiar el porcentaje de un titular no se cuenta su valor anterior", () => {
+    expect(validarPorcentajeTitular([t("a", 50), t("b", 25)], 70, "a")).toBeNull();
+    expect(validarPorcentajeTitular([t("a", 50), t("b", 25)], 80, "a")).toBe("excede");
+  });
+  it("CON-01: el porcentaje debe ser mayor a 0 y hasta 100", () => {
+    expect(validarPorcentajeTitular([], 0)).toBe("porcentaje_invalido");
+    expect(validarPorcentajeTitular([], 101)).toBe("porcentaje_invalido");
+    expect(validarPorcentajeTitular([], Number.NaN)).toBe("porcentaje_invalido");
+  });
+  it("CON-01: el último titular no se quita", () => {
+    expect(puedeQuitarTitular(1)).toBe(false);
+    expect(puedeQuitarTitular(2)).toBe(true);
+  });
+});
+
+describe("CON-04: representante", () => {
+  it("CON-04: al quitar al representante pasa al titular con mayor porcentaje", () => {
+    expect(representanteTrasQuitar([t("a", 50, true), t("b", 25), t("c", 40)], "a")).toBe("c");
+  });
+  it("CON-04: al quitar a otro titular el representante no cambia", () => {
+    expect(representanteTrasQuitar([t("a", 50, true), t("b", 25)], "b")).toBe("a");
+  });
+  it("CON-04: sin titulares restantes no hay representante", () => {
+    expect(representanteTrasQuitar([t("a", 100, true)], "a")).toBeNull();
+  });
+  it("CON-04: liquidar al representante exige exactamente uno", () => {
+    expect(validarModoLiquidacion("al_representante", [t("a", 50, true), t("b", 25)])).toBeNull();
+    expect(validarModoLiquidacion("al_representante", [t("a", 50), t("b", 25)])).toBe("sin_representante");
+    expect(validarModoLiquidacion("al_representante", [t("a", 50, true), t("b", 25, true)])).toBe("sin_representante");
+  });
+  it("CON-04: liquidar por separado no exige representante", () => {
+    expect(validarModoLiquidacion("por_separado", [t("a", 50), t("b", 25)])).toBeNull();
+  });
+  it("CON-04: liquidar a un propietario exige elegir uno de los titulares", () => {
+    const titulares = [{ ...t("a", 50), propietarioId: "p1" }, { ...t("b", 25), propietarioId: "p2" }];
+    expect(validarModoLiquidacion("a_propietario", titulares, "p2")).toBeNull();
+    expect(validarModoLiquidacion("a_propietario", titulares, "p9")).toBe("sin_propietario");
+    expect(validarModoLiquidacion("a_propietario", titulares, null)).toBe("sin_propietario");
+  });
+  it("CON-04: liquidar a un propietario no exige que sea el representante", () => {
+    const titulares = [{ ...t("a", 50, true), propietarioId: "p1" }, { ...t("b", 25), propietarioId: "p2" }];
+    expect(validarModoLiquidacion("a_propietario", titulares, "p2")).toBeNull();
+  });
+});
+
+describe("PROP-03: cambio a Vendido", () => {
+  const hoy = "2026-10-19";
+  it("PROP-03: un contrato vigente ya empezó, no terminó y no fue rescindido", () => {
+    expect(contratoVigente({ fechaInicio: "2026-01-01", fechaFin: "2027-01-01", rescisionFecha: null }, hoy)).toBe(true);
+    expect(contratoVigente({ fechaInicio: "2026-01-01", fechaFin: null, rescisionFecha: null }, hoy)).toBe(true);
+  });
+  it("PROP-03: un contrato que todavía no empezó, ya terminó o fue rescindido no está vigente", () => {
+    expect(contratoVigente({ fechaInicio: "2026-11-01", fechaFin: null, rescisionFecha: null }, hoy)).toBe(false);
+    expect(contratoVigente({ fechaInicio: "2025-01-01", fechaFin: "2026-10-18", rescisionFecha: null }, hoy)).toBe(false);
+    expect(contratoVigente({ fechaInicio: "2025-01-01", fechaFin: "2027-01-01", rescisionFecha: "2026-10-19" }, hoy)).toBe(false);
+  });
+  it("PROP-03: el último día del contrato todavía está vigente", () => {
+    expect(contratoVigente({ fechaInicio: "2025-01-01", fechaFin: "2026-10-19", rescisionFecha: null }, hoy)).toBe(true);
+  });
+  it("PROP-03: obligaciones pendientes o contrato vigente impiden vender", () => {
+    expect(impedimentosDeVenta({ obligacionesPendientes: 0, contratosVigentes: 0 })).toEqual([]);
+    expect(impedimentosDeVenta({ obligacionesPendientes: 2, contratosVigentes: 0 })).toEqual(["obligaciones"]);
+    expect(impedimentosDeVenta({ obligacionesPendientes: 1, contratosVigentes: 1 })).toEqual(["obligaciones", "contrato"]);
+  });
+});

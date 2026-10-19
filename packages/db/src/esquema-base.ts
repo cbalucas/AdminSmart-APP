@@ -244,6 +244,8 @@ export const bien = pgTable(
     edificioId: uuid("edificio_id").references(() => edificio.id),
     unidadFuncional: text("unidad_funcional"),
     modoLiquidacion: modoLiquidacion("modo_liquidacion").notNull().default("por_separado"),
+    // Solo en el modo "a un propietario": a cuál de los titulares se liquida.
+    propietarioLiquidacionId: uuid("propietario_liquidacion_id").references(() => propietario.id),
     modoHonorarios: modoHonorarios("modo_honorarios").notNull().default("sobre_parte_de_cada_titular"),
     esGastosVarios: boolean("es_gastos_varios").notNull().default(false), // PROP-06
     observaciones: text("observaciones"),

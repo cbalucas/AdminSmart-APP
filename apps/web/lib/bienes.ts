@@ -40,6 +40,7 @@ export interface Bien {
   edificioId: string | null;
   unidadFuncional: string | null;
   modoLiquidacion: string;
+  propietarioLiquidacionId: string | null;
   esGastosVarios: boolean;
   observaciones: string | null;
 }
@@ -65,6 +66,7 @@ const aBien = (b: Record<string, unknown>): Bien => ({
   edificioId: (b.edificio_id as string | null) ?? null,
   unidadFuncional: (b.unidad_funcional as string | null) ?? null,
   modoLiquidacion: b.modo_liquidacion as string,
+  propietarioLiquidacionId: (b.propietario_liquidacion_id as string | null) ?? null,
   esGastosVarios: Boolean(b.es_gastos_varios),
   observaciones: (b.observaciones as string | null) ?? null,
 });

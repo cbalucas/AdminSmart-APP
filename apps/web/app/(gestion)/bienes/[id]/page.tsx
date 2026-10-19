@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
-import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, porcentajeDisponible } from "@ai/domain";
-import { formatearPorcentaje, listarEdificios, obtenerBien, titularesDe } from "@/lib/bienes";
+import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, type TipoBien } from "@ai/domain";
+import { CambiarEstadoBien } from "@/components/CambiarEstadoBien";
+import { SeccionTitulares } from "@/components/SeccionTitulares";
+import { listarEdificios, obtenerBien, titularesDe } from "@/lib/bienes";
 import { esGestion } from "@/lib/menu";
+import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
 
 const PESTANAS = ["datos", "servicios", "obligaciones", "documentos"] as const;
@@ -38,7 +41,12 @@ export default async function FichaBien({ params }: { params: Promise<{ id: stri
 
   const porcentajes = titulares.map((x) => x.porcentaje);
   const titularidad = estadoTitularidad(porcentajes);
-  const suma = porcentajes.reduce((a, b) => a + b, 0);
+  const esAdmin = usuario.roles.includes("administrador");
+  const supabase = await crearClienteServidor();
+  const { data: activos } = await supabase.from("propietario").select("id, nombre_razon_social").eq("estado", "activo").is("deleted_at", null).order("nombre_razon_social");
+  const candidatos = (activos ?? [])
+    .filter((p) => !titulares.some((x) => x.propietarioId === p.id))
+    .map((p) => ({ id: p.id as string, nombre: p.nombre_razon_social as string }));
   const titulo = bien.esGastosVarios ? `${t("bienes.gastos_varios")} · ${titulares[0]?.nombre ?? ""}` : bien.alias;
   const vacio = t("propietarios.dato_vacio");
 
@@ -57,13 +65,12 @@ export default async function FichaBien({ params }: { params: Promise<{ id: stri
             {direccion && ` · ${direccion}`}
           </p>
           <p className="insignias">
-            <span className={["disponible", "activo", "alquilado"].includes(bien.estado) ? "estado estado-ok" : "estado estado-neutro"}>
-              {t(`estado_bien.${bien.estado}`)}
-            </span>
+            {bien.esGastosVarios && <span className="estado estado-ok">{t(`estado_bien.${bien.estado}`)}</span>}
             {titularidad === "vacia" && <span className="estado estado-vencida">{t("bienes.sin_titulares")}</span>}
             {titularidad === "excedida" && <span className="estado estado-vencida">{t("bienes.titularidad_excedida")}</span>}
           </p>
         </div>
+        {!bien.esGastosVarios && <CambiarEstadoBien bienId={bien.id} tipo={bien.tipoBien as TipoBien} estado={bien.estado} />}
         <div className="acciones-rapidas">
           {mapa && (
             <a href={mapa} target="_blank" rel="noreferrer" className="boton boton-secundario">{t("bienes.ver_mapa")}</a>
@@ -115,48 +122,24 @@ export default async function FichaBien({ params }: { params: Promise<{ id: stri
             </>
           )}
           <dt>{t("bienes.dato_modo")}</dt>
-          <dd>{t(`bienes.modo_${bien.modoLiquidacion}`)}</dd>
+          <dd>
+            {bien.modoLiquidacion === "a_propietario"
+              ? t("bienes.modo_a_propietario_de", { nombre: titulares.find((x) => x.propietarioId === bien.propietarioLiquidacionId)?.nombre ?? "—" })
+              : t(`bienes.modo_${bien.modoLiquidacion}`)}
+          </dd>
           <dt>{t("bienes.dato_observaciones")}</dt>
           <dd>{bien.observaciones ?? vacio}</dd>
         </dl>
       </section>
 
-      <section className="panel">
-        <div className="encabezado">
-          <h2>{t("bienes.titulares")}</h2>
-        </div>
-        {titulares.length === 0 ? (
-          <p className="muted">{t("bienes.titulares_vacio")}</p>
-        ) : (
-          <div className="tabla-envoltorio">
-            <table className="tabla">
-              <thead>
-                <tr>
-                  <th>{t("bienes.campo_titular")}</th>
-                  <th className="num">{t("bienes.col_porcentaje")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {titulares.map((x) => (
-                  <tr key={x.vinculoId}>
-                    <td>
-                      <Link href={`/propietarios/${x.propietarioId}`}><strong>{x.nombre}</strong></Link>
-                      {x.esRepresentante && titulares.length > 1 && <span className="muted"> · {t("bienes.titular_representante")}</span>}
-                    </td>
-                    <td className="num">{formatearPorcentaje(x.porcentaje)} %</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {titulares.length > 0 && (
-          <p className="muted">
-            {t("bienes.titulares_suma", { suma: formatearPorcentaje(Math.round(suma * 10000) / 10000) })}
-            {titularidad === "parcial" && ` · ${t("bienes.titulares_sin_cargar", { resto: formatearPorcentaje(porcentajeDisponible(porcentajes)) })}`}
-          </p>
-        )}
-      </section>
+      <SeccionTitulares
+        bienId={bien.id}
+        titulares={titulares}
+        candidatos={candidatos}
+        modo={bien.modoLiquidacion}
+        propietarioLiquidacionId={bien.propietarioLiquidacionId}
+        puedeEditar={esAdmin && !bien.esGastosVarios}
+      />
     </>
   );
 }

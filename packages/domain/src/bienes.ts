@@ -158,3 +158,96 @@ export const esquemaTitular = z.object({
     .gt(0, { error: "validacion.porcentaje_invalido" })
     .max(100, { error: "validacion.porcentaje_invalido" }),
 });
+
+// ---------------------------------------------------------------- titulares: operaciones (P-18)
+
+export interface TitularBasico {
+  id: string;
+  propietarioId?: string;
+  porcentaje: number;
+  esRepresentante: boolean;
+}
+
+export type ErrorTitularidad =
+  | "excede"
+  | "ultimo_titular"
+  | "sin_representante"
+  | "sin_propietario"
+  | "porcentaje_invalido"
+  | "repetido";
+
+export type ModoLiquidacion = "por_separado" | "al_representante" | "a_propietario";
+export const MODOS_LIQUIDACION: readonly ModoLiquidacion[] = ["por_separado", "al_representante", "a_propietario"];
+
+/** CON-01: al agregar o cambiar un titular, la suma no puede superar 100 %. */
+export function validarPorcentajeTitular(
+  actuales: readonly TitularBasico[],
+  porcentaje: number,
+  excluirId?: string,
+): ErrorTitularidad | null {
+  if (!(porcentaje > 0 && porcentaje <= 100)) return "porcentaje_invalido";
+  const otros = actuales.filter((t) => t.id !== excluirId).map((t) => t.porcentaje);
+  return estadoTitularidad([...otros, porcentaje]) === "excedida" ? "excede" : null;
+}
+
+/** Un bien no puede quedar sin titulares: el último no se quita. */
+export const puedeQuitarTitular = (cantidad: number): boolean => cantidad > 1;
+
+/**
+ * Al quitar al representante, el cargo pasa al titular con mayor porcentaje que queda
+ * (empate: el primero de la lista). Si quitás a otro titular, el representante no cambia.
+ */
+export function representanteTrasQuitar(actuales: readonly TitularBasico[], quitadoId: string): string | null {
+  const restantes = actuales.filter((t) => t.id !== quitadoId);
+  if (restantes.length === 0) return null;
+  const actual = restantes.find((t) => t.esRepresentante);
+  if (actual) return actual.id;
+  return restantes.reduce((mejor, t) => (t.porcentaje > mejor.porcentaje ? t : mejor)).id;
+}
+
+/**
+ * Cómo se liquida el bien:
+ * - Por separado: cada titular recibe su liquidación por su porcentaje.
+ * - Al representante (CON-04): exactamente un representante recibe una sola liquidación.
+ * - A un propietario: una sola liquidación a nombre de un titular elegido (`propietarioId`).
+ */
+export function validarModoLiquidacion(
+  modo: ModoLiquidacion,
+  titulares: readonly TitularBasico[],
+  propietarioId?: string | null,
+): ErrorTitularidad | null {
+  if (modo === "al_representante") {
+    return titulares.filter((t) => t.esRepresentante).length === 1 ? null : "sin_representante";
+  }
+  if (modo === "a_propietario") {
+    return propietarioId && titulares.some((t) => t.propietarioId === propietarioId) ? null : "sin_propietario";
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------- estado del bien (PROP-03)
+
+export interface FechasContrato {
+  fechaInicio: string | null; // AAAA-MM-DD
+  fechaFin: string | null;
+  rescisionFecha: string | null;
+}
+
+/** Un contrato está vigente si ya empezó, no terminó y no fue rescindido. `hoy` es AAAA-MM-DD. */
+export function contratoVigente(c: FechasContrato, hoy: string): boolean {
+  if (c.fechaInicio !== null && c.fechaInicio > hoy) return false;
+  if (c.fechaFin !== null && c.fechaFin < hoy) return false;
+  if (c.rescisionFecha !== null && c.rescisionFecha <= hoy) return false;
+  return true;
+}
+
+/** PROP-03: no pasa a Vendido con obligaciones pendientes a cargo del propietario o con contrato vigente. */
+export function impedimentosDeVenta(m: {
+  obligacionesPendientes: number;
+  contratosVigentes: number;
+}): ("obligaciones" | "contrato")[] {
+  const motivos: ("obligaciones" | "contrato")[] = [];
+  if (m.obligacionesPendientes > 0) motivos.push("obligaciones");
+  if (m.contratosVigentes > 0) motivos.push("contrato");
+  return motivos;
+}

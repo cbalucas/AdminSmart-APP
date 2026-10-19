@@ -337,3 +337,15 @@ a { color: var(--accent); }
 .filtros-pie { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .filtros-pie .filtros-opciones { grid-column: auto; }
 .filtros-pie .acciones { grid-column: auto; margin-top: 0; }
+
+/* Titulares y estado del bien */
+.porcentaje-editable { display: inline-flex; align-items: center; gap: 6px; }
+.porcentaje-editable input { width: 84px; padding: 8px 10px; font: inherit; text-align: right; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.porcentaje-editable input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.agregar-titular { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid var(--lineSoft); }
+.agregar-titular select, .agregar-titular input[type="text"] { padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.modo-liquidacion { padding-top: 10px; border-top: 1px solid var(--lineSoft); }
+.modo-liquidacion select { max-width: 360px; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.cambiar-estado { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.cambiar-estado select { padding: 8px 10px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+.modo-liquidacion .boton { align-self: flex-start; }
