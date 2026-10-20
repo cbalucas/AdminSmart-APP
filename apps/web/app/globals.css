@@ -881,3 +881,5 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .filtros-compactos .campo:not(.filtro-buscar) { flex: 0 1 190px; }
 .filtros-compactos .filtros-pie { flex: 1 1 100%; }
 .filtros-compactos > .boton-texto { align-self: center; }
+/* Tarjetas de indicadores angostas (como en el Inicio), alineadas a la izquierda */
+.indicadores-compactos { grid-template-columns: repeat(auto-fill, minmax(200px, 240px)); }

@@ -176,7 +176,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
         </div>
       </div>
 
-      <section className="indicadores">
+      <section className="indicadores indicadores-compactos">
         <TarjetaIndicador id="vencidas" icono="obligaciones" tono={vencidasTot.cantidad > 0 ? "peligro" : "ok"} titulo={t("indicadores.vencidas")} valor={String(vencidasTot.cantidad)} nota={vencidasTot.total || t("indicadores.nada")} />
         <TarjetaIndicador id="pendientes" icono="calendario" tono="acento" titulo={t("indicadores.proximas")} valor={String(pendientesTot.cantidad)} nota={pendientesTot.total || t("indicadores.nada")} />
         <TarjetaIndicador id="a-completar" icono="recurrente" tono="aviso" titulo={t("indicadores.a_completar")} valor={String(porCompletar)} nota={porCompletar > 0 ? t("indicadores.sin_monto") : t("indicadores.nada")} />
