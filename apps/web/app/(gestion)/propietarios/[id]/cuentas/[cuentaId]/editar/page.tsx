@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioCuenta } from "@/components/FormularioCuenta";
 import { obtenerCuentas } from "@/lib/cuentas";
 import { obtenerPropietario } from "@/lib/propietarios";
@@ -19,9 +20,7 @@ export default async function EditarCuenta({ params }: { params: Promise<{ id: s
   return (
     <>
       <p className="migas">{p.nombre}</p>
-      <div className="encabezado">
-        <h1>{t("cuentas.edicion_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="editar">{t("cuentas.edicion_titulo")}</TituloConIcono>
       {cuenta.compartidaCon.length > 0 && (
         <p className="aviso-advertencia">{t("cuentas.edicion_compartida", { nombres: cuenta.compartidaCon.join(", ") })}</p>
       )}

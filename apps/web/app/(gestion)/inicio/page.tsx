@@ -17,6 +17,12 @@ function montosTexto(montos: Record<Moneda, number>): string {
   return partes.length > 0 ? partes.join(" · ") : "—";
 }
 
+// Cuanto más largo el importe, más chica la letra.
+const tamanoCifra = (valor: string) => {
+  const largo = valor.length;
+  return largo <= 7 ? "1.7rem" : largo <= 9 ? "1.45rem" : largo <= 11 ? "1.25rem" : largo <= 13 ? "1.05rem" : "0.9rem";
+};
+
 // Ícono y tono de cada indicador del inicio.
 const ICONO_INDICADOR: Record<string, [string, string]> = {
   vencidas: ["obligaciones", "peligro"],
@@ -67,7 +73,7 @@ export default async function Inicio() {
         )}
         <p className="muted indicador-titulo">{titulo}</p>
         <span className="indicador-icono" aria-hidden="true"><Icono nombre={icono} tamano={22} /></span>
-        <strong className="cifra">{valor}</strong>
+        <strong className="cifra" style={{ fontSize: tamanoCifra(valor) }} title={valor}>{valor}</strong>
         {observacion && (
           <span className="indicador-info">
             <button type="button" className="info-boton" aria-label={t("inicio.ver_observacion")} aria-describedby={`obs-${clave}`}>

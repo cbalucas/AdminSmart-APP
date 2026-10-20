@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { CUENTA_NUEVA, FormularioCuenta } from "@/components/FormularioCuenta";
 import { obtenerPropietario } from "@/lib/propietarios";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -16,9 +17,7 @@ export default async function NuevaCuenta({ params }: { params: Promise<{ id: st
   return (
     <>
       <p className="migas">{p.nombre}</p>
-      <div className="encabezado">
-        <h1>{t("cuentas.alta_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="cuentas">{t("cuentas.alta_titulo")}</TituloConIcono>
       <FormularioCuenta
         accion={crearCuenta.bind(null, p.id)}
         valores={{ ...CUENTA_NUEVA, titular: p.nombre }}

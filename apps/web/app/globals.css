@@ -778,3 +778,38 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 /* La cifra de un indicador nunca se parte en dos renglones: se achica si hace falta. */
 .indicador .cifra { white-space: nowrap; font-size: clamp(1.45rem, 2vw, 2.2rem); min-width: 0; text-align: center; }
 @media (max-width: 700px) { .indicador .cifra { font-size: clamp(1.25rem, 5.4vw, 1.7rem); } .indicador { grid-template-columns: 38px 1fr 38px; } .indicador-icono { width: 38px; height: 38px; } }
+
+/* ------------------------------------------------------------------ tarjeta de bien con detalle */
+.tarjeta-bien-nombre { position: relative; z-index: 1; font-family: var(--fuente-titulo), serif; font-size: 1.1rem; font-weight: 600; line-height: 1.25; color: var(--text); text-decoration: none; }
+.tarjeta-bien-nombre:hover { color: var(--accent); text-decoration: underline; }
+.tarjeta-bien-linea { font-size: 0.88rem; color: var(--muted); }
+.tarjeta-propietario-vinculo { background: transparent; border: none; padding: 0; cursor: pointer; width: 100%; height: 100%; }
+.ventana-detalle { width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 22px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 60px rgba(10, 16, 24, 0.35); }
+.ventana-detalle::backdrop { background: rgba(10, 16, 24, 0.55); }
+.ventana-detalle[open] { display: flex; flex-direction: column; gap: 14px; }
+.detalle-cabecera { display: flex; align-items: center; gap: 14px; }
+.detalle-cabecera > div { flex: 1; min-width: 0; }
+.detalle-cabecera h2 { font-size: 1.3rem; }
+.detalle-cabecera p { margin: 2px 0 0; font-size: 0.9rem; }
+.detalle-bloque { padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface2); }
+.detalle-bloque h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.detalle-bloque ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.detalle-bloque li { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 0.92rem; }
+.detalle-peligro { border-color: var(--danger); background: var(--dangerBg); }
+.detalle-aviso { border-color: var(--warnLine); background: var(--warnBg); }
+.detalle-pie { display: flex; justify-content: flex-end; padding-top: 4px; }
+
+/* Formulario compacto (menos aire entre bloques y campos) */
+.formulario-compacto { gap: 12px; }
+.formulario-compacto .grupo { padding: 14px 16px 16px; gap: 10px; }
+.formulario-compacto .grupo-cabecera { padding-bottom: 8px; }
+.formulario-compacto .grupo-icono { width: 32px; height: 32px; border-radius: 10px; }
+.formulario-compacto .grupo-cabecera h3 { font-size: 1rem; }
+.formulario-compacto .fila { gap: 10px; }
+.formulario-compacto .campo { gap: 4px; }
+.formulario-compacto .grupo > .muted { font-size: 0.88rem; }
+
+/* Indicadores: el importe tiene casi todo el ancho de la tarjeta */
+.indicador { grid-template-columns: 36px minmax(0, 1fr) 36px; padding-left: 14px; padding-right: 14px; }
+.indicador-icono { width: 36px; height: 36px; border-radius: 11px; }
+.indicador .cifra { font-size: inherit; }

@@ -5,10 +5,11 @@ import { calcularPagoPromedio, formatearImporte, type Moneda } from "@ai/domain"
 import { CambiarFoto } from "@/components/CambiarFoto";
 import { BotonEstadoPropietario } from "@/components/BotonEstadoPropietario";
 import { Icono } from "@/components/Iconos";
-import { IconoBien } from "@/components/IconoBien";
 import { SeccionCuentas } from "@/components/SeccionCuentas";
+import { TarjetaBien, type FilaDetalle } from "@/components/TarjetaBien";
 import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { enlacesDeAvatares } from "@/lib/avatares";
+import { resumenDeBienes, type ItemDetalle } from "@/lib/estado-bienes";
 import { esGestion } from "@/lib/menu";
 import { conVolver } from "@/lib/volver";
 import { obtenerPropietario } from "@/lib/propietarios";
@@ -80,9 +81,17 @@ export default async function FichaPropietario({
     ? await supabase.from("bien").select("id, alias, tipo_bien, estado, es_gastos_varios").in("id", bienIds).is("deleted_at", null)
     : { data: [] };
 
-  const principal = p.emails.find((e) => e.principal) ?? p.emails[0];
-  const telefono = p.telefonos[0];
   const activo = p.estado === "activo";
+  const situaciones = pestana === "bienes" ? await resumenDeBienes(bienIds) : new Map();
+  const fechaCorta = (f: string | null) => (f ? f.split("-").reverse().join("/") : "");
+  const filas = (items: ItemDetalle[]): FilaDetalle[] =>
+    items.map((i) => ({ concepto: i.concepto, fecha: fechaCorta(i.vencimiento), monto: i.monto === null ? t("bien_card.falta_monto") : formatearImporte(i.monto, i.moneda) }));
+  const total = (items: ItemDetalle[]) =>
+    (["ARS", "USD"] as const)
+      .map((m) => ({ m, suma: items.filter((i) => i.moneda === m && i.monto !== null).reduce((x, i) => x + (i.monto as number), 0) }))
+      .filter((x) => x.suma > 0)
+      .map((x) => formatearImporte(x.suma, x.m))
+      .join(" · ");
   const vacio = t("propietarios.dato_vacio");
 
   return (
@@ -101,11 +110,7 @@ export default async function FichaPropietario({
         />
         <div className="ficha-datos">
           <h1>{p.nombre}</h1>
-          <p className="muted">
-            {t(`propietarios.tipo_${p.tipoPersona}`)}
-            {principal && ` · ${principal.email}`}
-            {telefono && ` · ${telefono.numero}`}
-          </p>
+          <p className="muted">{t(`propietarios.tipo_${p.tipoPersona}`)}</p>
           <p className="insignias">
             <span className="estado estado-neutro">{t("propietarios.informes_es")}</span>
             <span className={activo ? "estado estado-ok" : "estado estado-neutro"}>{t(`propietarios.estado_${p.estado}`)}</span>
@@ -236,18 +241,38 @@ export default async function FichaPropietario({
               .sort((a, b) => Number(a.es_gastos_varios) - Number(b.es_gastos_varios) || String(a.alias).localeCompare(String(b.alias)))
               .map((b) => {
                 const porcentaje = Number((vinculos ?? []).find((v) => v.bien_id === b.id)?.porcentaje ?? 0);
-                const nombre = b.es_gastos_varios ? t("propietarios.bien_gastos_varios") : (b.alias as string);
+                const r = situaciones.get(b.id as string);
+                const primera = r?.proximas[0];
+                const linea = !r
+                  ? ""
+                  : r.vencidas.length > 0
+                    ? t("bien_card.vencido", { monto: total(r.vencidas) || `${r.vencidas.length}` })
+                    : r.aCompletar.length > 0
+                      ? t("bien_card.faltan_montos", { cantidad: String(r.aCompletar.length) })
+                      : primera
+                        ? t("bien_card.proximo", { fecha: fechaCorta(primera.vencimiento), monto: primera.monto === null ? t("bien_card.falta_monto") : formatearImporte(primera.monto, primera.moneda) })
+                        : r.pagadas > 0
+                          ? t("bien_card.todo_pagado")
+                          : "";
                 return (
-                  <li key={b.id as string} className="tarjeta-propietario tarjeta-bien">
-                    <Link href={`/bienes/${b.id}?${conVolver(`/propietarios/${p.id}?tab=bienes`)}`} className="tarjeta-propietario-vinculo" aria-label={nombre} />
-                    <IconoBien tipo={b.tipo_bien as string} />
-                    <strong className="tarjeta-propietario-nombre">{nombre}</strong>
-                    <span className="muted">{t(`tipo_bien.${b.tipo_bien}`)}</span>
-                    <dl className="tarjeta-propietario-datos">
-                      <div><dt>{t("propietarios.col_estado")}</dt><dd>{t(`estado_bien.${b.estado}`)}</dd></div>
-                      <div><dt>{t("propietarios.col_porcentaje")}</dt><dd>{t("propietarios.bien_porcentaje", { porcentaje: String(porcentaje).replace(".", ",") })}</dd></div>
-                    </dl>
-                  </li>
+                  <TarjetaBien
+                    key={b.id as string}
+                    d={{
+                      id: b.id as string,
+                      href: `/bienes/${b.id}?${conVolver(`/propietarios/${p.id}?tab=bienes`)}`,
+                      nombre: b.es_gastos_varios ? t("propietarios.bien_gastos_varios") : (b.alias as string),
+                      tipoBien: b.tipo_bien as string,
+                      tipoTexto: t(`tipo_bien.${b.tipo_bien}`),
+                      estadoTexto: t(`estado_bien.${b.estado}`),
+                      porcentajeTexto: t("propietarios.bien_porcentaje", { porcentaje: String(porcentaje).replace(".", ",") }),
+                      situacion: r?.situacion ?? "sin_obligaciones",
+                      linea,
+                      vencidas: filas(r?.vencidas ?? []),
+                      proximas: filas(r?.proximas ?? []),
+                      aCompletar: filas(r?.aCompletar ?? []),
+                      pagadas: r?.pagadas ?? 0,
+                    }}
+                  />
                 );
               })}
           </ul>

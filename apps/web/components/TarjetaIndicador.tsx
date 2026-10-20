@@ -2,6 +2,12 @@ import Link from "next/link";
 import { t } from "@ai/i18n";
 import { Icono } from "./Iconos";
 
+// Cuanto más largo el importe, más chica la letra, para que ni millones desarmen la tarjeta.
+const tamanoCifra = (valor: string) => {
+  const largo = valor.length;
+  return largo <= 7 ? "1.7rem" : largo <= 9 ? "1.45rem" : largo <= 11 ? "1.25rem" : largo <= 13 ? "1.05rem" : "0.9rem";
+};
+
 export type TonoIndicador = "peligro" | "aviso" | "acento" | "ok" | "neutro";
 
 /**
@@ -36,7 +42,7 @@ export function TarjetaIndicador({
       )}
       <p className="muted indicador-titulo">{titulo}</p>
       <span className="indicador-icono" aria-hidden="true"><Icono nombre={icono} tamano={22} /></span>
-      <strong className="cifra">{valor}</strong>
+      <strong className="cifra" style={{ fontSize: tamanoCifra(valor) }} title={valor}>{valor}</strong>
       {observacion && (
         <span className="indicador-info">
           <button type="button" className="info-boton" aria-label={t("inicio.ver_observacion")} aria-describedby={`obs-${id}`}>
