@@ -59,13 +59,17 @@ export async function prepararEnvioWhatsApp(propietarioId: string, h: string, fe
 
   const telefono = elegirTelefonoWhatsApp(r.telefonos);
   if (!telefono) return { error: "resumen.sin_telefono" };
-  const mensaje = texto.trim() || mensajeWhatsApp(r);
-  const url = enlaceWhatsApp(telefono.numero, mensaje);
-  if (!url) return { error: "resumen.telefono_invalido" };
+  const base = texto.trim() || (await mensajeWhatsApp(r));
+  // Se controla el teléfono antes de generar el PDF para no gastar un número si el envío no se puede armar.
+  if (!enlaceWhatsApp(telefono.numero, base)) return { error: "resumen.telefono_invalido" };
 
   const existente = await resumenOficialVigente(r);
   const oficial = existente ? { ok: true as const, ...existente } : await crearResumenOficial(r, usuario.organizacionId);
   if (!oficial.ok) return { error: oficial.motivo === "sin_pdf" ? "resumen.error_pdf" : "resumen.error_enviar" };
+
+  // El número del resumen ({numero}) se completa ahora que el PDF existe.
+  const mensaje = base.split("{numero}").join(oficial.numero);
+  const url = enlaceWhatsApp(telefono.numero, mensaje) as string;
 
   // LIQ-07: cada envío queda registrado con fecha, canal, destinatario, texto y usuario.
   const supabase = await crearClienteServidor();

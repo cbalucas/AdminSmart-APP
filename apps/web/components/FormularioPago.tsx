@@ -33,6 +33,7 @@ export function FormularioPago({
   cancelarHref,
   obligacion,
   directo,
+  monedaDefecto = "ARS",
 }: {
   accion: Accion;
   hoy: string;
@@ -41,6 +42,7 @@ export function FormularioPago({
   cancelarHref: string;
   obligacion?: ResumenObligacion;
   directo?: { bienes: BienOpcion[]; conceptos: { id: string; nombre: string }[] };
+  monedaDefecto?: Moneda;
 }) {
   const [estado, enviar, enviando] = useActionState(accion, {} as EstadoFormularioPago);
   const [, iniciar] = useTransition();
@@ -53,7 +55,7 @@ export function FormularioPago({
     ) : null;
 
   const [importe, setImporte] = useState(aTextoEditable(obligacion?.monto ?? null));
-  const [moneda, setMoneda] = useState<Moneda>(obligacion?.moneda ?? "ARS");
+  const [moneda, setMoneda] = useState<Moneda>(obligacion?.moneda ?? monedaDefecto);
   const [pagadoPor, setPagadoPor] = useState("administracion");
   const [bienId, setBienId] = useState("");
   const [responsable, setResponsable] = useState(obligacion?.responsable ?? "propietario");

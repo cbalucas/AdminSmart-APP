@@ -14,6 +14,8 @@ export interface Administracion {
   cuentaDepositoAlias: string | null;
   emailEnvio: string | null;
   logoPath: string | null;
+  diasAvisoRecurrentes: number;
+  monedaDefecto: "ARS" | "USD";
 }
 
 // ADM-01: existe una sola administración; la base devuelve la de quien ingresó.
@@ -35,6 +37,8 @@ export const obtenerAdministracion = cache(async (): Promise<Administracion | nu
     cuentaDepositoAlias: texto(o.cuenta_deposito_alias),
     emailEnvio: texto(o.email_envio),
     logoPath: texto(o.logo_path),
+    diasAvisoRecurrentes: Number(o.dias_aviso_recurrentes ?? 5),
+    monedaDefecto: o.moneda_defecto === "USD" ? "USD" : "ARS",
   };
 });
 

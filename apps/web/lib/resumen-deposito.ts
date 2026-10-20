@@ -1,5 +1,6 @@
 import {
   armarResumenDeposito,
+  completarPlantilla,
   fechaLimiteDelHorizonte,
   formatearImporte,
   imputacionDelBien,
@@ -11,6 +12,7 @@ import {
   type ResumenDeposito,
 } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { plantillaVigente } from "@/lib/plantillas";
 import { titularesDe } from "@/lib/bienes";
 import { fechaHoy, listarObligaciones } from "@/lib/obligaciones";
 import { obtenerPropietario } from "@/lib/propietarios";
@@ -134,15 +136,34 @@ export async function calcularResumenDelPropietario(propietarioId: string, horiz
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
 
-/** Texto del mensaje de WhatsApp del resumen (plantilla por defecto, 06-textos-de-envio). */
-export function mensajeWhatsApp(r: ResumenDelPropietario): string {
+/** Banco, titular, CBU y alias de la administración, solo con lo que está cargado. */
+export function textoDatosDeposito(d: DatosDeposito): string {
+  return [
+    d.banco ? `${t("resumen.banco")} ${d.banco}` : null,
+    d.titular ? `${t("resumen.titular")} ${d.titular}` : null,
+    d.cbu ? `${t("resumen.cbu")} ${d.cbu}` : null,
+    d.alias ? `${t("resumen.alias")} ${d.alias}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/**
+ * Texto del mensaje de WhatsApp del resumen, con la plantilla vigente (la del administrador o la de fábrica).
+ * El número DEP-AAAA-NNNN todavía no existe: queda como {numero} y se completa cuando se genera el PDF.
+ */
+export async function mensajeWhatsApp(r: ResumenDelPropietario): Promise<string> {
   const aDepositar = r.resumenes.filter((x) => x.aDepositar > 0);
-  const nombre = r.nombre;
-  const administracion = r.deposito.administracion;
   const limite = fechaCorta(r.fechaLimite);
-  if (aDepositar.length === 0) return t("resumen.wa_sin_deposito", { nombre, fecha_limite: limite, administracion });
-  const monto = aDepositar.map((x) => formatearImporte(x.aDepositar, x.moneda)).join(" y ");
-  return t("resumen.wa_texto", { nombre, fecha_limite: limite, monto, administracion });
+  if (aDepositar.length === 0) return t("resumen.wa_sin_deposito", { nombre: r.nombre, fecha_limite: limite, administracion: r.deposito.administracion });
+  const plantilla = await plantillaVigente("resumen_deposito", "whatsapp");
+  return completarPlantilla(plantilla.cuerpo, {
+    nombre: r.nombre,
+    administracion: r.deposito.administracion,
+    monto: aDepositar.map((x) => formatearImporte(x.aDepositar, x.moneda)).join(" y "),
+    fecha_limite: limite,
+    datos_deposito: textoDatosDeposito(r.deposito),
+  });
 }
 
 export interface FilaHistorial {

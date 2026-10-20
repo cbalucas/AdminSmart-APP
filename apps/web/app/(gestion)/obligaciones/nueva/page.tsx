@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { generarUuidV7 } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { FormularioObligacion } from "@/components/FormularioObligacion";
+import { obtenerAdministracion } from "@/lib/administracion";
 import { esGestion } from "@/lib/menu";
 import { fechaHoy } from "@/lib/obligaciones";
 import { opcionesObligacion } from "@/lib/opciones-obligacion";
@@ -13,7 +14,7 @@ export default async function NuevaObligacion({ searchParams }: { searchParams: 
   const { usuario } = await usuarioActual();
   if (!usuario || !esGestion(usuario.roles)) notFound();
   const { bien } = await searchParams;
-  const o = await opcionesObligacion();
+  const [o, admin] = await Promise.all([opcionesObligacion(), obtenerAdministracion()]);
   const otro = o.conceptos.find((c) => c.nombre.trim().toLowerCase() === "otro");
 
   return (
@@ -36,7 +37,7 @@ export default async function NuevaObligacion({ searchParams }: { searchParams: 
           esRecurrente: false,
           frecuencia: "",
           monto: "",
-          moneda: "ARS",
+          moneda: admin?.monedaDefecto ?? "ARS",
           responsable: "propietario",
           vencimiento: "",
           descripcion: "",

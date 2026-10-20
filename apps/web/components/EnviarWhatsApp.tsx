@@ -57,6 +57,7 @@ export function EnviarWhatsApp({
         <label htmlFor="texto-whatsapp">{t("resumen.mensaje_whatsapp")}</label>
         <textarea id="texto-whatsapp" rows={6} value={texto} onChange={(e) => setTexto(e.target.value)} disabled={Boolean(motivoDeshabilitado)} />
         <span className="muted">{telefono ? t("resumen.se_envia_a", { telefono }) : ""}</span>
+        {texto.includes("{numero}") && <span className="muted">{t("resumen.leyenda_numero")}</span>}
       </div>
       <div className="acciones-fila">
         <button type="button" className="boton" disabled={pendiente || Boolean(motivoDeshabilitado)} onClick={enviar} title={motivoDeshabilitado ?? undefined}>

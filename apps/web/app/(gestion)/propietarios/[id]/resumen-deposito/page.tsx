@@ -254,7 +254,7 @@ export default async function ResumenDeposito({ params, searchParams }: { params
               propietarioId={id}
               h={f.h ?? ""}
               fecha={f.fecha ?? ""}
-              textoInicial={mensajeWhatsApp(r)}
+              textoInicial={await mensajeWhatsApp(r)}
               telefono={telefonoWa?.numero ?? null}
               motivoDeshabilitado={motivoWa}
             />

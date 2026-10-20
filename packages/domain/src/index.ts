@@ -14,3 +14,5 @@ export * from "./movimientos";
 export * from "./resumenDeposito";
 export * from "./whatsapp";
 export * from "./administracion";
+export * from "./preferencias";
+export * from "./plantillas";

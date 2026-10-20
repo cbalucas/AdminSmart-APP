@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { generarUuidV7 } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { FormularioPago } from "@/components/FormularioPago";
+import { obtenerAdministracion } from "@/lib/administracion";
 import { esGestion } from "@/lib/menu";
 import { fechaHoy } from "@/lib/obligaciones";
 import { opcionesObligacion } from "@/lib/opciones-obligacion";
@@ -12,7 +13,7 @@ import { registrarPagoDirecto } from "../pagos";
 export default async function PagoDirecto() {
   const { usuario } = await usuarioActual();
   if (!usuario || !esGestion(usuario.roles)) notFound();
-  const o = await opcionesObligacion();
+  const [o, admin] = await Promise.all([opcionesObligacion(), obtenerAdministracion()]);
   const pagoId = generarUuidV7();
   return (
     <>
@@ -24,6 +25,7 @@ export default async function PagoDirecto() {
         organizacionId={usuario.organizacionId}
         cancelarHref="/obligaciones"
         directo={{ bienes: o.bienes, conceptos: o.conceptos }}
+        monedaDefecto={admin?.monedaDefecto ?? "ARS"}
       />
     </>
   );
