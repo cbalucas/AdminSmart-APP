@@ -882,7 +882,7 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .filtros-compactos .filtros-pie { flex: 1 1 100%; }
 .filtros-compactos > .boton-texto { align-self: center; }
 /* Tarjetas de indicadores angostas (como en el Inicio), alineadas a la izquierda */
-.indicadores-compactos { grid-template-columns: repeat(auto-fill, minmax(200px, 240px)); }
+.indicadores-compactos { grid-template-columns: repeat(auto-fill, minmax(180px, 225px)); }
 
 /* Configuración de la auditoría */
 .casilla-grande { font-size: 1.05rem; font-weight: 500; gap: 10px; }
@@ -890,3 +890,13 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .lista-marcas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 16px; }
 .lista-marcas .casilla { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface2); }
 .acciones-izquierda { justify-content: flex-start; }
+
+/* Tarjeta de aviso (ámbar) dentro de la fila de indicadores */
+.indicador-destacado { background: var(--warnBg); border-color: var(--warnLine); }
+.indicador-destacado .indicador-titulo { color: var(--warn); text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-weight: 500; }
+.indicador-destacado .indicador-icono { background: transparent; color: var(--warn); }
+.indicador-destacado .cifra { color: var(--text); }
+.indicador-accion { font-weight: 600; color: var(--text); text-decoration: underline; }
+.indicador-accion:hover { color: var(--accent); }
+.indicador-accion:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.indicadores-compactos { grid-template-columns: repeat(auto-fill, minmax(180px, 225px)); }

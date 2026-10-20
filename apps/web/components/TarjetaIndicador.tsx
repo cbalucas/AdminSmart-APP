@@ -23,6 +23,8 @@ export function TarjetaIndicador({
   nota,
   observacion,
   href,
+  accion,
+  destacada = false,
 }: {
   id: string;
   icono: string;
@@ -32,9 +34,13 @@ export function TarjetaIndicador({
   nota?: string;
   observacion?: string;
   href?: string;
+  /** Enlace de acción dentro de la tarjeta (en lugar de la nota). */
+  accion?: { href: string; texto: string };
+  /** Fondo de aviso (ámbar), para lo que requiere atención. */
+  destacada?: boolean;
 }) {
   return (
-    <article className={`indicador tono-${tono}${href ? " indicador-enlace" : ""}`}>
+    <article className={`indicador tono-${tono}${href ? " indicador-enlace" : ""}${destacada ? " indicador-destacado" : ""}`}>
       {href && (
         <Link href={href} className="indicador-vinculo">
           <span className="solo-lectores">{titulo}</span>
@@ -52,6 +58,11 @@ export function TarjetaIndicador({
         </span>
       )}
       {nota && <p className="muted indicador-nota">{nota}</p>}
+      {accion && (
+        <p className="indicador-nota">
+          <Link href={accion.href} className="indicador-accion">{accion.texto}</Link>
+        </p>
+      )}
     </article>
   );
 }

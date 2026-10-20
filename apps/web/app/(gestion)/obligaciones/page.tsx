@@ -10,7 +10,6 @@ import { listarBienes, titularesDe } from "@/lib/bienes";
 import { generarOcurrenciasSiHaceFalta, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
 import { filtrarObligaciones } from "@/lib/filtrar-obligaciones";
-import { Icono } from "@/components/Iconos";
 import { IconoBien } from "@/components/IconoBien";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
 import { pagosVigentesDe } from "@/lib/pagos";
@@ -180,17 +179,20 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
         <TarjetaIndicador id="vencidas" icono="obligaciones" tono={vencidasTot.cantidad > 0 ? "peligro" : "ok"} titulo={t("indicadores.vencidas")} valor={String(vencidasTot.cantidad)} nota={vencidasTot.total || t("indicadores.nada")} />
         <TarjetaIndicador id="pendientes" icono="calendario" tono="acento" titulo={t("indicadores.proximas")} valor={String(pendientesTot.cantidad)} nota={pendientesTot.total || t("indicadores.nada")} />
         <TarjetaIndicador id="a-completar" icono="recurrente" tono="aviso" titulo={t("indicadores.a_completar")} valor={String(porCompletar)} nota={porCompletar > 0 ? t("indicadores.sin_monto") : t("indicadores.nada")} />
+        {porCompletar > 0 && (
+          <TarjetaIndicador
+            id="aviso-a-completar"
+            icono="recurrente"
+            tono="aviso"
+            destacada
+            titulo={porCompletar === 1 ? t("obligaciones.aviso_tarjeta_uno") : t("obligaciones.aviso_tarjeta")}
+            valor={String(porCompletar)}
+            accion={{ href: "/obligaciones?completar=1", texto: t("obligaciones.completar_ahora") }}
+          />
+        )}
       </section>
 
       {f.aviso === "comprobante" && <p className="aviso-advertencia" role="status">{t("adjuntos.error_registrar_pago")}</p>}
-      {porCompletar > 0 && (
-        <div className="aviso-advertencia aviso-con-icono" role="status">
-          <Icono nombre="recurrente" tamano={20} />
-          <span>{porCompletar === 1 ? t("obligaciones.aviso_a_completar_uno") : t("obligaciones.aviso_a_completar", { cantidad: String(porCompletar) })}</span>
-          <Link href="/obligaciones?completar=1" className="aviso-enlace">{t("obligaciones.completar_ahora")}</Link>
-        </div>
-      )}
-
       <section className="panel">
         <div className="fila-pildoras">
         <nav className="pildoras" aria-label={t("obligaciones.col_estado")}>
