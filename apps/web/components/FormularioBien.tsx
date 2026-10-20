@@ -70,6 +70,7 @@ export function FormularioBien({
   edificios,
   propietarios,
   cancelarHref,
+  propietarioInicial,
   editando = false,
 }: {
   accion: Accion;
@@ -77,6 +78,7 @@ export function FormularioBien({
   edificios: EdificioOpcion[];
   propietarios?: PropietarioOpcion[];
   cancelarHref: string;
+  propietarioInicial?: string;
   editando?: boolean;
 }) {
   const [estado, enviar, pendiente] = useActionState(accion, {} as EstadoFormularioBien);
@@ -291,7 +293,7 @@ export function FormularioBien({
             <div className="campo">
               <label htmlFor="propietarioId">{t("bienes.campo_titular")}</label>
               <CampoIcono icono="propietarios">
-                <select id="propietarioId" name="propietarioId" defaultValue="" aria-invalid={Boolean(errores.propietarioId)}>
+                <select id="propietarioId" name="propietarioId" defaultValue={propietarios?.some((x) => x.id === propietarioInicial) ? propietarioInicial : ""} aria-invalid={Boolean(errores.propietarioId)}>
                   <option value="">{t("bienes.elegir_propietario")}</option>
                   {propietarios.map((p) => (
                     <option key={p.id} value={p.id}>{p.nombre}</option>

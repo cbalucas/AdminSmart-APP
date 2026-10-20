@@ -10,9 +10,10 @@ import { usuarioActual } from "@/lib/usuario-actual";
 import { crearBien } from "../acciones";
 
 // P-17 Alta de bien.
-export default async function NuevoBien() {
+export default async function NuevoBien({ searchParams }: { searchParams: Promise<{ propietario?: string }> }) {
   const { usuario } = await usuarioActual();
   if (!usuario || !esGestion(usuario.roles)) notFound();
+  const { propietario: propietarioInicial } = await searchParams;
 
   const supabase = await crearClienteServidor();
   const [edificios, { data: propietarios }] = await Promise.all([
@@ -28,7 +29,8 @@ export default async function NuevoBien() {
         valores={VALORES_BIEN_NUEVO}
         edificios={edificios.map((e) => ({ id: e.id, nombre: e.nombre, direccion: formatearDireccion(e) }))}
         propietarios={(propietarios ?? []).map((p) => ({ id: p.id as string, nombre: p.nombre_razon_social as string }))}
-        cancelarHref="/bienes"
+        propietarioInicial={propietarioInicial}
+        cancelarHref={propietarioInicial && /^[0-9a-f-]{36}$/i.test(propietarioInicial) ? `/propietarios/${propietarioInicial}?tab=bienes` : "/bienes"}
       />
     </>
   );

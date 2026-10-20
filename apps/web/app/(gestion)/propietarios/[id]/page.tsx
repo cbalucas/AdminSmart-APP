@@ -117,7 +117,6 @@ export default async function FichaPropietario({
           </p>
         </div>
         <div className="acciones-rapidas acciones-ficha">
-          <AccionIcono href={`/propietarios/${p.id}/editar`} icono="editar" titulo={t("app.editar")} />
           <AccionIcono href={`/propietarios/${p.id}/resumen-deposito`} icono="liquidaciones" titulo={t("propietarios.ver_resumen")} />
           <BotonEstadoPropietario id={p.id} activo={activo} />
         </div>
@@ -145,7 +144,7 @@ export default async function FichaPropietario({
           icono="dinero"
           tono="aviso"
           titulo={t("propietarios.a_depositar")}
-          valor={aDepositar ?? formatearImporte(0, "ARS")}
+          valor={aDepositar || formatearImporte(0, "ARS")}
           nota={resumenInicial ? t("propietarios.a_depositar_hasta", { fecha: resumenInicial.fechaLimite.split("-").reverse().join("/") }) : t("propietarios.a_depositar_nota")}
         />
         <TarjetaIndicador
@@ -183,6 +182,10 @@ export default async function FichaPropietario({
       {pestana === "datos" && (
         <>
         <section className="panel">
+          <div className="encabezado">
+            <h2>{t("propietarios.tab_datos")}</h2>
+            <AccionIcono href={`/propietarios/${p.id}/editar`} icono="editar" titulo={t("app.editar")} />
+          </div>
           <dl className="datos datos-ancho">
             <dt>{t("propietarios.campo_telefonos")}</dt>
             <dd>
@@ -226,6 +229,10 @@ export default async function FichaPropietario({
 
       {pestana === "bienes" && (
         <section className="panel">
+          <div className="encabezado">
+            <h2>{t("propietarios.tab_bienes")}</h2>
+            <AccionIcono href={`/bienes/nuevo?propietario=${p.id}`} icono="mas" titulo={t("propietarios.agregar_bien")} tono="primario" />
+          </div>
           {(bienes ?? []).filter((b) => !b.es_gastos_varios).length === 0 && (
             <p className="muted">{t("propietarios.bienes_vacio")}</p>
           )}

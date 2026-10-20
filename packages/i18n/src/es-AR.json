@@ -118,6 +118,7 @@
   "bien_card.sin_pendientes": "No hay obligaciones pendientes.",
   "bien_card.falta_monto": "Falta el monto",
   "bien_card.mas": "y {cantidad} más",
+  "propietarios.agregar_bien": "Agregar bien",
   "menu.contraer": "Contraer el menú",
   "menu.expandir": "Desplegar el menú",
   "menu.inicio": "Inicio",

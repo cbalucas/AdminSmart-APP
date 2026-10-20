@@ -846,3 +846,8 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .tarjeta-cuenta .acciones-cuenta .error-campo { width: 100%; justify-content: center; }
 /* Dentro de las tablas el globo se abre hacia la izquierda, para no agrandar el área desplazable */
 .tabla [data-tip]::after { top: 50%; left: auto; right: calc(100% + 8px); transform: translateY(-50%); }
+
+/* El elemento que tiene el mouse (o el foco) pasa por encima de sus vecinos, para que su globo no quede tapado */
+[data-tip]:hover, [data-tip]:focus-visible { z-index: 50; }
+.indicador:hover, .indicador:focus-within, .tarjeta-propietario:hover, .tarjeta-propietario:focus-within { z-index: 20; }
+.indicador-info:hover, .indicador-info:focus-within { z-index: 30; }
