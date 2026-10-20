@@ -94,14 +94,17 @@ export function leerHorizonte(h: string | undefined, fecha: string | undefined, 
 // RN-02, RN-15, sección 4.5: obligaciones a cargo del propietario (su parte según el modo de liquidación de cada bien),
 // su saldo y el fondo de reserva, por moneda.
 export async function calcularResumenDelPropietario(propietarioId: string, horizonte?: Horizonte): Promise<ResumenDelPropietario | null> {
-  const propietario = await obtenerPropietario(propietarioId);
+  const supabase = await crearClienteServidor();
+  // La ficha y los vínculos no dependen entre sí: se piden juntos.
+  const [propietario, { data: vinculos }] = await Promise.all([
+    obtenerPropietario(propietarioId),
+    supabase.from("bien_propietario").select("bien_id").eq("propietario_id", propietarioId).is("deleted_at", null),
+  ]);
   if (!propietario) return null;
   const hoy = fechaHoy();
   const h: Horizonte = horizonte ?? { tipo: "dias", dias: propietario.horizonteResumenDias };
   const fechaLimite = fechaLimiteDelHorizonte(h, hoy);
 
-  const supabase = await crearClienteServidor();
-  const { data: vinculos } = await supabase.from("bien_propietario").select("bien_id").eq("propietario_id", propietarioId).is("deleted_at", null);
   const bienIds = [...new Set((vinculos ?? []).map((v) => v.bien_id as string))];
 
   const [{ data: bienes }, titulares, todas, { data: saldos }, { data: org }] = await Promise.all([

@@ -102,27 +102,24 @@ export const listarBienes = cache(async (): Promise<Bien[]> => {
   return (data ?? []).map(aBien);
 });
 
-// Titulares de varios bienes a la vez: bienId → titulares.
+// Titulares de varios bienes a la vez: bienId → titulares. El nombre viene en la misma consulta (una sola ida y vuelta).
 export async function titularesDe(bienIds: string[]): Promise<Map<string, Titular[]>> {
   const mapa = new Map<string, Titular[]>();
   if (bienIds.length === 0) return mapa;
   const supabase = await crearClienteServidor();
   const { data: vinculos } = await supabase
     .from("bien_propietario")
-    .select("id, bien_id, propietario_id, porcentaje, es_representante")
+    .select("id, bien_id, propietario_id, porcentaje, es_representante, propietario:propietario_id(nombre_razon_social)")
     .in("bien_id", bienIds)
     .is("deleted_at", null);
-  const propietarioIds = [...new Set((vinculos ?? []).map((v) => v.propietario_id as string))];
-  const { data: propietarios } = propietarioIds.length
-    ? await supabase.from("propietario").select("id, nombre_razon_social").in("id", propietarioIds)
-    : { data: [] as Record<string, unknown>[] };
-  const nombreDe = new Map((propietarios ?? []).map((p) => [p.id as string, p.nombre_razon_social as string]));
   for (const v of vinculos ?? []) {
+    const p = v.propietario as { nombre_razon_social?: string } | { nombre_razon_social?: string }[] | null;
+    const nombre = (Array.isArray(p) ? p[0] : p)?.nombre_razon_social ?? "—";
     const lista = mapa.get(v.bien_id as string) ?? [];
     lista.push({
       vinculoId: v.id as string,
       propietarioId: v.propietario_id as string,
-      nombre: nombreDe.get(v.propietario_id as string) ?? "—",
+      nombre,
       porcentaje: Number(v.porcentaje),
       esRepresentante: Boolean(v.es_representante),
     });

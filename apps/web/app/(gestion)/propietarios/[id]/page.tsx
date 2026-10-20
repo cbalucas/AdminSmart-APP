@@ -35,6 +35,8 @@ export default async function FichaPropietario({
 
   const supabase = await crearClienteServidor();
   const hoy = fechaHoy();
+  // El cálculo de "A depositar" arranca ya y corre mientras se leen el resto de los datos.
+  const resumenPromesa = calcularResumenDelPropietario(id);
   const [{ data: saldos }, { data: depositos }, { data: anulaciones }, { data: vinculos }, { data: usuarioVinculado }] = await Promise.all([
     supabase.from("saldo_propietario").select("moneda, saldo").eq("propietario_id", id),
     supabase
@@ -66,7 +68,7 @@ export default async function FichaPropietario({
     );
 
   // "A depositar" con el horizonte del propietario (30 días por defecto).
-  const resumenInicial = await calcularResumenDelPropietario(id);
+  const resumenInicial = await resumenPromesa;
   const aDepositar = resumenInicial?.resumenes.filter((x) => x.aDepositar > 0).map((x) => formatearImporte(x.aDepositar, x.moneda)).join(" y ");
 
   const bienIds = (vinculos ?? []).map((v) => v.bien_id as string);

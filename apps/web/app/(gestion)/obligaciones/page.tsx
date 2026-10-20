@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIEN, type EstadoObligacion } from "@ai/domain";
 import { listarBienes, titularesDe } from "@/lib/bienes";
-import { generarOcurrenciasPendientes, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
+import { generarOcurrenciasSiHaceFalta, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
 import { pagosVigentesDe } from "@/lib/pagos";
@@ -40,7 +40,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   const f = await searchParams;
 
   // OBL-05, OBL-09: al abrir la pantalla se crean las ocurrencias siguientes que falten.
-  await generarOcurrenciasPendientes(usuario.organizacionId);
+  await generarOcurrenciasSiHaceFalta(usuario.organizacionId);
   const [todas, bienes] = await Promise.all([listarObligaciones(), listarBienes()]);
   const [titulares, boletas, pagos] = await Promise.all([
     titularesDe(bienes.map((b) => b.id)),

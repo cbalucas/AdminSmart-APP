@@ -59,6 +59,20 @@ export const claveObligacion = (o: { bien_servicio_id: unknown; bien_id: unknown
 
 // OBL-05, OBL-09: crea las ocurrencias siguientes que falten (sin monto ni vencimiento, A completar).
 // Se ejecuta al abrir Obligaciones o el Inicio, sin proceso programado. Devuelve cuántas creó.
+const ultimaRevision = new Map<string, string>();
+
+/**
+ * Igual que `generarOcurrenciasPendientes`, pero solo la primera vez del día en este servidor: abrir Obligaciones
+ * o el Inicio no tiene que costar una consulta extra cada vez. Las acciones que crean o cambian obligaciones
+ * llaman a la versión completa, así que la cadena de períodos nunca queda atrasada.
+ */
+export async function generarOcurrenciasSiHaceFalta(organizacionId: string): Promise<void> {
+  const hoy = fechaHoy();
+  if (ultimaRevision.get(organizacionId) === hoy) return;
+  ultimaRevision.set(organizacionId, hoy);
+  await generarOcurrenciasPendientes(organizacionId);
+}
+
 export async function generarOcurrenciasPendientes(organizacionId: string): Promise<number> {
   const supabase = await crearClienteServidor();
   const hoy = fechaHoy();

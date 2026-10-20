@@ -73,8 +73,6 @@ export async function prepararEnvioWhatsApp(propietarioId: string, h: string, fe
 
   // LIQ-07: cada envío queda registrado con fecha, canal, destinatario, texto y usuario.
   const supabase = await crearClienteServidor();
-  const { data: sesion } = await supabase.auth.getUser();
-  if (!sesion.user) return { error: "resumen.error_enviar" };
   const { error } = await supabase.from("envio").insert({
     id: generarUuidV7(),
     organizacion_id: usuario.organizacionId,
@@ -85,7 +83,7 @@ export async function prepararEnvioWhatsApp(propietarioId: string, h: string, fe
     idioma: "es",
     texto: mensaje,
     estado: "abierto_whatsapp",
-    usuario_id: sesion.user.id,
+    usuario_id: usuario.id,
   });
   if (error) return { error: "resumen.error_registrar_envio" };
 
