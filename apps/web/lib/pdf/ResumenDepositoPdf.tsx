@@ -134,6 +134,32 @@ function PaginaMoneda({ r, resumen, numero }: { r: ResumenDelPropietario; resume
         <Text style={e.nota}>{t("pdf.saldo_a_transferir", { monto: m(resumen.saldoATransferir) })}</Text>
       )}
 
+      {resumen.futuras.length > 0 && (
+        <View wrap={false}>
+          <Text style={e.seccion}>{t("pdf.futuras")}</Text>
+          <View style={e.tablaCab}>
+            <Text style={[e.th, { width: "28%" }]}>{t("pdf.col_bien")}</Text>
+            <Text style={[e.th, { width: "24%" }]}>{t("pdf.col_concepto")}</Text>
+            <Text style={[e.th, { width: "14%" }]}>{t("pdf.col_periodo")}</Text>
+            <Text style={[e.th, { width: "16%" }]}>{t("pdf.col_vencimiento")}</Text>
+            <Text style={[e.th, e.derecha, { width: "18%" }]}>{t("pdf.col_monto")}</Text>
+          </View>
+          {resumen.futuras.map((o) => (
+            <View key={o.id} style={e.fila}>
+              <Text style={{ width: "28%" }}>{o.bien}</Text>
+              <Text style={{ width: "24%" }}>{o.porcentaje < 100 ? `${o.concepto} (${t("pdf.su_parte", { porcentaje: String(o.porcentaje).replace(".", ",") })})` : o.concepto}</Text>
+              <Text style={{ width: "14%" }}>{periodoCorto(o.periodo)}</Text>
+              <Text style={{ width: "16%" }}>{fechaCorta(o.vencimiento as string)}</Text>
+              <Text style={[e.derecha, { width: "18%" }]}>{m(o.monto as number)}</Text>
+            </View>
+          ))}
+          <View style={e.filaTotal}>
+            <Text style={[e.negrita, { width: "82%", paddingLeft: 6 }]}>{t("pdf.total_futuras")}</Text>
+            <Text style={[e.negrita, e.derecha, { width: "18%" }]}>{m(resumen.futuras.reduce((acc, o) => acc + (o.monto as number), 0))}</Text>
+          </View>
+        </View>
+      )}
+
       {resumen.aConfirmar.length > 0 && (
         <View wrap={false}>
           <Text style={e.seccion}>{t("pdf.a_confirmar")}</Text>
@@ -198,7 +224,7 @@ export function ResumenDepositoPdf({ r, numero }: { r: ResumenDelPropietario; nu
     <Document title={`${t("pdf.titulo")} ${numero ?? ""}`.trim()} author={r.deposito.administracion} creator="AdminSmart" producer="AdminSmart">
       {/* Pesos siempre; dólares solo si hay algo que informar o depositar en esa moneda. */}
       {r.resumenes
-        .filter((x) => x.moneda === "ARS" || x.pendientes.length > 0 || x.aConfirmar.length > 0 || x.posibles.length > 0 || x.aDepositar > 0)
+        .filter((x) => x.moneda === "ARS" || x.pendientes.length > 0 || x.aConfirmar.length > 0 || x.posibles.length > 0 || x.futuras.length > 0 || x.aDepositar > 0)
         .map((x) => (
           <PaginaMoneda key={x.moneda} r={r} resumen={x} numero={numero} />
         ))}

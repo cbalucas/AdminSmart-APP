@@ -160,6 +160,43 @@ export default async function ResumenDeposito({ params, searchParams }: { params
             {resumen.saldoDisponible < 0 && <p className="muted">{t("resumen.nota_saldo_deudor")}</p>}
           </section>
 
+          {resumen.futuras.length > 0 && (
+            <section className="panel">
+              <h2>{t("resumen.futuras")}</h2>
+              <div className="tabla-envoltorio">
+                <table className="tabla tabla-compacta">
+                  <thead>
+                    <tr>
+                      <th>{t("resumen.col_bien")}</th>
+                      <th>{t("resumen.col_concepto")}</th>
+                      <th>{t("resumen.col_periodo")}</th>
+                      <th>{t("resumen.col_vencimiento")}</th>
+                      <th className="num">{t("resumen.col_monto")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {resumen.futuras.map((o) => (
+                      <tr key={o.id}>
+                        <td>{o.bien}</td>
+                        <td>
+                          {o.concepto}
+                          {o.porcentaje < 100 && <span className="linea muted">{t("resumen.su_parte", { porcentaje: String(o.porcentaje).replace(".", ",") })}</span>}
+                        </td>
+                        <td className="nowrap">{periodoCorto(o.periodo)}</td>
+                        <td className="nowrap">{fechaCorta(o.vencimiento as string)}</td>
+                        <td className="num">{total(o.monto as number)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <dl className="resumen-calculo">
+                <div className="resumen-calculo-total"><dt>{t("resumen.total_futuras")}</dt><dd>{total(resumen.futuras.reduce((acc, o) => acc + (o.monto as number), 0))}</dd></div>
+              </dl>
+              <p className="muted">{t("resumen.futuras_nota")}</p>
+            </section>
+          )}
+
           {resumen.aConfirmar.length > 0 && (
             <section className="panel">
               <h2>{t("resumen.a_confirmar")}</h2>

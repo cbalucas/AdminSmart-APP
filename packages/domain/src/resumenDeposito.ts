@@ -67,6 +67,8 @@ export interface ResumenDeposito {
   aDepositar: number;
   /** Si el saldo cubre todo, lo que sobra (sin tocar el fondo de reserva) se puede transferir al propietario. */
   saldoATransferir: number;
+  /** Pagos a futuro: con monto y vencimiento posterior a la fecha límite. Se informan, pero no suman. */
+  futuras: ObligacionParaResumen[];
   /** OBL-11: A completar, sin monto: no suman. */
   aConfirmar: ObligacionParaResumen[];
   /** OBL-07: con monto pero sin vencimiento: no suman. */
@@ -93,6 +95,9 @@ export function armarResumenDeposito(args: {
   const pendientes = vivas
     .filter((o) => estadoDe(o) !== "a_completar" && o.vencimiento !== null && o.vencimiento <= fechaLimite)
     .sort((a, b) => (a.vencimiento as string).localeCompare(b.vencimiento as string) || a.bien.localeCompare(b.bien));
+  const futuras = vivas
+    .filter((o) => estadoDe(o) !== "a_completar" && o.vencimiento !== null && o.vencimiento > fechaLimite)
+    .sort((a, b) => (a.vencimiento as string).localeCompare(b.vencimiento as string) || a.bien.localeCompare(b.bien));
   const aConfirmar = vivas.filter((o) => estadoDe(o) === "a_completar").sort((a, b) => a.periodo.localeCompare(b.periodo) || a.bien.localeCompare(b.bien));
   const posibles = vivas.filter((o) => estadoDe(o) !== "a_completar" && o.vencimiento === null).sort((a, b) => a.periodo.localeCompare(b.periodo));
 
@@ -108,6 +113,7 @@ export function armarResumenDeposito(args: {
     reposicionFondo: reposicion,
     aDepositar: Math.max(0, necesidad) + reposicion,
     saldoATransferir: Math.max(0, -necesidad - (args.fondoReserva ?? 0)),
+    futuras,
     aConfirmar,
     posibles,
   };

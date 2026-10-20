@@ -81,6 +81,23 @@ describe("Monto a depositar", () => {
     const r = armarResumenDeposito({ ...base, obligaciones: [ob({ id: "g", estado: "pagada" }), ob({ id: "h", estado: "anulada" })], saldoDisponible: 0 });
     expect(r.sumaObligaciones).toBe(0);
   });
+  it("4.5: lo que vence después de la fecha límite figura como pago a futuro y no suma", () => {
+    const r = armarResumenDeposito({
+      ...base,
+      obligaciones: [...obligaciones, ob({ id: "f2", vencimiento: "2026-12-10", monto: 200000 }), ob({ id: "f1", vencimiento: "2026-11-13", monto: 100000 })],
+      saldoDisponible: 0,
+    });
+    expect(r.futuras.map((o) => o.id)).toEqual(["f1", "f2"]);
+    expect(r.sumaObligaciones).toBe(15105000);
+  });
+  it("4.5: un gasto A completar o sin vencimiento no es un pago a futuro", () => {
+    const r = armarResumenDeposito({
+      ...base,
+      obligaciones: [ob({ id: "x", monto: null, estado: "a_completar", vencimiento: null }), ob({ id: "p", vencimiento: null })],
+      saldoDisponible: 0,
+    });
+    expect(r.futuras).toHaveLength(0);
+  });
   it("4.5: las pendientes se ordenan por vencimiento", () => {
     const r = armarResumenDeposito({ ...base, obligaciones: [obligaciones[2] as ObligacionParaResumen, obligaciones[0] as ObligacionParaResumen], saldoDisponible: 0 });
     expect(r.pendientes.map((o) => o.id)).toEqual(["a", "c"]);

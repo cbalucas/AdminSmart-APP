@@ -853,5 +853,10 @@
   "resumen.ultimo_envio": "Último envío: {fecha} por {canal} ({numero})",
   "resumen.canal_whatsapp": "WhatsApp",
   "resumen.canal_email": "email",
-  "resumen.canal_descarga": "descarga"
+  "resumen.canal_descarga": "descarga",
+  "pdf.futuras": "Pagos a futuro (vencimiento posterior, no incluidos en el monto)",
+  "pdf.total_futuras": "Total de pagos a futuro",
+  "resumen.futuras": "Pagos a futuro (vencimiento posterior a la fecha límite, no incluidos en el monto)",
+  "resumen.futuras_nota": "Ya tienen monto y vencimiento: se sumarán al depósito de los períodos en que vencen.",
+  "resumen.total_futuras": "Total de pagos a futuro"
 }
