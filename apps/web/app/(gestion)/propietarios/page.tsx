@@ -71,43 +71,28 @@ export default async function Propietarios({
         {lista.length === 0 ? (
           <p className="muted">{hayDatos ? t("propietarios.sin_resultados") : t("propietarios.vacio")}</p>
         ) : (
-          <div className="tabla-envoltorio">
-            <table className="tabla tabla-responsive">
-              <thead>
-                <tr>
-                  <th>{t("propietarios.col_nombre")}</th>
-                  <th className="num">{t("propietarios.col_bienes")}</th>
-                  <th className="num">{t("propietarios.col_saldo_ars")}</th>
-                  <th className="num">{t("propietarios.col_saldo_usd")}</th>
-                  <th className="num">{t("propietarios.col_a_depositar")}</th>
-                  <th>{t("propietarios.col_estado")}</th>
-                  <th>{t("propietarios.col_acceso")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lista.map((p) => (
-                  <tr key={p.id as string}>
-                    <td data-label={t("propietarios.col_nombre")}>
-                      <Link href={`/propietarios/${p.id}`} className="celda-persona">
-                        <Avatar nombre={p.nombre_razon_social as string} url={enlaces.get(p.avatar_path as string)} />
-                        <strong>{p.nombre_razon_social as string}</strong>
-                      </Link>
-                    </td>
-                    <td className="num" data-label={t("propietarios.col_bienes")}>{cantidadBienes.get(p.id as string) ?? 0}</td>
-                    <td className="num" data-label={t("propietarios.col_saldo_ars")}>{formatearImporte(saldoDe(p.id as string, "ARS"), "ARS")}</td>
-                    <td className="num" data-label={t("propietarios.col_saldo_usd")}>{formatearImporte(saldoDe(p.id as string, "USD"), "USD")}</td>
-                    <td className="num muted" data-label={t("propietarios.col_a_depositar")}>—</td>
-                    <td data-label={t("propietarios.col_estado")}>
-                      <span className={p.estado === "activo" ? "estado estado-ok" : "estado estado-neutro"}>
-                        {t(`propietarios.estado_${p.estado}`)}
-                      </span>
-                    </td>
-                    <td data-label={t("propietarios.col_acceso")}>{conAcceso.has(p.id as string) ? t("propietarios.con_acceso") : t("propietarios.sin_acceso")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="tarjetas-propietarios">
+            {lista.map((p) => {
+              const id = p.id as string;
+              const nombre = p.nombre_razon_social as string;
+              return (
+                <li key={id} className="tarjeta-propietario">
+                  <Link href={`/propietarios/${id}`} className="tarjeta-propietario-vinculo" aria-label={nombre} />
+                  <Avatar nombre={nombre} tamano={64} url={enlaces.get(p.avatar_path as string)} />
+                  <strong className="tarjeta-propietario-nombre">{nombre}</strong>
+                  <span className={p.estado === "activo" ? "estado estado-ok" : "estado estado-neutro"}>
+                    {t(`propietarios.estado_${p.estado}`)}
+                  </span>
+                  <dl className="tarjeta-propietario-datos">
+                    <div><dt>{t("propietarios.col_bienes")}</dt><dd>{cantidadBienes.get(id) ?? 0}</dd></div>
+                    <div><dt>{t("propietarios.col_acceso")}</dt><dd>{conAcceso.has(id) ? t("propietarios.con_acceso") : t("propietarios.sin_acceso")}</dd></div>
+                    <div><dt>{t("propietarios.col_saldo_ars")}</dt><dd>{formatearImporte(saldoDe(id, "ARS"), "ARS")}</dd></div>
+                    <div><dt>{t("propietarios.col_saldo_usd")}</dt><dd>{formatearImporte(saldoDe(id, "USD"), "USD")}</dd></div>
+                  </dl>
+                </li>
+              );
+            })}
+          </ul>
         )}
       </section>
     </>

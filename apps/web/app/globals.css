@@ -703,3 +703,14 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   .ingreso-panel { padding: 20px 16px 32px; }
   .formulario-ingreso { margin-top: -8px; padding: 26px 20px; }
 }
+
+/* ------------------------------------------------------------------ propietarios como tarjetas */
+.tarjetas-propietarios { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.tarjeta-propietario { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 22px 18px 18px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(20, 30, 40, 0.04); transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+.tarjeta-propietario:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(20, 30, 40, 0.1); border-color: var(--inputLine); }
+.tarjeta-propietario-vinculo { position: absolute; inset: 0; border-radius: inherit; }
+.tarjeta-propietario-vinculo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tarjeta-propietario-nombre { font-family: var(--fuente-titulo), serif; font-size: 1.1rem; line-height: 1.25; }
+.tarjeta-propietario-datos { width: 100%; margin: 6px 0 0; padding-top: 12px; border-top: 1px solid var(--lineSoft); display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
+.tarjeta-propietario-datos dt { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.tarjeta-propietario-datos dd { margin: 2px 0 0; font-weight: 500; }
