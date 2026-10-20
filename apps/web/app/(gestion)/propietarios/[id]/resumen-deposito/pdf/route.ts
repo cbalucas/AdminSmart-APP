@@ -8,8 +8,9 @@ import { usuarioActual } from "@/lib/usuario-actual";
 // Vista previa del resumen de depósito: PDF sin número, que no se guarda ni consume el correlativo.
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { usuario } = await usuarioActual();
-  if (!usuario || !esGestion(usuario.roles)) return new NextResponse("No autorizado", { status: 403 });
   const { id } = await params;
+  // La gestión accede a todos; un propietario, solo a los suyos (además, la base filtra por permisos).
+  if (!usuario || (!esGestion(usuario.roles) && usuario.propietarioId !== id)) return new NextResponse("No autorizado", { status: 403 });
   const p = await obtenerPropietario(id);
   if (!p) return new NextResponse("No encontrado", { status: 404 });
 

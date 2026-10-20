@@ -14,7 +14,7 @@ import {
 import { t } from "@ai/i18n";
 import { plantillaVigente } from "@/lib/plantillas";
 import { titularesDe } from "@/lib/bienes";
-import { fechaHoy, listarObligaciones } from "@/lib/obligaciones";
+import { fechaHoy, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { obtenerPropietario } from "@/lib/propietarios";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 
@@ -43,6 +43,46 @@ export interface ResumenDelPropietario {
 }
 
 const MONEDAS: Moneda[] = ["ARS", "USD"];
+
+export interface BienParaResumen {
+  alias: string;
+  esGastosVarios: boolean;
+  modo: ModoLiquidacion;
+  propietarioLiquidacionId: string | null;
+}
+
+/**
+ * Obligaciones a cargo del propietario, con su parte de cada una según el modo de liquidación del bien (CON-02, CON-04).
+ * Las de bienes que no son suyos, o cuya parte no le corresponde, no entran.
+ */
+export function obligacionesParaResumen(args: {
+  propietarioId: string;
+  obligaciones: readonly FilaObligacion[];
+  bienes: ReadonlyMap<string, BienParaResumen>;
+  titulares: ReadonlyMap<string, readonly { propietarioId: string; porcentaje: number; esRepresentante: boolean }[]>;
+}): ObligacionParaResumen[] {
+  const lista: ObligacionParaResumen[] = [];
+  for (const o of args.obligaciones) {
+    const bien = args.bienes.get(o.bienId);
+    if (!bien || o.responsable !== "propietario") continue;
+    const imputacion = imputacionDelBien(bien.modo, (args.titulares.get(o.bienId) ?? []).map((x) => ({ propietarioId: x.propietarioId, porcentaje: x.porcentaje, esRepresentante: x.esRepresentante })), bien.propietarioLiquidacionId);
+    const suParte = imputacion.find((x) => x.propietarioId === args.propietarioId);
+    if (!suParte) continue;
+    lista.push({
+      id: o.id,
+      bien: bien.esGastosVarios ? t("bienes.gastos_varios") : bien.alias,
+      concepto: o.concepto,
+      descripcion: o.descripcion,
+      periodo: o.periodo,
+      vencimiento: o.vencimiento,
+      monto: o.monto === null ? null : parteDelPropietario(o.monto, imputacion, args.propietarioId),
+      moneda: o.moneda,
+      estado: o.estado,
+      porcentaje: suParte.porcentaje,
+    });
+  }
+  return lista;
+}
 
 /** Horizonte desde los parámetros de la dirección: días del propietario (por defecto), fin de mes o fecha a elección. */
 export function leerHorizonte(h: string | undefined, fecha: string | undefined, diasDelPropietario: number): Horizonte {
@@ -74,31 +114,17 @@ export async function calcularResumenDelPropietario(propietarioId: string, horiz
     supabase.from("organizacion").select("nombre, logo_path, cuenta_deposito_banco, cuenta_deposito_titular, cuenta_deposito_cbu, cuenta_deposito_alias").limit(1).maybeSingle(),
   ]);
 
-  const bienDe = new Map((bienes ?? []).map((b) => [b.id as string, b]));
-  const paraResumen: ObligacionParaResumen[] = [];
-  for (const o of todas) {
-    const bien = bienDe.get(o.bienId);
-    if (!bien || o.responsable !== "propietario") continue;
-    const imputacion = imputacionDelBien(
-      bien.modo_liquidacion as ModoLiquidacion,
-      (titulares.get(o.bienId) ?? []).map((x) => ({ propietarioId: x.propietarioId, porcentaje: x.porcentaje, esRepresentante: x.esRepresentante })),
-      (bien.propietario_liquidacion_id as string | null) ?? null,
-    );
-    const suParte = imputacion.find((x) => x.propietarioId === propietarioId);
-    if (!suParte) continue;
-    paraResumen.push({
-      id: o.id,
-      bien: bien.es_gastos_varios ? t("bienes.gastos_varios") : (bien.alias as string),
-      concepto: o.concepto,
-      descripcion: o.descripcion,
-      periodo: o.periodo,
-      vencimiento: o.vencimiento,
-      monto: o.monto === null ? null : parteDelPropietario(o.monto, imputacion, propietarioId),
-      moneda: o.moneda,
-      estado: o.estado,
-      porcentaje: suParte.porcentaje,
-    });
-  }
+  const paraResumen = obligacionesParaResumen({
+    propietarioId,
+    obligaciones: todas,
+    bienes: new Map(
+      (bienes ?? []).map((b) => [
+        b.id as string,
+        { alias: b.alias as string, esGastosVarios: Boolean(b.es_gastos_varios), modo: b.modo_liquidacion as ModoLiquidacion, propietarioLiquidacionId: (b.propietario_liquidacion_id as string | null) ?? null },
+      ]),
+    ),
+    titulares,
+  });
 
   const saldoDe = (m: Moneda) => Number(saldos?.find((s) => s.moneda === m)?.saldo ?? 0);
   const hayDolares = paraResumen.some((o) => o.moneda === "USD") || saldos?.some((s) => s.moneda === "USD");

@@ -6,8 +6,9 @@ import { usuarioActual } from "@/lib/usuario-actual";
 // Descarga de un resumen de depósito ya generado: enlace temporal del almacén privado (DOC-03).
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string; resumenId: string }> }) {
   const { usuario } = await usuarioActual();
-  if (!usuario || !esGestion(usuario.roles)) return new NextResponse("No autorizado", { status: 403 });
   const { id, resumenId } = await params;
+  // La gestión descarga cualquiera; un propietario, solo los suyos (además, la base filtra por permisos).
+  if (!usuario || (!esGestion(usuario.roles) && usuario.propietarioId !== id)) return new NextResponse("No autorizado", { status: 403 });
 
   // La base solo devuelve el resumen si el usuario puede verlo (RLS).
   const supabase = await crearClienteServidor();

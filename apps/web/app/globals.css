@@ -480,3 +480,9 @@ a { color: var(--accent); }
 .vista-previa { padding: 14px 16px; border-radius: 10px; background: var(--okBg); color: var(--text); }
 .vista-previa p { margin: 0; white-space: pre-wrap; }
 .vista-asunto { font-weight: 600; padding-bottom: 8px; margin-bottom: 8px !important; border-bottom: 1px solid var(--line); }
+
+.indicador-enlace { color: var(--text); text-decoration: none; }
+.indicador-enlace:hover { background: var(--surface2); }
+.indicador-enlace:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.home-marca { display: flex; align-items: center; gap: 16px; }
+.home-logo { max-height: 56px; max-width: 160px; object-fit: contain; }

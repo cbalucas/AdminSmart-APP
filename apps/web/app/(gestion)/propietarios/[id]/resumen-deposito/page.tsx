@@ -23,8 +23,11 @@ const periodoCorto = (p: string) => `${p.slice(5, 7)}/${p.slice(0, 4)}`;
 // P-34 Resumen de depósito: cuánto debe depositar el propietario para cubrir sus obligaciones hasta la fecha límite.
 export default async function ResumenDeposito({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Filtros> }) {
   const { usuario } = await usuarioActual();
-  if (!usuario || !esGestion(usuario.roles)) notFound();
+  if (!usuario) notFound();
   const { id } = await params;
+  // La gestión ve a cualquier propietario; un propietario solo mira el suyo, sin generar ni enviar.
+  const soloLectura = !esGestion(usuario.roles);
+  if (soloLectura && usuario.propietarioId !== id) notFound();
   const f = await searchParams;
   const p = await obtenerPropietario(id);
   if (!p) notFound();
@@ -32,7 +35,7 @@ export default async function ResumenDeposito({ params, searchParams }: { params
   const horizonte = leerHorizonte(f.h, f.fecha, p.horizonteResumenDias);
   const [r, historial] = await Promise.all([calcularResumenDelPropietario(id, horizonte), historialDeResumenes(id)]);
   if (!r) notFound();
-  const ultimoEnvio = await ultimoEnvioDeResumen(historial);
+  const ultimoEnvio = soloLectura ? null : await ultimoEnvioDeResumen(historial);
 
   const hayUsd = r.resumenes.some((x) => x.moneda === "USD");
   const moneda: Moneda = f.moneda === "USD" && hayUsd ? "USD" : "ARS";
@@ -60,7 +63,13 @@ export default async function ResumenDeposito({ params, searchParams }: { params
   return (
     <>
       <p className="migas">
-        <Link href="/propietarios">{t("propietarios.migas")}</Link> / <Link href={`/propietarios/${id}`}>{p.nombre}</Link>
+        {soloLectura ? (
+          <Link href="/inicio">{t("resumen.migas_inicio")}</Link>
+        ) : (
+          <>
+            <Link href="/propietarios">{t("propietarios.migas")}</Link> / <Link href={`/propietarios/${id}`}>{p.nombre}</Link>
+          </>
+        )}
       </p>
 
       <div className="resumen-cabecera">
@@ -240,6 +249,16 @@ export default async function ResumenDeposito({ params, searchParams }: { params
             {!d.banco && !d.cbu && !d.alias && <p className="aviso-advertencia">{t("resumen.completar_datos")}</p>}
           </section>
 
+          {soloLectura ? (
+            <section className="panel">
+              <h2>{t("resumen.titulo")}</h2>
+              <div className="acciones-fila">
+                <a href={`/propietarios/${id}/resumen-deposito/pdf?${parametrosPdf.toString()}`} target="_blank" rel="noreferrer" className="boton boton-secundario">{t("resumen.ver_pdf")}</a>
+              </div>
+              <p className="muted">{t("resumen.solo_lectura")}</p>
+            </section>
+          ) : (
+            <>
           <section className="panel">
             <h2>{t("resumen.enviar")}</h2>
             <div className="acciones-fila">
@@ -268,6 +287,8 @@ export default async function ResumenDeposito({ params, searchParams }: { params
               </p>
             )}
           </section>
+            </>
+          )}
         </aside>
       </div>
 
