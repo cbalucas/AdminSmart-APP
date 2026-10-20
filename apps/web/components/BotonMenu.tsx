@@ -11,6 +11,8 @@ export function BotonMenu() {
 
   useEffect(() => {
     try {
+      // Se lee después de montar para que el servidor y el navegador dibujen lo mismo la primera vez.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (localStorage.getItem(CLAVE) === "contraido") setContraido(true);
     } catch {
       /* sin almacenamiento: el menú arranca desplegado */
