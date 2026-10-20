@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { generarUuidV7 } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioObligacion } from "@/components/FormularioObligacion";
 import { obtenerAdministracion } from "@/lib/administracion";
 import { esGestion } from "@/lib/menu";
@@ -19,9 +20,7 @@ export default async function NuevaObligacion({ searchParams }: { searchParams: 
 
   return (
     <>
-      <div className="encabezado">
-        <h1>{t("obligaciones.alta_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="obligaciones">{t("obligaciones.alta_titulo")}</TituloConIcono>
       <FormularioObligacion
         accion={crearObligacion}
         bienes={o.bienes}

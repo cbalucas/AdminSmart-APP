@@ -37,16 +37,30 @@ export function BotonIcono({ icono, titulo, onClick, tono = "neutro", disabled }
 }
 
 /** Cancelar y Guardar, con ícono y palabra. En el celular quedan fijos al pie de la pantalla. */
-export function AccionesFormulario({ cancelarHref, pendiente = false }: { cancelarHref: string; pendiente?: boolean }) {
+export function AccionesFormulario({
+  cancelarHref,
+  pendiente = false,
+  guardarTexto,
+  iconoGuardar = "guardar",
+  peligro = false,
+}: {
+  cancelarHref?: string;
+  pendiente?: boolean;
+  guardarTexto?: string;
+  iconoGuardar?: string;
+  peligro?: boolean;
+}) {
   return (
     <div className="acciones acciones-formulario">
-      <Link href={cancelarHref} className="boton boton-secundario boton-con-icono">
-        <Icono nombre="cancelar" tamano={18} />
-        {t("app.cancelar")}
-      </Link>
-      <button type="submit" className="boton boton-con-icono" disabled={pendiente}>
-        <Icono nombre="guardar" tamano={18} />
-        {t("app.guardar")}
+      {cancelarHref && (
+        <Link href={cancelarHref} className="boton boton-secundario boton-con-icono">
+          <Icono nombre="cancelar" tamano={18} />
+          {t("app.cancelar")}
+        </Link>
+      )}
+      <button type="submit" className={`boton boton-con-icono${peligro ? " boton-peligro" : ""}`} disabled={pendiente}>
+        <Icono nombre={peligro ? "anular" : iconoGuardar} tamano={18} />
+        {guardarTexto ?? t("app.guardar")}
       </button>
     </div>
   );

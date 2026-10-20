@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioServicio, SERVICIO_NUEVO } from "@/components/FormularioServicio";
 import { obtenerBien } from "@/lib/bienes";
 import { esGestion } from "@/lib/menu";
@@ -21,9 +22,7 @@ export default async function NuevoServicio({ params }: { params: Promise<{ id: 
   return (
     <>
       <p className="migas">{bien.esGastosVarios ? t("bienes.gastos_varios") : bien.alias}</p>
-      <div className="encabezado">
-        <h1>{t("servicios.alta_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="obligaciones">{t("servicios.alta_titulo")}</TituloConIcono>
       {activos.length === 0 ? (
         <p className="aviso-advertencia">{t("servicios.sin_conceptos")}</p>
       ) : (

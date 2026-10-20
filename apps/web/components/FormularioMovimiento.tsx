@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 import { t } from "@ai/i18n";
+import { AccionesFormulario, CampoIcono, SeccionFormulario } from "@/components/ElementosFormulario";
 import { aCentavos, completarTraspaso, parsearCotizacion, TIPOS_MOVIMIENTO_MANUAL, type Moneda } from "@ai/domain";
 import { CampoAdjuntos } from "@/components/CampoAdjuntos";
 import type { EstadoFormularioMovimiento } from "@/lib/formulario-movimiento";
@@ -52,12 +52,14 @@ function CampoBien({
   return (
     <div className="campo">
       <label htmlFor="bienId">{t("cuentas.bien")}</label>
-      <select id="bienId" name="bienId" defaultValue={ordenados[0]?.id ?? ""} aria-invalid={invalido}>
-        {general ? null : <option value="">—</option>}
-        {ordenados.map((b) => (
-          <option key={b.id} value={b.id}>{b.esGeneral ? t("cuentas.general_opcion") : b.nombre}</option>
-        ))}
-      </select>
+      <CampoIcono icono="bienes">
+        <select id="bienId" name="bienId" defaultValue={ordenados[0]?.id ?? ""} aria-invalid={invalido}>
+          {general ? null : <option value="">—</option>}
+          {ordenados.map((b) => (
+            <option key={b.id} value={b.id}>{b.esGeneral ? t("cuentas.general_opcion") : b.nombre}</option>
+          ))}
+        </select>
+      </CampoIcono>
       {conSelector && <span className="muted">{t("cuentas.ayuda_bien")}</span>}
       {error}
     </div>
@@ -88,26 +90,29 @@ export function FormularioMovimiento({
       {estado.error && <p className="aviso-error" role="alert">{t(estado.error)}</p>}
       <input type="hidden" name="propietarioId" value={propietario.id} />
 
-      <fieldset className="grupo">
-        <legend>{t("cuentas.seccion_movimiento")}</legend>
+      <SeccionFormulario icono="cuentas" titulo={t("cuentas.seccion_movimiento")}>
         <p className="muted">{t("cuentas.de_propietario", { nombre: propietario.nombre })}</p>
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="tipo">{t("cuentas.col_tipo")}</label>
-            <select id="tipo" name="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-              {TIPOS_MOVIMIENTO_MANUAL.map((x) => (
-                <option key={x} value={x}>{t(`cuentas.tipo_${x}`)}</option>
-              ))}
-            </select>
+            <CampoIcono icono="contratos">
+              <select id="tipo" name="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+                {TIPOS_MOVIMIENTO_MANUAL.map((x) => (
+                  <option key={x} value={x}>{t(`cuentas.tipo_${x}`)}</option>
+                ))}
+              </select>
+            </CampoIcono>
             <span className="muted">{t(`cuentas.efecto_${tipo}`)}</span>
           </div>
           {tipo === "ajuste_manual" ? (
             <div className="campo">
               <label htmlFor="ajuste">{t("cuentas.ajuste_sentido")}</label>
-              <select id="ajuste" name="ajuste" defaultValue="debe">
-                <option value="debe">{t("cuentas.ajuste_debe")}</option>
-                <option value="haber">{t("cuentas.ajuste_haber")}</option>
-              </select>
+              <CampoIcono icono="traspaso">
+                <select id="ajuste" name="ajuste" defaultValue="debe">
+                  <option value="debe">{t("cuentas.ajuste_debe")}</option>
+                  <option value="haber">{t("cuentas.ajuste_haber")}</option>
+                </select>
+              </CampoIcono>
             </div>
           ) : (
             <div />
@@ -116,41 +121,45 @@ export function FormularioMovimiento({
         <CampoBien bienes={bienes} conSelector={tipo === "gasto_extraordinario" || tipo === "ajuste_manual"} error={error("bienId")} invalido={Boolean(estado.errores?.bienId)} />
         <div className="campo">
           <label htmlFor="moneda">{t("obligaciones.campo_moneda")}</label>
-          <select id="moneda" name="moneda" defaultValue={monedaInicial}>
-            <option value="ARS">ARS</option>
-            <option value="USD">USD</option>
-          </select>
+          <CampoIcono icono="dinero">
+            <select id="moneda" name="moneda" defaultValue={monedaInicial}>
+              <option value="ARS">ARS</option>
+              <option value="USD">USD</option>
+            </select>
+          </CampoIcono>
         </div>
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="fecha">{t("pagos.campo_fecha")}</label>
-            <input id="fecha" name="fecha" type="date" defaultValue={hoy} aria-invalid={Boolean(estado.errores?.fecha)} />
+            <CampoIcono icono="calendario">
+              <input id="fecha" name="fecha" type="date" defaultValue={hoy} aria-invalid={Boolean(estado.errores?.fecha)} />
+            </CampoIcono>
             {error("fecha")}
           </div>
           <div className="campo">
             <label htmlFor="importe">{t("cuentas.importe")}</label>
-            <input id="importe" name="importe" type="text" inputMode="decimal" aria-invalid={Boolean(estado.errores?.importe)} />
+            <CampoIcono icono="dinero">
+              <input id="importe" name="importe" type="text" inputMode="decimal" aria-invalid={Boolean(estado.errores?.importe)} />
+            </CampoIcono>
             {error("importe")}
           </div>
         </div>
         <div className="campo">
           <label htmlFor="descripcion">{t("obligaciones.campo_descripcion")}</label>
-          <input id="descripcion" name="descripcion" type="text" placeholder={t("cuentas.placeholder_descripcion")} aria-invalid={Boolean(estado.errores?.descripcion)} />
+          <CampoIcono icono="nota">
+            <input id="descripcion" name="descripcion" type="text" placeholder={t("cuentas.placeholder_descripcion")} aria-invalid={Boolean(estado.errores?.descripcion)} />
+          </CampoIcono>
           {error("descripcion")}
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
-      <fieldset className="grupo">
-        <legend>{t("cuentas.seccion_comprobante")}</legend>
+      <SeccionFormulario icono="documento" titulo={t("cuentas.seccion_comprobante")}>
         <CampoAdjuntos organizacionId={organizacionId} entidad="movimiento" entidadId={movimientoId} tipo="comprobante" existentes={[]} etiqueta={t("pagos.campo_comprobante")} />
-      </fieldset>
+      </SeccionFormulario>
 
       {estado.avisoExceso && <AvisoExceso saldo={estado.avisoExceso} etiqueta={t("cuentas.confirmar_exceso")} />}
 
-      <div className="acciones">
-        <Link href={cancelarHref} className="boton boton-secundario">{t("app.cancelar")}</Link>
-        <button type="submit" className="boton" disabled={enviando}>{t("app.guardar")}</button>
-      </div>
+      <AccionesFormulario cancelarHref={cancelarHref} pendiente={enviando} />
     </form>
   );
 }
@@ -220,15 +229,16 @@ export function FormularioTraspaso({ accion, propietario, bienes, hoy, cancelarH
       {estado.error && <p className="aviso-error" role="alert">{t(estado.error)}</p>}
       <input type="hidden" name="propietarioId" value={propietario.id} />
 
-      <fieldset className="grupo">
-        <legend>{t("cuentas.seccion_traspaso")}</legend>
+      <SeccionFormulario icono="traspaso" titulo={t("cuentas.seccion_traspaso")}>
         <p className="muted">{t("cuentas.de_propietario", { nombre: propietario.nombre })}</p>
         <div className="campo">
           <label htmlFor="monedaOrigen">{t("cuentas.sale_de")}</label>
-          <select id="monedaOrigen" name="monedaOrigen" value={origen} onChange={(e) => setOrigen(e.target.value as Moneda)}>
-            <option value="ARS">{t("cuentas.pesos")}</option>
-            <option value="USD">{t("cuentas.dolares")}</option>
-          </select>
+          <CampoIcono icono="dinero">
+            <select id="monedaOrigen" name="monedaOrigen" value={origen} onChange={(e) => setOrigen(e.target.value as Moneda)}>
+              <option value="ARS">{t("cuentas.pesos")}</option>
+              <option value="USD">{t("cuentas.dolares")}</option>
+            </select>
+          </CampoIcono>
         </div>
         <CampoBien bienes={bienes} conSelector={false} error={error("bienId")} invalido={Boolean(estado.errores?.bienId)} />
         <p className="muted">{t("cuentas.ayuda_traspaso")}</p>
@@ -240,22 +250,23 @@ export function FormularioTraspaso({ accion, propietario, bienes, hoy, cancelarH
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="fecha">{t("pagos.campo_fecha")}</label>
-            <input id="fecha" name="fecha" type="date" defaultValue={hoy} aria-invalid={Boolean(estado.errores?.fecha)} />
+            <CampoIcono icono="calendario">
+              <input id="fecha" name="fecha" type="date" defaultValue={hoy} aria-invalid={Boolean(estado.errores?.fecha)} />
+            </CampoIcono>
             {error("fecha")}
           </div>
           <div className="campo">
             <label htmlFor="descripcion">{t("cuentas.nota_opcional")}</label>
-            <input id="descripcion" name="descripcion" type="text" />
+            <CampoIcono icono="nota">
+              <input id="descripcion" name="descripcion" type="text" />
+            </CampoIcono>
           </div>
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
       {estado.avisoExceso && <AvisoExceso saldo={estado.avisoExceso} etiqueta={t("cuentas.confirmar_exceso")} />}
 
-      <div className="acciones">
-        <Link href={cancelarHref} className="boton boton-secundario">{t("app.cancelar")}</Link>
-        <button type="submit" className="boton" disabled={enviando}>{t("cuentas.registrar_traspaso")}</button>
-      </div>
+      <AccionesFormulario cancelarHref={cancelarHref} pendiente={enviando} guardarTexto={t("cuentas.registrar_traspaso")} />
     </form>
   );
 }

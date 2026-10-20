@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { formatearPeriodo, puedeModificarObligacion } from "@ai/domain";
 import { FormularioObligacion } from "@/components/FormularioObligacion";
 import { documentosDe } from "@/lib/documentos";
@@ -35,9 +36,7 @@ export default async function EditarObligacion({ params }: { params: Promise<{ i
   if (!puedeModificarObligacion({ pagada: fila.estado === "pagada", anulada: fila.estado === "anulada" })) {
     return (
       <>
-        <div className="encabezado">
-          <h1>{t("obligaciones.edicion_titulo")}</h1>
-        </div>
+        <TituloConIcono icono="editar">{t("obligaciones.edicion_titulo")}</TituloConIcono>
         <p className="aviso-advertencia">{t("obligaciones.error_no_modificable")}</p>
         <Link href="/obligaciones" className="boton boton-secundario">{t("app.volver")}</Link>
       </>
@@ -46,9 +45,7 @@ export default async function EditarObligacion({ params }: { params: Promise<{ i
 
   return (
     <>
-      <div className="encabezado">
-        <h1>{t("obligaciones.edicion_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="editar">{t("obligaciones.edicion_titulo")}</TituloConIcono>
       <FormularioObligacion
         accion={actualizarObligacion.bind(null, id)}
         bienes={opciones.bienes}

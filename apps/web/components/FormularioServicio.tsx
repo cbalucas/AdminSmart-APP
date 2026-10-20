@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState } from "react";
 import { t } from "@ai/i18n";
+import { AccionesFormulario, CampoIcono, SeccionFormulario } from "@/components/ElementosFormulario";
 import { PERIODICIDADES_SERVICIO } from "@ai/domain";
 import type { EstadoFormularioServicio } from "@/lib/formulario-servicio";
 
@@ -69,48 +69,54 @@ export function FormularioServicio({
     <form action={enviar} className="formulario-ancho" noValidate>
       {estado.error && <p className="aviso-error" role="alert">{t(estado.error)}</p>}
 
-      <fieldset className="grupo">
-        <legend>{t("servicios.seccion_servicio")}</legend>
+      <SeccionFormulario icono="obligaciones" titulo={t("servicios.seccion_servicio")}>
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="conceptoId">{t("servicios.campo_concepto")}</label>
-            <select id="conceptoId" name="conceptoId" defaultValue={valores.conceptoId} aria-invalid={Boolean(errores.conceptoId)}>
-              <option value="">—</option>
-              {conceptos.map((c) => (
-                <option key={c.id} value={c.id}>{c.nombre}</option>
-              ))}
-            </select>
+            <CampoIcono icono="contratos">
+              <select id="conceptoId" name="conceptoId" defaultValue={valores.conceptoId} aria-invalid={Boolean(errores.conceptoId)}>
+                <option value="">—</option>
+                {conceptos.map((c) => (
+                  <option key={c.id} value={c.id}>{c.nombre}</option>
+                ))}
+              </select>
+            </CampoIcono>
             {error("conceptoId")}
           </div>
           <div className="campo">
             <label htmlFor="responsableDefault">{t("servicios.campo_responsable")}</label>
-            <select id="responsableDefault" name="responsableDefault" defaultValue={valores.responsableDefault}>
-              <option value="propietario">{t("servicios.responsable_propietario")}</option>
-              <option value="inquilino">{t("servicios.responsable_inquilino")}</option>
-            </select>
+            <CampoIcono icono="persona">
+              <select id="responsableDefault" name="responsableDefault" defaultValue={valores.responsableDefault}>
+                <option value="propietario">{t("servicios.responsable_propietario")}</option>
+                <option value="inquilino">{t("servicios.responsable_inquilino")}</option>
+              </select>
+            </CampoIcono>
           </div>
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
-      <fieldset className="grupo">
-        <legend>{t("servicios.seccion_cuenta")}</legend>
+      <SeccionFormulario icono="cuentas" titulo={t("servicios.seccion_cuenta")}>
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="nroCuentaCliente">{t("servicios.campo_cuenta")}</label>
-            <input id="nroCuentaCliente" name="nroCuentaCliente" type="text" defaultValue={valores.nroCuentaCliente} aria-invalid={Boolean(errores.nroCuentaCliente)} />
+            <CampoIcono icono="numero">
+              <input id="nroCuentaCliente" name="nroCuentaCliente" type="text" defaultValue={valores.nroCuentaCliente} aria-invalid={Boolean(errores.nroCuentaCliente)} />
+            </CampoIcono>
             {error("nroCuentaCliente")}
           </div>
           <div className="campo">
             <label htmlFor="empresaPrestadora">{t("servicios.campo_empresa")}</label>
-            <input
-              id="empresaPrestadora"
-              name="empresaPrestadora"
-              type="text"
-              list="lista-empresas"
-              autoComplete="off"
-              defaultValue={valores.empresaPrestadora}
-              aria-invalid={Boolean(errores.empresaPrestadora)}
-            />
+            <CampoIcono icono="edificios">
+              <input
+                id="empresaPrestadora"
+                name="empresaPrestadora"
+                type="text"
+                list="lista-empresas"
+                autoComplete="off"
+                defaultValue={valores.empresaPrestadora}
+                aria-invalid={Boolean(errores.empresaPrestadora)}
+              />
+            </CampoIcono>
             <datalist id="lista-empresas">
               {empresas.map((e) => (
                 <option key={e} value={e} />
@@ -121,41 +127,50 @@ export function FormularioServicio({
         </div>
         <div className="campo">
           <label htmlFor="titularServicio">{t("servicios.campo_titular")}</label>
-          <input id="titularServicio" name="titularServicio" type="text" defaultValue={valores.titularServicio} />
+          <CampoIcono icono="persona">
+            <input id="titularServicio" name="titularServicio" type="text" defaultValue={valores.titularServicio} />
+          </CampoIcono>
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
-      <fieldset className="grupo">
-        <legend>{t("servicios.seccion_pago")}</legend>
+      <SeccionFormulario icono="dinero" titulo={t("servicios.seccion_pago")}>
         <p className="muted">{t("servicios.ayuda_periodicidad")}</p>
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="periodicidad">{t("servicios.campo_periodicidad")}</label>
-            <select id="periodicidad" name="periodicidad" defaultValue={valores.periodicidad}>
-              <option value="">{t("servicios.sin_periodicidad")}</option>
-              {PERIODICIDADES_SERVICIO.map((p) => (
-                <option key={p} value={p}>{t(`propietarios.per_${p}`)}</option>
-              ))}
-            </select>
+            <CampoIcono icono="recurrente">
+              <select id="periodicidad" name="periodicidad" defaultValue={valores.periodicidad}>
+                <option value="">{t("servicios.sin_periodicidad")}</option>
+                {PERIODICIDADES_SERVICIO.map((p) => (
+                  <option key={p} value={p}>{t(`propietarios.per_${p}`)}</option>
+                ))}
+              </select>
+            </CampoIcono>
           </div>
           <div className="campo">
             <label htmlFor="diaVencimiento">{t("servicios.campo_dia")}</label>
-            <input id="diaVencimiento" name="diaVencimiento" type="number" min={1} max={31} defaultValue={valores.diaVencimiento} aria-invalid={Boolean(errores.diaVencimiento)} />
+            <CampoIcono icono="calendario">
+              <input id="diaVencimiento" name="diaVencimiento" type="number" min={1} max={31} defaultValue={valores.diaVencimiento} aria-invalid={Boolean(errores.diaVencimiento)} />
+            </CampoIcono>
             {error("diaVencimiento")}
           </div>
         </div>
         <div className="fila fila-calle">
           <div className="campo">
             <label htmlFor="montoEstimado">{t("servicios.campo_monto")}</label>
-            <input id="montoEstimado" name="montoEstimado" type="text" inputMode="decimal" defaultValue={valores.montoEstimado} aria-invalid={Boolean(errores.montoEstimado)} />
+            <CampoIcono icono="dinero">
+              <input id="montoEstimado" name="montoEstimado" type="text" inputMode="decimal" defaultValue={valores.montoEstimado} aria-invalid={Boolean(errores.montoEstimado)} />
+            </CampoIcono>
             {error("montoEstimado")}
           </div>
           <div className="campo">
             <label htmlFor="montoEstimadoMoneda">{t("servicios.campo_moneda")}</label>
-            <select id="montoEstimadoMoneda" name="montoEstimadoMoneda" defaultValue={valores.montoEstimadoMoneda}>
-              <option value="ARS">ARS</option>
-              <option value="USD">USD</option>
-            </select>
+            <CampoIcono icono="dinero">
+              <select id="montoEstimadoMoneda" name="montoEstimadoMoneda" defaultValue={valores.montoEstimadoMoneda}>
+                <option value="ARS">ARS</option>
+                <option value="USD">USD</option>
+              </select>
+            </CampoIcono>
           </div>
         </div>
         <label className="casilla">
@@ -164,32 +179,32 @@ export function FormularioServicio({
         </label>
         <div className="campo">
           <label htmlFor="sitioBoletas">{t("servicios.campo_sitio")}</label>
-          <input id="sitioBoletas" name="sitioBoletas" type="text" inputMode="url" autoCapitalize="none" defaultValue={valores.sitioBoletas} aria-invalid={Boolean(errores.sitioBoletas)} />
+          <CampoIcono icono="documento">
+            <input id="sitioBoletas" name="sitioBoletas" type="text" inputMode="url" autoCapitalize="none" defaultValue={valores.sitioBoletas} aria-invalid={Boolean(errores.sitioBoletas)} />
+          </CampoIcono>
           {error("sitioBoletas")}
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
-      <fieldset className="grupo">
-        <legend>{t("servicios.seccion_otros")}</legend>
+      <SeccionFormulario icono="nota" titulo={t("servicios.seccion_otros")}>
         {editando && (
           <div className="campo">
             <label htmlFor="estado">{t("servicios.campo_estado")}</label>
-            <select id="estado" name="estado" defaultValue={valores.estado}>
-              <option value="activo">{t("conceptos.activo")}</option>
-              <option value="inactivo">{t("conceptos.inactivo")}</option>
-            </select>
+            <CampoIcono icono="info">
+              <select id="estado" name="estado" defaultValue={valores.estado}>
+                <option value="activo">{t("conceptos.activo")}</option>
+                <option value="inactivo">{t("conceptos.inactivo")}</option>
+              </select>
+            </CampoIcono>
           </div>
         )}
         <div className="campo">
           <label htmlFor="observaciones">{t("servicios.campo_observaciones")}</label>
           <textarea id="observaciones" name="observaciones" rows={3} defaultValue={valores.observaciones} />
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
-      <div className="acciones">
-        <Link href={cancelarHref} className="boton boton-secundario">{t("app.cancelar")}</Link>
-        <button type="submit" className="boton" disabled={pendiente}>{t("app.guardar")}</button>
-      </div>
+      <AccionesFormulario cancelarHref={cancelarHref} pendiente={pendiente} />
     </form>
   );
 }

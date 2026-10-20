@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { generarUuidV7, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioMovimiento } from "@/components/FormularioMovimiento";
 import { bienesDelPropietario, propietariosParaCuenta } from "@/lib/cuentas-corrientes";
 import { esGestion } from "@/lib/menu";
@@ -19,7 +20,7 @@ export default async function NuevoMovimiento({ searchParams }: { searchParams: 
   const movimientoId = generarUuidV7();
   return (
     <>
-      <div className="encabezado"><h1>{t("cuentas.nuevo_movimiento")}</h1></div>
+      <TituloConIcono icono="cuentas">{t("cuentas.nuevo_movimiento")}</TituloConIcono>
       <FormularioMovimiento
         accion={crearMovimientoManual.bind(null, movimientoId)}
         movimientoId={movimientoId}

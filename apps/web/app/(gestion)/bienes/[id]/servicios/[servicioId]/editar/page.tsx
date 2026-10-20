@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioServicio } from "@/components/FormularioServicio";
 import { obtenerBien } from "@/lib/bienes";
 import { esGestion } from "@/lib/menu";
@@ -28,9 +29,7 @@ export default async function EditarServicio({ params }: { params: Promise<{ id:
   return (
     <>
       <p className="migas">{bien.esGastosVarios ? t("bienes.gastos_varios") : bien.alias}</p>
-      <div className="encabezado">
-        <h1>{t("servicios.edicion_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="editar">{t("servicios.edicion_titulo")}</TituloConIcono>
       <FormularioServicio
         editando
         accion={actualizarServicio.bind(null, bien.id, servicio.id)}

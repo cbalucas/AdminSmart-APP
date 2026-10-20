@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { generarUuidV7 } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioPago } from "@/components/FormularioPago";
 import { obtenerAdministracion } from "@/lib/administracion";
 import { esGestion } from "@/lib/menu";
@@ -17,7 +18,7 @@ export default async function PagoDirecto() {
   const pagoId = generarUuidV7();
   return (
     <>
-      <div className="encabezado"><h1>{t("pagos.titulo_directo")}</h1></div>
+      <TituloConIcono icono="dinero">{t("pagos.titulo_directo")}</TituloConIcono>
       <FormularioPago
         accion={registrarPagoDirecto.bind(null, pagoId)}
         hoy={fechaHoy()}

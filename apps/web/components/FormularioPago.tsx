@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 import { t } from "@ai/i18n";
+import { AccionesFormulario, CampoIcono, SeccionFormulario } from "@/components/ElementosFormulario";
 import { aCentavos, formatearImporte, MEDIOS_PAGO, resolverResponsable, type Moneda } from "@ai/domain";
 import { CampoAdjuntos } from "@/components/CampoAdjuntos";
 import type { BienOpcion } from "@/components/FormularioObligacion";
@@ -97,66 +97,78 @@ export function FormularioPago({
       )}
 
       {directo && (
-        <fieldset className="grupo">
-          <legend>{t("pagos.seccion_gasto")}</legend>
+        <SeccionFormulario icono="obligaciones" titulo={t("pagos.seccion_gasto")}>
           <p className="muted">{t("pagos.ayuda_directo")}</p>
           <div className="fila fila-2">
             <div className="campo">
               <label htmlFor="bienId">{t("obligaciones.campo_bien")}</label>
-              <select id="bienId" name="bienId" value={bienId} onChange={(e) => elegirBien(e.target.value)} aria-invalid={Boolean(errores.bienId)}>
-                <option value="">—</option>
-                {directo.bienes.map((b) => (
-                  <option key={b.id} value={b.id}>{b.nombre}</option>
-                ))}
-              </select>
+              <CampoIcono icono="bienes">
+                <select id="bienId" name="bienId" value={bienId} onChange={(e) => elegirBien(e.target.value)} aria-invalid={Boolean(errores.bienId)}>
+                  <option value="">—</option>
+                  {directo.bienes.map((b) => (
+                    <option key={b.id} value={b.id}>{b.nombre}</option>
+                  ))}
+                </select>
+              </CampoIcono>
               {error("bienId")}
             </div>
             <div className="campo">
               <label htmlFor="conceptoId">{t("obligaciones.campo_concepto")}</label>
-              <select id="conceptoId" name="conceptoId" defaultValue="" aria-invalid={Boolean(errores.conceptoId)}>
-                <option value="">—</option>
-                {directo.conceptos.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nombre}</option>
-                ))}
-              </select>
+              <CampoIcono icono="contratos">
+                <select id="conceptoId" name="conceptoId" defaultValue="" aria-invalid={Boolean(errores.conceptoId)}>
+                  <option value="">—</option>
+                  {directo.conceptos.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nombre}</option>
+                  ))}
+                </select>
+              </CampoIcono>
               {error("conceptoId")}
             </div>
           </div>
           <div className="campo">
             <label htmlFor="descripcion">{t("obligaciones.campo_descripcion")}</label>
-            <input id="descripcion" name="descripcion" type="text" placeholder={t("obligaciones.placeholder_descripcion")} aria-invalid={Boolean(errores.descripcion)} />
+            <CampoIcono icono="nota">
+              <input id="descripcion" name="descripcion" type="text" placeholder={t("obligaciones.placeholder_descripcion")} aria-invalid={Boolean(errores.descripcion)} />
+            </CampoIcono>
             {error("descripcion")}
           </div>
           <div className="fila fila-2">
             <div className="campo">
               <label htmlFor="responsable">{t("obligaciones.campo_responsable")}</label>
-              <select id="responsable" name="responsable" value={responsable} onChange={(e) => setResponsable(e.target.value as "propietario" | "inquilino")}>
-                <option value="propietario">{t("obligaciones.responsable_propietario")}</option>
-                <option value="inquilino">{t("obligaciones.responsable_inquilino")}</option>
-              </select>
+              <CampoIcono icono="persona">
+                <select id="responsable" name="responsable" value={responsable} onChange={(e) => setResponsable(e.target.value as "propietario" | "inquilino")}>
+                  <option value="propietario">{t("obligaciones.responsable_propietario")}</option>
+                  <option value="inquilino">{t("obligaciones.responsable_inquilino")}</option>
+                </select>
+              </CampoIcono>
             </div>
             <div className="campo">
               <label htmlFor="moneda">{t("obligaciones.campo_moneda")}</label>
-              <select id="moneda" name="moneda" value={moneda} onChange={(e) => setMoneda(e.target.value as Moneda)}>
-                <option value="ARS">ARS</option>
-                <option value="USD">USD</option>
-              </select>
+              <CampoIcono icono="dinero">
+                <select id="moneda" name="moneda" value={moneda} onChange={(e) => setMoneda(e.target.value as Moneda)}>
+                  <option value="ARS">ARS</option>
+                  <option value="USD">USD</option>
+                </select>
+              </CampoIcono>
             </div>
           </div>
-        </fieldset>
+        </SeccionFormulario>
       )}
 
-      <fieldset className="grupo">
-        <legend>{t("pagos.seccion_pago")}</legend>
+      <SeccionFormulario icono="dinero" titulo={t("pagos.seccion_pago")}>
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="fecha">{t("pagos.campo_fecha")}</label>
-            <input id="fecha" name="fecha" type="date" defaultValue={hoy} aria-invalid={Boolean(errores.fecha)} />
+            <CampoIcono icono="calendario">
+              <input id="fecha" name="fecha" type="date" defaultValue={hoy} aria-invalid={Boolean(errores.fecha)} />
+            </CampoIcono>
             {error("fecha")}
           </div>
           <div className="campo">
             <label htmlFor="importe">{t("pagos.campo_importe", { moneda: monedaPago })}</label>
-            <input id="importe" name="importe" type="text" inputMode="decimal" value={importe} onChange={(e) => setImporte(e.target.value)} aria-invalid={Boolean(errores.importe)} />
+            <CampoIcono icono="dinero">
+              <input id="importe" name="importe" type="text" inputMode="decimal" value={importe} onChange={(e) => setImporte(e.target.value)} aria-invalid={Boolean(errores.importe)} />
+            </CampoIcono>
             {error("importe")}
           </div>
         </div>
@@ -175,7 +187,9 @@ export function FormularioPago({
             </label>
             <div className="campo">
               <label htmlFor="motivoDiferencia">{t("pagos.campo_motivo")}</label>
-              <input id="motivoDiferencia" name="motivoDiferencia" type="text" placeholder={t("pagos.placeholder_motivo")} aria-invalid={Boolean(errores.motivoDiferencia)} />
+              <CampoIcono icono="nota">
+                <input id="motivoDiferencia" name="motivoDiferencia" type="text" placeholder={t("pagos.placeholder_motivo")} aria-invalid={Boolean(errores.motivoDiferencia)} />
+              </CampoIcono>
               {error("motivoDiferencia")}
             </div>
           </div>
@@ -198,28 +212,31 @@ export function FormularioPago({
         <div className="fila fila-2">
           <div className="campo">
             <label htmlFor="medio">{t("pagos.campo_medio")}</label>
-            <select id="medio" name="medio" defaultValue="">
-              <option value="">—</option>
-              {MEDIOS_PAGO.map((m) => (
-                <option key={m} value={m}>{t(`pagos.medio_${m}`)}</option>
-              ))}
-            </select>
+            <CampoIcono icono="cuentas">
+              <select id="medio" name="medio" defaultValue="">
+                <option value="">—</option>
+                {MEDIOS_PAGO.map((m) => (
+                  <option key={m} value={m}>{t(`pagos.medio_${m}`)}</option>
+                ))}
+              </select>
+            </CampoIcono>
           </div>
           <div className="campo">
             <label htmlFor="nroOperacion">{t("pagos.campo_operacion")}</label>
-            <input id="nroOperacion" name="nroOperacion" type="text" placeholder={t("pagos.placeholder_operacion")} />
+            <CampoIcono icono="numero">
+              <input id="nroOperacion" name="nroOperacion" type="text" placeholder={t("pagos.placeholder_operacion")} />
+            </CampoIcono>
           </div>
         </div>
         <div className="campo">
           <label htmlFor="observaciones">{t("obligaciones.campo_observaciones")}</label>
           <textarea id="observaciones" name="observaciones" rows={2} />
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
-      <fieldset className="grupo">
-        <legend>{t("pagos.seccion_comprobante")}</legend>
+      <SeccionFormulario icono="documento" titulo={t("pagos.seccion_comprobante")}>
         <CampoAdjuntos organizacionId={organizacionId} entidad="pago" entidadId={pagoId} tipo="comprobante" existentes={[]} etiqueta={t("pagos.campo_comprobante")} />
-      </fieldset>
+      </SeccionFormulario>
 
       {estado.avisoSaldo && estado.avisoSaldo.length > 0 && (
         <div className="aviso-advertencia" role="alert">
@@ -231,10 +248,7 @@ export function FormularioPago({
         </div>
       )}
 
-      <div className="acciones">
-        <Link href={cancelarHref} className="boton boton-secundario">{t("app.cancelar")}</Link>
-        <button type="submit" className="boton" disabled={enviando}>{t("pagos.guardar")}</button>
-      </div>
+      <AccionesFormulario cancelarHref={cancelarHref} pendiente={enviando} guardarTexto={t("pagos.guardar")} />
     </form>
   );
 }

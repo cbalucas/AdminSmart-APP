@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioAdministracion } from "@/components/FormularioAdministracion";
 import { LogoAdministracion } from "@/components/LogoAdministracion";
 import { enlaceDelLogo, obtenerAdministracion } from "@/lib/administracion";
@@ -19,9 +20,7 @@ export default async function DatosAdministracion() {
       <p className="migas">
         <Link href="/configuracion">{t("configuracion.titulo")}</Link> / {t("administracion.titulo")}
       </p>
-      <div className="encabezado">
-        <h1>{t("administracion.titulo")}</h1>
-      </div>
+      <TituloConIcono icono="edificios">{t("administracion.titulo")}</TituloConIcono>
 
       <section className="grupo logo-seccion">
         <h2>{t("administracion.logo")}</h2>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioPreferencias } from "@/components/FormularioPreferencias";
 import { obtenerAdministracion } from "@/lib/administracion";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -16,9 +17,7 @@ export default async function Preferencias() {
       <p className="migas">
         <Link href="/configuracion">{t("configuracion.titulo")}</Link> / {t("preferencias.titulo")}
       </p>
-      <div className="encabezado">
-        <h1>{t("preferencias.titulo")}</h1>
-      </div>
+      <TituloConIcono icono="configuracion">{t("preferencias.titulo")}</TituloConIcono>
       <FormularioPreferencias diasAviso={admin.diasAvisoRecurrentes} moneda={admin.monedaDefecto} />
     </>
   );

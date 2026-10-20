@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState } from "react";
 import { t } from "@ai/i18n";
+import { AccionesFormulario, SeccionFormulario } from "@/components/ElementosFormulario";
 import type { EstadoAnulacion } from "@/app/(gestion)/obligaciones/pagos";
 
 // P-28 Anular un pago: el motivo es obligatorio (PAG-05).
@@ -17,18 +17,15 @@ export function FormularioAnulacion({
   return (
     <form action={enviar} className="formulario-ancho" noValidate>
       {estado.error && <p className="aviso-error" role="alert">{t(estado.error)}</p>}
-      <section className="grupo">
+      <SeccionFormulario icono="anular" titulo={t("pagos.titulo_anular")}>
         <p>{resumen}</p>
         <p className="muted">{t("pagos.ayuda_anular")}</p>
         <div className="campo">
           <label htmlFor="motivo">{t("pagos.campo_motivo_anulacion")}</label>
           <textarea id="motivo" name="motivo" rows={3} />
         </div>
-      </section>
-      <div className="acciones">
-        <Link href="/obligaciones" className="boton boton-secundario">{t("app.cancelar")}</Link>
-        <button type="submit" className="boton boton-peligro" disabled={pendiente}>{t("pagos.anular")}</button>
-      </div>
+      </SeccionFormulario>
+      <AccionesFormulario cancelarHref="/obligaciones" pendiente={pendiente} guardarTexto={t("pagos.anular")} peligro />
     </form>
   );
 }

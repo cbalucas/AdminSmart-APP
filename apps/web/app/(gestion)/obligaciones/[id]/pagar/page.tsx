@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatearPeriodo, generarUuidV7 } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioPago } from "@/components/FormularioPago";
 import { esGestion } from "@/lib/menu";
 import { fechaHoy, listarObligaciones } from "@/lib/obligaciones";
@@ -22,7 +23,7 @@ export default async function PagarObligacion({ params }: { params: Promise<{ id
   if (o.estado === "pagada" || o.estado === "anulada") {
     return (
       <>
-        <div className="encabezado"><h1>{t("pagos.titulo")}</h1></div>
+        <TituloConIcono icono="dinero">{t("pagos.titulo")}</TituloConIcono>
         <p className="aviso-advertencia">{t("pagos.ya_pagada")}</p>
         <Link href="/obligaciones" className="boton boton-secundario">{t("app.volver")}</Link>
       </>
@@ -33,7 +34,7 @@ export default async function PagarObligacion({ params }: { params: Promise<{ id
   const pagoId = generarUuidV7();
   return (
     <>
-      <div className="encabezado"><h1>{t("pagos.titulo")}</h1></div>
+      <TituloConIcono icono="dinero">{t("pagos.titulo")}</TituloConIcono>
       <FormularioPago
         accion={registrarPago.bind(null, id, pagoId)}
         hoy={fechaHoy()}

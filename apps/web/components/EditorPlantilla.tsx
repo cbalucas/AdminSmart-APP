@@ -3,6 +3,8 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { t } from "@ai/i18n";
+import { CampoIcono } from "@/components/ElementosFormulario";
+import { Icono } from "@/components/Iconos";
 import { completarPlantilla, VARIABLES_POR_DOCUMENTO, type CanalPlantilla, type DocumentoPlantilla } from "@ai/domain";
 import { guardarPlantilla, restaurarPlantilla, type EstadoPlantilla } from "@/app/(gestion)/configuracion/plantillas/acciones";
 
@@ -96,7 +98,9 @@ export function EditorPlantilla({
           {esEmail && (
             <div className="campo">
               <label htmlFor="asunto">{t("plantillas.asunto")}</label>
-              <input id="asunto" ref={campoAsunto} type="text" value={asunto} onChange={(e) => setAsunto(e.target.value)} onFocus={() => setActivo("asunto")} />
+              <CampoIcono icono="mail">
+                <input id="asunto" ref={campoAsunto} type="text" value={asunto} onChange={(e) => setAsunto(e.target.value)} onFocus={() => setActivo("asunto")} />
+              </CampoIcono>
             </div>
           )}
           <div className="campo">
@@ -117,10 +121,12 @@ export function EditorPlantilla({
           </div>
 
           <div className="acciones">
-            <button type="button" className="boton-texto" onClick={restaurar} disabled={pendiente || (!personalizada && igualAlOriginal)}>
+            <button type="button" className="boton boton-secundario boton-con-icono" onClick={restaurar} disabled={pendiente || (!personalizada && igualAlOriginal)}>
+              <Icono nombre="anular" tamano={18} />
               {t("plantillas.restaurar")}
             </button>
-            <button type="button" className="boton" onClick={guardar} disabled={pendiente || igualAlOriginal && !personalizada}>
+            <button type="button" className="boton boton-con-icono" onClick={guardar} disabled={pendiente || igualAlOriginal && !personalizada}>
+              <Icono nombre="guardar" tamano={18} />
               {t("app.guardar")}
             </button>
           </div>

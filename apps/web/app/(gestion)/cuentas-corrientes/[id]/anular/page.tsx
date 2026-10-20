@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioAnularMovimiento } from "@/components/FormularioAnularMovimiento";
 import { libroDelPropietario } from "@/lib/cuentas-corrientes";
 import { esGestion } from "@/lib/menu";
@@ -27,7 +28,7 @@ export default async function AnularMovimiento({
   const importe = m.debe > 0 ? m.debe : m.haber;
   return (
     <>
-      <div className="encabezado"><h1>{t("cuentas.titulo_anular")}</h1></div>
+      <TituloConIcono icono="anular">{t("cuentas.titulo_anular")}</TituloConIcono>
       <FormularioAnularMovimiento
         accion={anularMovimiento.bind(null, id, f.propietario, moneda)}
         resumen={`${t(`cuentas.tipo_${m.tipo}`)} · ${m.descripcion} · ${formatearImporte(importe, moneda)}`}

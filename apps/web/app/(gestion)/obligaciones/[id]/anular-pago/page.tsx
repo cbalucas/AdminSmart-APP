@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatearImporte, formatearPeriodo } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioAnulacion } from "@/components/FormularioAnulacion";
 import { esGestion } from "@/lib/menu";
 import { listarObligaciones } from "@/lib/obligaciones";
@@ -22,7 +23,7 @@ export default async function AnularPago({ params }: { params: Promise<{ id: str
   if (!usuario.roles.includes("administrador")) {
     return (
       <>
-        <div className="encabezado"><h1>{t("pagos.titulo_anular")}</h1></div>
+        <TituloConIcono icono="anular">{t("pagos.titulo_anular")}</TituloConIcono>
         <p className="aviso-advertencia">{t("pagos.solo_administrador")}</p>
         <Link href="/obligaciones" className="boton boton-secundario">{t("app.volver")}</Link>
       </>
@@ -31,7 +32,7 @@ export default async function AnularPago({ params }: { params: Promise<{ id: str
 
   return (
     <>
-      <div className="encabezado"><h1>{t("pagos.titulo_anular")}</h1></div>
+      <TituloConIcono icono="anular">{t("pagos.titulo_anular")}</TituloConIcono>
       <FormularioAnulacion
         accion={anularPago.bind(null, pago.id)}
         resumen={`${o.concepto} · ${formatearPeriodo(o.periodo)} · ${formatearImporte(pago.importe, o.moneda)}`}

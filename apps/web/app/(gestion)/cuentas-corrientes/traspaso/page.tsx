@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioTraspaso } from "@/components/FormularioMovimiento";
 import { bienesDelPropietario, propietariosParaCuenta } from "@/lib/cuentas-corrientes";
 import { esGestion } from "@/lib/menu";
@@ -18,7 +19,7 @@ export default async function NuevoTraspaso({ searchParams }: { searchParams: Pr
   const moneda: Moneda = f.moneda === "USD" ? "USD" : "ARS";
   return (
     <>
-      <div className="encabezado"><h1>{t("cuentas.traspaso")}</h1></div>
+      <TituloConIcono icono="traspaso">{t("cuentas.traspaso")}</TituloConIcono>
       <FormularioTraspaso
         accion={registrarTraspaso}
         propietario={propietario}

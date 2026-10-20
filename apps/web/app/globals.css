@@ -852,3 +852,9 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .indicador:hover, .indicador:focus-within, .tarjeta-propietario:hover, .tarjeta-propietario:focus-within { z-index: 20; }
 .indicador-info:hover, .indicador-info:focus-within { z-index: 30; }
 .ver-mas { display: flex; justify-content: center; padding-top: 4px; }
+
+/* Editor de plantillas con el mismo aire que los formularios */
+.editor-edicion, .editor-vista { padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(20, 30, 40, 0.04); }
+.editor-edicion textarea, .editor-edicion input[type="text"] { border-radius: 10px; }
+.editor-edicion .con-icono > input { padding-left: 40px; }
+.vista-previa { border-radius: 12px; }
