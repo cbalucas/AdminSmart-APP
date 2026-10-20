@@ -73,7 +73,7 @@ docs/           especificación, prototipos, modelos, marca y registro de cambio
 
 - Seguí el orden de `docs/especificacion/05-hoja-de-ruta.md`: una tarea por vez.
 - Para cada tarea: leé las secciones de la especificación que la afectan, proponé un plan breve, implementalo, corré las pruebas y verificá que la app levante.
-- Al terminar una tarea que funciona, hacé un commit con un mensaje claro en español y subilo a GitHub (`git push`).
+- Al terminar una tarea que funciona, hacé un commit con un mensaje claro en español. No hagas `git push`: el usuario sube los cambios a GitHub él mismo.
 - Usá las capturas y los prototipos para que cada pantalla se parezca a lo diseñado.
 - No agregues funciones que no estén en la especificación sin preguntar.
 
@@ -89,4 +89,9 @@ Cada vez que durante el desarrollo se decida algo que cambia o completa la espec
 - Web en modo desarrollo: `pnpm --filter web dev`
 - App móvil: `pnpm --filter mobile start` (se abre con Expo Go en el teléfono)
 - App móvil con ingreso por Google o enlaces del email: `pnpm --filter mobile movil`. Supabase no acepta direcciones con número IP como retorno; este comando hace que Expo use un nombre (192-168-x-x.sslip.io). Si el router bloquea ese nombre, en el teléfono se configura el DNS de Google (8.8.8.8 o, en Android, DNS privado `dns.google`)
-- Pruebas: `pnpm test`
+- Pruebas: `pnpm test` (dominio y textos del sistema). Cobertura del dominio (mínimo 80 %): `pnpm --filter @ai/domain cobertura`
+- Tipos de todo el proyecto: `pnpm typecheck`. Estilo de código de la web: `pnpm --filter web lint`
+- Web como en producción (más rápida que el modo desarrollo; hay que volver a compilar al cambiar variables de entorno): `pnpm --filter web build` y `pnpm --filter web start`
+- Base de datos (Supabase, proyecto `adminsmart` en São Paulo): las migraciones de `supabase/migrations/` se aplican con `npx supabase db query --linked --project-ref <ref> -f supabase/migrations/<archivo>.sql`, en este orden: bloque1_1, bloque1_2, bloque1_3, bloque2_1, bloque2_2, bloque2_3, bloque3_1 a bloque3_6, ingreso_1, ingreso_2, propietarios_1, cuentas_1, cuentas_2, titularidad_1, liquidacion_1, liquidacion_2, pagos_1, movimientos_1, resumen_1 y seguridad_1. Las funciones del servidor se publican con `npx supabase functions deploy <nombre> --project-ref <ref> --use-api` y el código de instalación con `npx supabase secrets set CODIGO_INSTALACION=... --project-ref <ref>`
+- Datos de prueba: `supabase/demo/` (propietarios, bienes, servicios, obligaciones, datos de la administración y cuentas demo, operador y propietario, con contraseña 123456). Antes de cargar datos reales se ejecuta `limpiar_datos_prueba.sql` (ver `docs/ANTES_DE_DATOS_REALES.md`)
+- Cambiar un texto o agregar uno nuevo con el servidor de desarrollo abierto puede dejar claves técnicas en pantalla: detener `pnpm --filter web dev`, borrar `apps\web\.next` y volver a iniciarlo

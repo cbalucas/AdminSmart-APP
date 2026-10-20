@@ -35,6 +35,8 @@ export function VentanaFinDeMes({ items, mes }: { items: ItemVentana[]; mes: str
     } catch {
       /* sin almacenamiento: se muestra igual */
     }
+    // El almacenamiento del navegador solo se puede leer en el cliente: el primer dibujo (el del servidor) sale cerrado.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAbierta(items.length > 0 && (forzada || !pospuesta));
     // Solo al montar: si se pospone, un refresco posterior no la vuelve a abrir.
     // eslint-disable-next-line react-hooks/exhaustive-deps

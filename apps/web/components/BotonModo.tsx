@@ -12,6 +12,8 @@ export function BotonModo() {
   const [modo, setModo] = useState<Modo | null>(null);
 
   useEffect(() => {
+    // El tema lo fija un script antes de dibujar: solo se puede leer en el cliente, así que no hay otra forma de saberlo.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setModo(document.documentElement.dataset.tema === "oscuro" ? "oscuro" : "claro");
   }, []);
 

@@ -180,6 +180,8 @@ export function AsistenteConfiguracion() {
     if (!cuentaGoogle) {
       await supabase.auth.signInWithPassword({ email: datosAdmin.email!, password: datosAdmin.contrasena! });
     }
+    // Recarga completa a propósito: el servidor tiene que leer la sesión recién creada.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign("/inicio");
   }
 

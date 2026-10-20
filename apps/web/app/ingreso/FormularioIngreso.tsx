@@ -22,6 +22,7 @@ export function FormularioIngreso({ errorInicial }: { errorInicial?: string }) {
   useEffect(() => {
     try {
       const guardado = localStorage.getItem(CLAVE_EMAIL);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- el almacenamiento local solo existe en el navegador
       if (guardado) setIdentificador(guardado);
     } catch {
       /* sin almacenamiento local: se ingresa a mano */
@@ -55,6 +56,8 @@ export function FormularioIngreso({ errorInicial }: { errorInicial?: string }) {
     } catch {
       /* sin almacenamiento local */
     }
+    // Recarga completa a propósito: el servidor tiene que leer la sesión recién creada.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign("/inicio");
   }
 

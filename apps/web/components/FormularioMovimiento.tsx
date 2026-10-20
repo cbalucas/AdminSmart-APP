@@ -17,7 +17,7 @@ interface Comun {
   cancelarHref: string;
 }
 
-function usarFormulario(accion: Accion) {
+function useFormularioMovimiento(accion: Accion) {
   const [estado, enviar, enviando] = useActionState(accion, {} as EstadoFormularioMovimiento);
   const [, iniciar] = useTransition();
   const errores = estado.errores ?? {};
@@ -80,7 +80,7 @@ function AvisoExceso({ saldo, etiqueta }: { saldo: string; etiqueta: string }) {
 export function FormularioMovimiento({
   accion, propietario, bienes, hoy, cancelarHref, moneda: monedaInicial, movimientoId, organizacionId,
 }: Comun & { moneda: Moneda; movimientoId: string; organizacionId: string }) {
-  const { estado, enviando, error, alEnviar } = usarFormulario(accion);
+  const { estado, enviando, error, alEnviar } = useFormularioMovimiento(accion);
   const [tipo, setTipo] = useState<string>("deposito_propietario");
 
   return (
@@ -168,7 +168,7 @@ const cotizacionATexto = (n: number) => n.toFixed(6).replace(".", ",").replace(/
 // el tercero se calcula solo. Se calcula el que se tocó hace más tiempo; si se escribe en el calculado,
 // pasa a ser un dato y se recalcula otro.
 export function FormularioTraspaso({ accion, propietario, bienes, hoy, cancelarHref, monedaInicial }: Comun & { monedaInicial: Moneda }) {
-  const { estado, enviando, error, alEnviar } = usarFormulario(accion);
+  const { estado, enviando, error, alEnviar } = useFormularioMovimiento(accion);
   const [origen, setOrigen] = useState<Moneda>(monedaInicial);
   const [escritos, setEscritos] = useState<Record<CampoCambio, string>>({ cotizacion: "", montoPesos: "", montoDolares: "" });
   const [tocados, setTocados] = useState<CampoCambio[]>([]);

@@ -68,6 +68,7 @@ function PaginaMoneda({ r, resumen, numero, logo }: { r: ResumenDelPropietario; 
     <Page size="A4" style={e.pagina}>
       <View style={e.cabecera}>
         <View style={e.marca}>
+          {/* eslint-disable-next-line jsx-a11y/alt-text -- imagen de react-pdf, no un elemento HTML */}
           {logo && <Image src={{ data: logo.data, format: logo.format }} style={e.logo} />}
           <Text style={e.administracion}>{d.administracion}</Text>
         </View>
