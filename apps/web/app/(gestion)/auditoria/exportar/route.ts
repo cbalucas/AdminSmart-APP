@@ -16,6 +16,7 @@ export async function GET(request: Request) {
   if (!usuario || !esGestion(usuario.roles)) return new NextResponse("No autorizado", { status: 403 });
   const q = new URL(request.url).searchParams;
   const f: FiltrosAuditoria = {
+    q: q.get("q") ?? undefined,
     usuario: q.get("usuario") ?? undefined,
     tabla: q.get("tabla") ?? undefined,
     accion: q.get("accion") ?? undefined,
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
   };
   const { filas, total } = await consultarAuditoria(f, "todo");
   const hoy = fechaHoy();
-  const filtros = [f.tabla ? t(`auditoria.tabla_${f.tabla}`) : null, f.accion ? t(`auditoria.accion_${f.accion}`) : null, f.desde ? `${t("auditoria.filtro_desde")} ${fechaCorta(f.desde)}` : null, f.hasta ? `${t("auditoria.filtro_hasta")} ${fechaCorta(f.hasta)}` : null].filter(Boolean);
+  const filtros = [f.q ? `"${f.q}"` : null, f.tabla ? t(`auditoria.tabla_${f.tabla}`) : null, f.accion ? t(`auditoria.accion_${f.accion}`) : null, f.desde ? `${t("auditoria.filtro_desde")} ${fechaCorta(f.desde)}` : null, f.hasta ? `${t("auditoria.filtro_hasta")} ${fechaCorta(f.hasta)}` : null].filter(Boolean);
   const limite = total > LIMITE_EXPORTACION ? ` · ${t("auditoria.limite_exportacion", { limite: LIMITE_EXPORTACION })}` : "";
 
   const h = crearHoja(

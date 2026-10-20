@@ -874,3 +874,10 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .tarjeta-esquina .accion-icono { width: 34px; height: 34px; border-radius: 10px; }
 .tarjeta-propietario p { margin: 0; }
 .tarjeta-propietario dd .linea { display: block; font-weight: 400; font-size: 0.85rem; }
+
+/* Filtros que se aplican solos: buscador ancho y, al lado, las pocas listas que quedan */
+.filtros-compactos { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.filtros-compactos .filtro-buscar { flex: 1 1 300px; grid-column: auto; }
+.filtros-compactos .campo:not(.filtro-buscar) { flex: 0 1 190px; }
+.filtros-compactos .filtros-pie { flex: 1 1 100%; }
+.filtros-compactos > .boton-texto { align-self: center; }

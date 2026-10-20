@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BuscadorEnVivo } from "@/components/BuscadorEnVivo";
+import { FormularioEnVivo } from "@/components/FormularioEnVivo";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { AccionIcono } from "@/components/AccionIcono";
@@ -8,7 +8,6 @@ import { listarBienes, listarEdificios, titularesDe, type Bien, type Edificio, t
 import { IconoBien } from "@/components/IconoBien";
 import { resumenDeBienes } from "@/lib/estado-bienes";
 import { esGestion } from "@/lib/menu";
-import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
 
 interface Filtros {
@@ -52,12 +51,7 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
   if (!usuario || !esGestion(usuario.roles)) notFound();
   const f = await searchParams;
 
-  const supabase = await crearClienteServidor();
-  const [todos, edificios, { data: propietarios }] = await Promise.all([
-    listarBienes(),
-    listarEdificios(),
-    supabase.from("propietario").select("id, nombre_razon_social").is("deleted_at", null).order("nombre_razon_social"),
-  ]);
+  const [todos, edificios] = await Promise.all([listarBienes(), listarEdificios()]);
   const titulares = await titularesDe(todos.map((b) => b.id));
   const edificioDe = new Map(edificios.map((e) => [e.id, e]));
 
@@ -71,11 +65,13 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
     .filter((b) => {
       if (!buscado) return true;
       const u = ubicacionDe(b, b.edificioId ? edificioDe.get(b.edificioId) : undefined);
-      return normalizarNombre([b.alias, u.texto, b.dominio ?? "", b.marcaModelo ?? ""].join(" ")).includes(buscado);
+      const propios = (titulares.get(b.id) ?? []).map((x) => x.nombre).join(" ");
+      const nombreEdificio = b.edificioId ? (edificioDe.get(b.edificioId)?.nombre ?? "") : "";
+      return normalizarNombre([b.alias, u.texto, b.dominio ?? "", b.marcaModelo ?? "", propios, nombreEdificio].join(" ")).includes(buscado);
     });
 
   const situaciones = await resumenDeBienes(lista.map((b) => b.id));
-  const hayFiltros = Boolean(f.q || f.tipo || f.estado || f.propietario || f.edificio);
+  const hayFiltros = Boolean(f.q || f.tipo || f.estado || f.agrupar || f.gv);
   const edificiosEnUso = edificios.filter((e) => todos.some((b) => b.edificioId === e.id));
 
   const tarjeta = (b: Bien) => {
@@ -140,9 +136,9 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
       </div>
 
       <section className="panel">
-        <form className="filtros" role="search">
+        <FormularioEnVivo className="filtros filtros-compactos">
           <div className="campo filtro-buscar">
-            <BuscadorEnVivo defaultValue={f.q ?? ""} placeholder={t("bienes.buscar")} ariaLabel={t("bienes.buscar")} />
+            <input type="search" name="q" defaultValue={f.q ?? ""} placeholder={t("bienes.buscar")} aria-label={t("bienes.buscar")} autoComplete="off" />
           </div>
           <div className="campo">
             <label htmlFor="f-tipo">{t("bienes.filtro_tipo")}</label>
@@ -162,42 +158,20 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
               ))}
             </select>
           </div>
-          <div className="campo">
-            <label htmlFor="f-prop">{t("bienes.filtro_propietario")}</label>
-            <select id="f-prop" name="propietario" defaultValue={f.propietario ?? ""}>
-              <option value="">{t("bienes.filtro_todos")}</option>
-              {(propietarios ?? []).map((p) => (
-                <option key={p.id as string} value={p.id as string}>{p.nombre_razon_social as string}</option>
-              ))}
-            </select>
-          </div>
-          <div className="campo">
-            <label htmlFor="f-edif">{t("bienes.filtro_edificio")}</label>
-            <select id="f-edif" name="edificio" defaultValue={f.edificio ?? ""}>
-              <option value="">{t("bienes.filtro_todos")}</option>
-              <option value="ninguno">{t("bienes.sin_edificio")}</option>
-              {edificiosEnUso.map((e) => (
-                <option key={e.id} value={e.id}>{e.nombre}</option>
-              ))}
-            </select>
-          </div>
           <div className="filtros-pie">
-          <div className="filtros-opciones">
-            <label className="casilla">
-              <input type="checkbox" name="agrupar" value="1" defaultChecked={f.agrupar === "1"} />
-              {t("bienes.agrupar")}
-            </label>
-            <label className="casilla">
-              <input type="checkbox" name="gv" value="1" defaultChecked={f.gv === "1"} />
-              {t("bienes.mostrar_gastos_varios")}
-            </label>
-          </div>
-          <div className="acciones">
+            <div className="filtros-opciones">
+              <label className="casilla">
+                <input type="checkbox" name="agrupar" value="1" defaultChecked={f.agrupar === "1"} />
+                {t("bienes.agrupar")}
+              </label>
+              <label className="casilla">
+                <input type="checkbox" name="gv" value="1" defaultChecked={f.gv === "1"} />
+                {t("bienes.mostrar_gastos_varios")}
+              </label>
+            </div>
             {hayFiltros && <Link href="/bienes" className="boton-texto">{t("bienes.limpiar")}</Link>}
-            <button type="submit" className="boton boton-secundario">{t("bienes.filtrar")}</button>
           </div>
-          </div>
-        </form>
+        </FormularioEnVivo>
 
         {lista.length === 0 ? (
           <p className="muted">{todos.filter((b) => !b.esGastosVarios).length === 0 ? t("bienes.vacio") : t("bienes.sin_resultados")}</p>

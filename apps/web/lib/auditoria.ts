@@ -1,7 +1,8 @@
-import { cambiosDeCampos, descripcionDelRegistro, type CambioDeCampo } from "@ai/domain";
+import { cambiosDeCampos, descripcionDelRegistro, normalizarNombre, type CambioDeCampo } from "@ai/domain";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 
 export interface FiltrosAuditoria {
+  q?: string;
   usuario?: string;
   tabla?: string;
   accion?: string;
@@ -50,6 +51,12 @@ export async function consultarAuditoria(f: FiltrosAuditoria, modo: "pagina" | "
     .select("id, fecha, usuario_id, tabla, registro_id, accion, valores_antes, valores_despues", { count: "exact" })
     .order("fecha", { ascending: false });
   if (f.usuario) q = q.eq("usuario_id", f.usuario);
+  if (f.q?.trim()) {
+    // Buscador por nombre de usuario.
+    const buscado = normalizarNombre(f.q);
+    const ids = (await usuariosParaFiltro()).filter((u) => normalizarNombre(u.nombre).includes(buscado)).map((u) => u.id);
+    q = q.in("usuario_id", ids.length > 0 ? ids : ["00000000-0000-0000-0000-000000000000"]);
+  }
   if (f.tabla) q = q.eq("tabla", f.tabla);
   if (f.accion) q = q.eq("accion", f.accion);
   if (f.desde && /^\d{4}-\d{2}-\d{2}$/.test(f.desde)) q = q.gte("fecha", inicioDelDia(f.desde));

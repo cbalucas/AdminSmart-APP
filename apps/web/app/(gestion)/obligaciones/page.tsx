@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { FormularioEnVivo } from "@/components/FormularioEnVivo";
 import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { AccionIcono } from "@/components/AccionIcono";
 import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIEN, type EstadoObligacion } from "@ai/domain";
@@ -25,6 +26,7 @@ interface Filtros {
   tipo?: string;
   responsable?: string;
   periodo?: string;
+  q?: string;
 }
 
 const ESTADOS: EstadoObligacion[] = ["vencida", "pendiente", "a_completar", "pagada"];
@@ -58,9 +60,6 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   const esAdmin = usuario.roles.includes("administrador");
   const bienDe = new Map(bienes.map((b) => [b.id, b]));
 
-  const propietarios = new Map<string, string>();
-  for (const lista of titulares.values()) for (const x of lista) propietarios.set(x.propietarioId, x.nombre);
-  const periodos = [...new Set(todas.map((o) => o.periodo))].sort().reverse();
 
   // Todos los filtros menos el estado: sobre ese resultado se cuentan las pestañas.
   const { sinEstado, lista } = filtrarObligaciones(todas, f, titulares, bienDe);
@@ -70,8 +69,8 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   const abrirVentana = f.completar === "1" && !(await configVentana()).enVentana ? await itemsDeVentana() : null;
 
   const paramsExport = new URLSearchParams();
-  for (const k of ["estado", "propietario", "tipo", "responsable", "periodo"] as const) if (f[k]) paramsExport.set(k, f[k] as string);
-  const hayFiltros = Boolean(f.propietario || f.tipo || f.responsable || f.periodo);
+  for (const k of ["estado", "propietario", "tipo", "responsable", "periodo", "q"] as const) if (f[k]) paramsExport.set(k, f[k] as string);
+  const hayFiltros = Boolean(f.q || f.tipo);
   const montosDe = (estado: string) => {
     const filas = todas.filter((o) => o.estado === estado);
     const total = (["ARS", "USD"] as const)
@@ -211,16 +210,9 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
         </p>
         </div>
 
-        <form className="filtros filtros-separados filtros-en-fila" role="search">
-          {f.estado && <input type="hidden" name="estado" value={f.estado} />}
-          <div className="campo">
-            <label htmlFor="f-prop">{t("obligaciones.filtro_propietario")}</label>
-            <select id="f-prop" name="propietario" defaultValue={f.propietario ?? ""}>
-              <option value="">{t("obligaciones.filtro_todos")}</option>
-              {[...propietarios].sort((a, b) => a[1].localeCompare(b[1])).map(([id, nombre]) => (
-                <option key={id} value={id}>{nombre}</option>
-              ))}
-            </select>
+        <FormularioEnVivo className="filtros filtros-separados filtros-compactos">
+          <div className="campo filtro-buscar">
+            <input type="search" name="q" defaultValue={f.q ?? ""} placeholder={t("obligaciones.buscar")} aria-label={t("obligaciones.buscar")} autoComplete="off" />
           </div>
           <div className="campo">
             <label htmlFor="f-tipo">{t("obligaciones.filtro_tipo")}</label>
@@ -231,28 +223,8 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
               ))}
             </select>
           </div>
-          <div className="campo">
-            <label htmlFor="f-resp">{t("obligaciones.filtro_responsable")}</label>
-            <select id="f-resp" name="responsable" defaultValue={f.responsable ?? ""}>
-              <option value="">{t("obligaciones.filtro_todos")}</option>
-              <option value="propietario">{t("obligaciones.responsable_propietario")}</option>
-              <option value="inquilino">{t("obligaciones.responsable_inquilino")}</option>
-            </select>
-          </div>
-          <div className="campo">
-            <label htmlFor="f-per">{t("obligaciones.filtro_periodo")}</label>
-            <select id="f-per" name="periodo" defaultValue={f.periodo ?? ""}>
-              <option value="">{t("obligaciones.filtro_todas")}</option>
-              {periodos.map((p) => (
-                <option key={p} value={p}>{formatearPeriodo(p)}</option>
-              ))}
-            </select>
-          </div>
-          <div className="filtros-boton">
-            <button type="submit" className="boton boton-secundario">{t("obligaciones.filtrar")}</button>
-            {(hayFiltros || f.estado) && <Link href="/obligaciones" className="boton-texto">{t("obligaciones.limpiar")}</Link>}
-          </div>
-        </form>
+          {(hayFiltros || f.estado) && <Link href="/obligaciones" className="boton-texto">{t("obligaciones.limpiar")}</Link>}
+        </FormularioEnVivo>
 
         {lista.length === 0 ? (
           <p className="muted">{todas.length === 0 ? t("obligaciones.vacio") : t("obligaciones.sin_resultados")}</p>

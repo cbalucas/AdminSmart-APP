@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { AccionIcono } from "@/components/AccionIcono";
+import { FormularioEnVivo } from "@/components/FormularioEnVivo";
 import { DetalleCambios, ResumenCambios } from "@/components/ResumenCambios";
-import { ACCIONES_AUDITORIA, consultarAuditoria, TABLAS_AUDITADAS, usuariosParaFiltro, type FiltrosAuditoria } from "@/lib/auditoria";
+import { ACCIONES_AUDITORIA, consultarAuditoria, TABLAS_AUDITADAS, type FiltrosAuditoria } from "@/lib/auditoria";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
 
@@ -23,8 +24,8 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
   if (!usuario || !esGestion(usuario.roles)) notFound();
   const f = await searchParams;
 
-  const [{ filas, total, pagina, paginas }, usuarios] = await Promise.all([consultarAuditoria(f), usuariosParaFiltro()]);
-  const hayFiltros = Boolean(f.usuario || f.tabla || f.accion || f.desde || f.hasta);
+  const { filas, total, pagina, paginas } = await consultarAuditoria(f);
+  const hayFiltros = Boolean(f.q || f.tabla || f.accion || f.desde || f.hasta);
 
   const enlace = (cambios: Partial<FiltrosAuditoria>) => {
     const q = new URLSearchParams();
@@ -33,7 +34,7 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
     return s ? `/auditoria?${s}` : "/auditoria";
   };
   const paramsExport = new URLSearchParams();
-  for (const k of ["usuario", "tabla", "accion", "desde", "hasta"] as const) if (f[k]) paramsExport.set(k, f[k] as string);
+  for (const k of ["q", "usuario", "tabla", "accion", "desde", "hasta"] as const) if (f[k]) paramsExport.set(k, f[k] as string);
 
   return (
     <>
@@ -46,15 +47,9 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
       </div>
 
       <section className="panel">
-        <form className="filtros" role="search">
-          <div className="campo">
-            <label htmlFor="a-usuario">{t("auditoria.filtro_usuario")}</label>
-            <select id="a-usuario" name="usuario" defaultValue={f.usuario ?? ""}>
-              <option value="">{t("auditoria.todos")}</option>
-              {usuarios.map((u) => (
-                <option key={u.id} value={u.id}>{u.nombre}</option>
-              ))}
-            </select>
+        <FormularioEnVivo className="filtros filtros-compactos">
+          <div className="campo filtro-buscar">
+            <input type="search" name="q" defaultValue={f.q ?? ""} placeholder={t("auditoria.buscar")} aria-label={t("auditoria.buscar")} autoComplete="off" />
           </div>
           <div className="campo">
             <label htmlFor="a-tabla">{t("auditoria.filtro_objeto")}</label>
@@ -86,10 +81,9 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
             <p className="resumen-lista-pie">{total === 1 ? t("auditoria.resultado_uno") : t("auditoria.resultados", { total })}</p>
             <div className="acciones">
               {hayFiltros && <Link href="/auditoria" className="boton-texto">{t("auditoria.limpiar")}</Link>}
-              <button type="submit" className="boton boton-secundario">{t("auditoria.filtrar")}</button>
             </div>
           </div>
-        </form>
+        </FormularioEnVivo>
 
         {filas.length === 0 ? (
           <p className="muted">{t("auditoria.vacio")}</p>

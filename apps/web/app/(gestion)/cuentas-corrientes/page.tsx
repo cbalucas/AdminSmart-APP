@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatearImporte, type Moneda } from "@ai/domain";
+import { formatearImporte, normalizarNombre, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { AccionIcono } from "@/components/AccionIcono";
 import { bienesDelPropietario, libroDelPropietario, propietariosParaCuenta, tieneCuentaEnDolares } from "@/lib/cuentas-corrientes";
+import { FormularioEnVivo } from "@/components/FormularioEnVivo";
 import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { BotonVolver } from "@/components/BotonVolver";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
@@ -19,6 +20,7 @@ interface Filtros {
   desde?: string;
   hasta?: string;
   volver?: string;
+  q?: string;
 }
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
@@ -42,16 +44,26 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
   }
 
   const moneda: Moneda = f.moneda === "USD" ? "USD" : "ARS";
-  const [bienes, hayDolares, libro] = await Promise.all([
+  const [bienes, hayDolares, libroCompleto] = await Promise.all([
     bienesDelPropietario(propietario.id),
     tieneCuentaEnDolares(propietario.id),
     libroDelPropietario({ propietarioId: propietario.id, moneda, bienId: f.bien || undefined, desde: f.desde || undefined, hasta: f.hasta || undefined }),
   ]);
   const destino = rutaDeVolver(f.volver);
   const origen = destino ? await obtenerPropietario(destino.propietarioId) : null;
-  const comprobantes = await documentosDe("movimiento", libro.filas.map((m) => m.id));
+  const comprobantes = await documentosDe("movimiento", libroCompleto.filas.map((m) => m.id));
   const etiquetaBien = (b: { nombre: string; esGeneral: boolean }) => (b.esGeneral ? t("cuentas.general") : b.nombre);
   const nombreBien = new Map(bienes.map((b) => [b.id, etiquetaBien(b)]));
+  // Buscador: por bien, tipo, descripción, fecha o importe (el saldo de cada fila no cambia).
+  const buscado = normalizarNombre(f.q ?? "");
+  const libro = buscado
+    ? {
+        ...libroCompleto,
+        filas: libroCompleto.filas.filter((m) =>
+          normalizarNombre([nombreBien.get(m.bienId) ?? "", t(`cuentas.tipo_${m.tipo}`), m.descripcion, fechaCorta(m.fecha), `${m.debe / 100} ${m.haber / 100}`].join(" ")).includes(buscado),
+        ),
+      }
+    : libroCompleto;
 
   const enlace = (cambios: Partial<Filtros>) => {
     const q = new URLSearchParams();
@@ -59,7 +71,7 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
     return `/cuentas-corrientes?${q.toString()}`;
   };
   const alta = (ruta: string) => `/cuentas-corrientes/${ruta}?propietario=${propietario.id}&moneda=${moneda}`;
-  const hayFiltros = Boolean(f.bien || f.desde || f.hasta);
+  const hayFiltros = Boolean(f.q || f.desde || f.hasta);
   const vigentes = libro.filas.filter((m) => !m.anulado && !m.esContramovimiento);
   const ingresos = vigentes.reduce((x, m) => x + m.haber, 0);
   const egresos = vigentes.reduce((x, m) => x + m.debe, 0);
@@ -96,23 +108,17 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
       </section>
 
       <section className="panel">
-        <form className="filtros filtros-separados filtros-cuenta" role="search">
+        <FormularioEnVivo className="filtros filtros-separados filtros-compactos">
           <input type="hidden" name="moneda" value={moneda} />
           {destino && <input type="hidden" name="volver" value={destino.href} />}
+          <div className="campo filtro-buscar">
+            <input type="search" name="q" defaultValue={f.q ?? ""} placeholder={t("cuentas.buscar")} aria-label={t("cuentas.buscar")} autoComplete="off" />
+          </div>
           <div className="campo">
             <label htmlFor="c-prop">{t("cuentas.propietario")}</label>
             <select id="c-prop" name="propietario" defaultValue={propietario.id}>
               {propietarios.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
-              ))}
-            </select>
-          </div>
-          <div className="campo">
-            <label htmlFor="c-bien">{t("cuentas.bien")}</label>
-            <select id="c-bien" name="bien" defaultValue={f.bien ?? ""}>
-              <option value="">{t("cuentas.todos_bienes")}</option>
-              {bienes.map((b) => (
-                <option key={b.id} value={b.id}>{etiquetaBien(b)}</option>
               ))}
             </select>
           </div>
@@ -125,16 +131,13 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
             <input id="c-hasta" name="hasta" type="date" defaultValue={f.hasta ?? ""} />
           </div>
           <div className="filtros-pie">
-            <nav className="pildoras" aria-label={t("cuentas.moneda")}>
+            <nav className="pildoras" aria-label={t("cuentas.col_saldo")}>
               <Link href={enlace({ moneda: "ARS" })} className={moneda === "ARS" ? "pildora activa" : "pildora"}>ARS</Link>
               {(hayDolares || moneda === "USD") && <Link href={enlace({ moneda: "USD" })} className={moneda === "USD" ? "pildora activa" : "pildora"}>USD</Link>}
             </nav>
-            <div className="acciones">
-              {hayFiltros && <Link href={enlace({ bien: "", desde: "", hasta: "" })} className="boton-texto">{t("cuentas.limpiar")}</Link>}
-              <button type="submit" className="boton boton-secundario">{t("cuentas.filtrar")}</button>
-            </div>
+            {hayFiltros && <Link href={enlace({ q: "", desde: "", hasta: "" })} className="boton-texto">{t("cuentas.limpiar")}</Link>}
           </div>
-        </form>
+        </FormularioEnVivo>
 
         {libro.filas.length === 0 ? (
           <p className="muted">{t("cuentas.vacio")}</p>

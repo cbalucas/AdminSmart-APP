@@ -1,3 +1,5 @@
+import { t } from "@ai/i18n";
+import { formatearPeriodo, normalizarNombre } from "@ai/domain";
 import type { Bien, Titular } from "@/lib/bienes";
 import type { FilaObligacion } from "@/lib/obligaciones";
 
@@ -7,6 +9,7 @@ export interface FiltrosObligaciones {
   tipo?: string;
   responsable?: string;
   periodo?: string;
+  q?: string;
 }
 
 /**
@@ -19,7 +22,29 @@ export function filtrarObligaciones(
   titulares: ReadonlyMap<string, readonly Titular[]>,
   bienDe: ReadonlyMap<string, Bien>,
 ): { sinEstado: FilaObligacion[]; lista: FilaObligacion[] } {
+  const buscado = normalizarNombre(f.q ?? "");
+  const coincide = (o: FilaObligacion) => {
+    if (!buscado) return true;
+    const bien = bienDe.get(o.bienId);
+    const fecha = o.vencimiento ? o.vencimiento.split("-").reverse().join("/") : "";
+    const monto = o.monto === null ? "" : `${o.monto / 100} ${(o.monto / 100).toLocaleString("es-AR")}`;
+    const texto = [
+      bien ? (bien.esGastosVarios ? t("bienes.gastos_varios") : bien.alias) : "",
+      bien ? t(`tipo_bien.${bien.tipoBien}`) : "",
+      (titulares.get(o.bienId) ?? []).map((x) => x.nombre).join(" "),
+      o.concepto,
+      o.empresa ?? "",
+      o.descripcion ?? "",
+      t(`obligaciones.responsable_${o.responsable}`),
+      formatearPeriodo(o.periodo),
+      `${o.periodo.slice(5, 7)}/${o.periodo.slice(0, 4)}`,
+      fecha,
+      monto,
+    ].join(" ");
+    return normalizarNombre(texto).includes(buscado);
+  };
   const sinEstado = todas
+    .filter(coincide)
     .filter((o) => !f.propietario || (titulares.get(o.bienId) ?? []).some((x) => x.propietarioId === f.propietario))
     .filter((o) => !f.tipo || bienDe.get(o.bienId)?.tipoBien === f.tipo)
     .filter((o) => !f.responsable || o.responsable === f.responsable)

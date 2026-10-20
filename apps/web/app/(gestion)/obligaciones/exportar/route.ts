@@ -20,6 +20,7 @@ export async function GET(request: Request) {
     tipo: q.get("tipo") ?? undefined,
     responsable: q.get("responsable") ?? undefined,
     periodo: q.get("periodo") ?? undefined,
+    q: q.get("q") ?? undefined,
   };
 
   const [todas, bienes] = await Promise.all([listarObligaciones(), listarBienes()]);
@@ -38,6 +39,7 @@ export async function GET(request: Request) {
     f.tipo ? t(`tipo_bien.${f.tipo}`) : null,
     f.responsable ? t(`obligaciones.responsable_${f.responsable}`) : null,
     f.periodo ? formatearPeriodo(f.periodo) : null,
+    f.q ? `"${f.q}"` : null,
   ].filter(Boolean);
   const hoy = fechaHoy();
   const subtitulo = `${t("exportar.exportado_el", { fecha: hoy.split("-").reverse().join("/") })} · ${t("exportar.filtro", { filtro: partes.length > 0 ? partes.join(", ") : t("exportar.sin_filtro") })}`;
