@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { DetalleObligacion } from "@/components/DetalleObligacion";
 import { FormularioEnVivo } from "@/components/FormularioEnVivo";
 import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { AccionIcono } from "@/components/AccionIcono";
@@ -36,9 +37,6 @@ const CLASE_ESTADO: Record<EstadoObligacion, string> = {
   a_completar: "estado estado-ambar",
   anulada: "estado estado-neutro",
 };
-
-// Primer titular y cuántos más hay: "Carlos José Paez Allende +2".
-const nombresCortos = (nombres: string[]) => (nombres.length <= 1 ? (nombres[0] ?? "") : `${nombres[0]} +${nombres.length - 1}`);
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
 
@@ -94,68 +92,66 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   const fila = (o: FilaObligacion) => {
     const bien = bienDe.get(o.bienId);
     const ts = titulares.get(o.bienId) ?? [];
+    const nombreBien = bien ? (bien.esGastosVarios ? `${t("bienes.gastos_varios")} · ${ts[0]?.nombre ?? ""}` : bien.alias) : "—";
+    const pago = pagos.get(o.id) as { fecha: string; pagadoPor: string } | undefined;
+    const boletasDe = ((boletas.get(o.id) ?? []) as DocumentoFila[]).filter((b) => b.url);
+    const puedePagar = o.estado !== "pagada" && o.estado !== "anulada";
+    const puedeAnularPago = o.estado === "pagada" && esAdmin;
+    const puedeEditar = puedeModificarObligacion({ pagada: o.estado === "pagada", anulada: o.estado === "anulada" });
+    const monto = o.monto === null ? null : formatearImporte(o.monto, o.moneda);
+    const acciones = [
+      ...(puedePagar ? [{ href: `/obligaciones/${o.id}/pagar`, icono: "dinero", texto: t("pagos.registrar") }] : []),
+      ...(puedeEditar ? [{ href: `/obligaciones/${o.id}/editar`, icono: "editar", texto: t("app.editar") }] : []),
+      ...(puedeAnularPago ? [{ href: `/obligaciones/${o.id}/anular-pago`, icono: "anular", texto: t("pagos.anular_pago"), peligro: true }] : []),
+    ];
     return (
       <tr key={o.id}>
-        <td data-label={t("obligaciones.col_bien")}>
+        <td data-label={t("obligaciones.col_que")}>
           <div className="celda-bien-icono">
             {bien && <IconoBien tipo={bien.tipoBien} />}
             <div>
-              <strong>{bien ? (bien.esGastosVarios ? `${t("bienes.gastos_varios")} · ${ts[0]?.nombre ?? ""}` : bien.alias) : "—"}</strong>
-              {bien && (
-                <span className="linea muted">
-                  {t(`tipo_bien.${bien.tipoBien}`)}
-                  {ts.length > 0 && ` · ${nombresCortos(ts.map((x) => x.nombre))}`}
-                </span>
-              )}
+              <strong>{o.concepto}</strong>
+              <span className="linea muted">{nombreBien}</span>
             </div>
           </div>
         </td>
-        <td data-label={t("obligaciones.col_concepto")}>
-          {o.concepto}
-          <span className="linea muted">
-            {o.empresa ?? o.descripcion ?? t("obligaciones.gasto_suelto")}
-            {o.esRecurrente && o.frecuencia && ` · ${t("obligaciones.recurrente")} ${t(`obligaciones.frec_${o.frecuencia}`).toLowerCase()}`}
-          </span>
+        <td className="nowrap" data-label={t("obligaciones.col_vence")}>
+          {o.vencimiento ? fechaCorta(o.vencimiento) : <span className="muted">—</span>}
+          <span className="linea muted">{formatearPeriodo(o.periodo)}</span>
         </td>
-        <td className="nowrap" data-label={t("obligaciones.col_periodo")}>{formatearPeriodo(o.periodo)}</td>
-        <td className="nowrap" data-label={t("obligaciones.col_vencimiento")}>{o.vencimiento ? fechaCorta(o.vencimiento) : <span className="muted">—</span>}</td>
         <td className="num" data-label={t("obligaciones.col_monto")}>
-          {o.monto === null ? <span className="falta-monto">{t("obligaciones.falta_monto")}</span> : formatearImporte(o.monto, o.moneda)}
+          {monto ?? <span className="falta-monto">{t("obligaciones.falta_monto")}</span>}
         </td>
-        <td data-label={t("obligaciones.col_responsable")}>{t(`obligaciones.responsable_${o.responsable}`)}</td>
         <td className="nowrap" data-label={t("obligaciones.col_estado")}>
           <span className={CLASE_ESTADO[o.estado]}>{t(`obligaciones.estado_${o.estado}`)}</span>
-          {pagos.get(o.id) && (
-            <span className="linea muted">
-              {fechaCorta((pagos.get(o.id) as { fecha: string }).fecha)} · {t(`pagos.quien_${(pagos.get(o.id) as { pagadoPor: string }).pagadoPor}`)}
-            </span>
-          )}
         </td>
         <td>
-          {(boletas.get(o.id) ?? []).length > 0 && (
-            <div className="acciones-fila">
-              {(boletas.get(o.id) as DocumentoFila[]).map((b, i) =>
-                b.url ? (
-                  <AccionIcono key={b.id} href={b.url} externo icono="documento" titulo={i === 0 ? t("obligaciones.ver_boleta") : t("obligaciones.ver_boleta_n", { n: i + 1 })} />
-                ) : null,
-              )}
-            </div>
-          )}
-          {o.estado !== "pagada" && o.estado !== "anulada" && (
-            <div className="acciones-fila">
-              <AccionIcono href={`/obligaciones/${o.id}/pagar`} icono="dinero" titulo={t("pagos.registrar")} />
-            </div>
-          )}
-          {o.estado === "pagada" && esAdmin && (
-            <div className="acciones-fila">
-              <AccionIcono href={`/obligaciones/${o.id}/anular-pago`} icono="anular" titulo={t("pagos.anular_pago")} tono="peligro" />
-            </div>
-          )}
-          {puedeModificarObligacion({ pagada: o.estado === "pagada", anulada: o.estado === "anulada" }) && (
-            <div className="acciones-fila">
-              <AccionIcono href={`/obligaciones/${o.id}/editar`} icono="editar" titulo={t("app.editar")} />
-            </div>
-          )}
+          <div className="acciones-fila">
+            <DetalleObligacion
+              d={{
+                id: o.id,
+                concepto: o.concepto,
+                bien: nombreBien,
+                tipoBien: bien?.tipoBien ?? "otros",
+                tipoBienTexto: bien ? t(`tipo_bien.${bien.tipoBien}`) : "",
+                propietarios: ts.map((x) => x.nombre).join(", "),
+                quien: o.empresa ?? o.descripcion ?? t("obligaciones.gasto_suelto"),
+                recurrencia: o.esRecurrente && o.frecuencia ? t(`obligaciones.frec_${o.frecuencia}`) : "",
+                periodo: formatearPeriodo(o.periodo),
+                vencimiento: o.vencimiento ? fechaCorta(o.vencimiento) : "",
+                monto,
+                responsable: t(`obligaciones.responsable_${o.responsable}`),
+                estadoTexto: t(`obligaciones.estado_${o.estado}`),
+                estadoClase: CLASE_ESTADO[o.estado],
+                pago: pago ? `${fechaCorta(pago.fecha)} · ${t(`pagos.quien_${pago.pagadoPor}`)}` : "",
+                boletas: boletasDe.map((b, k) => ({ titulo: k === 0 ? t("obligaciones.ver_boleta") : t("obligaciones.ver_boleta_n", { n: k + 1 }), url: b.url as string })),
+                acciones,
+              }}
+            />
+            {puedePagar && <AccionIcono href={`/obligaciones/${o.id}/pagar`} icono="dinero" titulo={t("pagos.registrar")} />}
+            {puedeAnularPago && <AccionIcono href={`/obligaciones/${o.id}/anular-pago`} icono="anular" titulo={t("pagos.anular_pago")} tono="peligro" />}
+            {puedeEditar && <AccionIcono href={`/obligaciones/${o.id}/editar`} icono="editar" titulo={t("app.editar")} />}
+          </div>
         </td>
       </tr>
     );
@@ -235,12 +231,9 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
             <table className="tabla tabla-responsive">
               <thead>
                 <tr>
-                  <th>{t("obligaciones.col_bien")}</th>
-                  <th>{t("obligaciones.col_concepto")}</th>
-                  <th>{t("obligaciones.col_periodo")}</th>
-                  <th>{t("obligaciones.col_vencimiento")}</th>
+                  <th>{t("obligaciones.col_que")}</th>
+                  <th>{t("obligaciones.col_vence")}</th>
                   <th className="num">{t("obligaciones.col_monto")}</th>
-                  <th>{t("obligaciones.col_responsable")}</th>
                   <th>{t("obligaciones.col_estado")}</th>
                   <th />
                 </tr>

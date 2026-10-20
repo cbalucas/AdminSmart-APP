@@ -900,3 +900,12 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .indicador-accion:hover { color: var(--accent); }
 .indicador-accion:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .indicadores-compactos { grid-template-columns: repeat(auto-fill, minmax(180px, 225px)); }
+
+/* Las cuatro tarjetas se reparten el ancho; el título del aviso va en mayúsculas como los demás */
+.indicadores-compactos { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.indicador-destacado .indicador-titulo { text-transform: uppercase; letter-spacing: 0.03em; font-size: 0.82rem; }
+.detalle-boletas { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
+.ventana-detalle .datos { margin: 0; }
+.ventana-detalle .datos dd { text-align: left; }
+.ventana-detalle .detalle-pie { flex-wrap: wrap; gap: 10px; }
+.ventana-detalle .datos dt, .ventana-detalle .datos dd { text-align: left; }
