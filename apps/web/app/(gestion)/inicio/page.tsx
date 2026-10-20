@@ -54,19 +54,30 @@ export default async function Inicio() {
   }
 
   const d = await datosHomeGestion();
-  const indicador = (clave: string, valor: string, nota: string, href?: string) => {
-    const contenido = (
-      <>
-        <span className="indicador-icono" aria-hidden="true"><Icono nombre={ICONO_INDICADOR[clave]?.[0] ?? "inicio"} tamano={22} /></span>
-        <p className="muted indicador-titulo">{t(`inicio.ind_${clave}`)}</p>
+  // `observacion`: texto aclaratorio; va en un globo que se abre al pasar el mouse o al tocar el ícono.
+  const indicador = (clave: string, valor: string, nota: string, href?: string, observacion?: string) => {
+    const [icono, tono] = ICONO_INDICADOR[clave] ?? ["inicio", "neutro"];
+    const titulo = t(`inicio.ind_${clave}`);
+    return (
+      <article key={clave} className={`indicador tono-${tono}${href ? " indicador-enlace" : ""}`}>
+        {href && (
+          <Link href={href} className="indicador-vinculo">
+            <span className="solo-lectores">{titulo}</span>
+          </Link>
+        )}
+        <p className="muted indicador-titulo">{titulo}</p>
+        <span className="indicador-icono" aria-hidden="true"><Icono nombre={icono} tamano={22} /></span>
         <strong className="cifra">{valor}</strong>
-        <p className="muted">{nota}</p>
-      </>
-    );
-    return href ? (
-      <Link key={clave} href={href} className={`indicador indicador-enlace tono-${ICONO_INDICADOR[clave]?.[1] ?? "neutro"}`}>{contenido}</Link>
-    ) : (
-      <article key={clave} className={`indicador tono-${ICONO_INDICADOR[clave]?.[1] ?? "neutro"}`}>{contenido}</article>
+        {observacion && (
+          <span className="indicador-info">
+            <button type="button" className="info-boton" aria-label={t("inicio.ver_observacion")} aria-describedby={`obs-${clave}`}>
+              <Icono nombre="info" tamano={18} />
+            </button>
+            <span role="tooltip" id={`obs-${clave}`} className="info-globo">{observacion}</span>
+          </span>
+        )}
+        {nota && <p className="muted indicador-nota">{nota}</p>}
+      </article>
     );
   };
   const nota = (tot: Total) => (tot.cantidad === 0 ? t("inicio.nada_pendiente") : montosTexto(tot.montos));
@@ -91,10 +102,10 @@ export default async function Inicio() {
         {indicador("vencidas", String(d.vencidas.cantidad), nota(d.vencidas), "/obligaciones?estado=vencida")}
         {indicador("vencen_7", String(d.vencen7.cantidad), nota(d.vencen7), "/obligaciones?estado=pendiente")}
         {indicador("vencen_30", String(d.vencen30.cantidad), nota(d.vencen30), "/obligaciones?estado=pendiente")}
-        {indicador("a_completar", String(d.aCompletar), d.aCompletar === 0 ? t("inicio.nada_pendiente") : t("inicio.a_completar_nota"), d.aCompletar > 0 ? "/obligaciones?completar=1" : undefined)}
-        {indicador("total_administrado", formatearImporte(d.saldoTotal.ARS, "ARS"), d.saldoTotal.USD !== 0 ? `${formatearImporte(d.saldoTotal.USD, "USD")} · ${t("inicio.saldo_total_nota")}` : t("inicio.saldo_total_nota"), "/cuentas-corrientes")}
-        {indicador("sin_cobrar", "—", t("inicio.llega_con_alquileres"))}
-        {indicador("deuda_inquilinos", "—", t("inicio.llega_con_alquileres"))}
+        {indicador("a_completar", String(d.aCompletar), d.aCompletar === 0 ? t("inicio.nada_pendiente") : "", d.aCompletar > 0 ? "/obligaciones?completar=1" : undefined, d.aCompletar > 0 ? t("inicio.a_completar_nota") : undefined)}
+        {indicador("total_administrado", formatearImporte(d.saldoTotal.ARS, "ARS"), d.saldoTotal.USD !== 0 ? formatearImporte(d.saldoTotal.USD, "USD") : "", "/cuentas-corrientes", t("inicio.saldo_total_nota"))}
+        {indicador("sin_cobrar", "—", "", undefined, t("inicio.llega_con_alquileres"))}
+        {indicador("deuda_inquilinos", "—", "", undefined, t("inicio.llega_con_alquileres"))}
       </section>
 
       <div className="paneles">

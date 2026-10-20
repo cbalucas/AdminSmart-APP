@@ -643,3 +643,18 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   .indicador .cifra { font-size: 1.8rem; }
   .indicador-titulo { font-size: 0.72rem; }
 }
+
+/* ------------------------------------------------------------------ indicadores compactos */
+.solo-lectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.indicador { position: relative; display: grid; grid-template-columns: 46px 1fr 46px; grid-template-areas: "titulo titulo titulo" "icono cifra info" "nota nota nota"; align-items: center; row-gap: 8px; padding: 16px 16px 18px; }
+.indicador-titulo { grid-area: titulo; }
+.indicador-icono { grid-area: icono; margin: 0; }
+.indicador .cifra { grid-area: cifra; }
+.indicador-nota { grid-area: nota; }
+.indicador-info { grid-area: info; position: relative; justify-self: end; }
+.indicador-vinculo { position: absolute; inset: 0; border-radius: inherit; z-index: 1; }
+.indicador-vinculo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.info-boton { position: relative; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; color: var(--muted); background: transparent; border: none; border-radius: 50%; cursor: help; }
+.info-boton:hover, .info-boton:focus-visible { color: var(--accent); background: var(--surface2); }
+.info-globo { position: absolute; z-index: 3; right: -8px; bottom: calc(100% + 8px); width: max-content; max-width: 220px; padding: 10px 12px; font-size: 0.85rem; line-height: 1.35; text-align: center; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 10px; box-shadow: 0 8px 24px rgba(20, 30, 40, 0.18); visibility: hidden; opacity: 0; transition: opacity 0.12s ease; pointer-events: none; }
+.indicador-info:hover .info-globo, .indicador-info:focus-within .info-globo { visibility: visible; opacity: 1; }
