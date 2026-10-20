@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioPropietario } from "@/components/FormularioPropietario";
 import { esGestion } from "@/lib/menu";
 import { obtenerPropietario } from "@/lib/propietarios";
@@ -20,9 +21,7 @@ export default async function EditarPropietario({ params }: { params: Promise<{ 
 
   return (
     <>
-      <div className="encabezado">
-        <h1>{t("propietarios.edicion_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="editar">{t("propietarios.edicion_titulo")}</TituloConIcono>
       <FormularioPropietario
         accion={actualizarPropietario.bind(null, p.id)}
         cancelarHref={`/propietarios/${p.id}`}

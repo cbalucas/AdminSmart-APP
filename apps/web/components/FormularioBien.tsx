@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState } from "react";
 import { t } from "@ai/i18n";
 import { ESTADOS_POR_TIPO, TIPOS_BIEN, estadoInicial, subtiposDe, tieneDireccion, type TipoBien } from "@ai/domain";
+import { AccionesFormulario, CampoIcono, SeccionFormulario } from "@/components/ElementosFormulario";
 import type { EstadoFormularioBien } from "@/lib/formulario-bien";
 
 export interface ValoresBien {
@@ -103,68 +103,78 @@ export function FormularioBien({
       <input type="hidden" name="latitud" value={valores.latitud} />
       <input type="hidden" name="longitud" value={valores.longitud} />
 
-      <fieldset className="grupo">
-        <legend>{t("bienes.seccion_tipo")}</legend>
+      <SeccionFormulario icono="bienes" titulo={t("bienes.seccion_tipo")}>
         <div className={subtipos.length > 0 ? "fila fila-3" : "fila fila-2"}>
           <div className="campo">
             <label htmlFor="tipoBien">{t("bienes.campo_tipo")}</label>
             {editando ? (
               <>
                 <input type="hidden" name="tipoBien" value={tipo} />
-                <input id="tipoBien" type="text" value={t(`tipo_bien.${tipo}`)} readOnly />
+                <CampoIcono icono="bienes">
+                  <input id="tipoBien" type="text" value={t(`tipo_bien.${tipo}`)} readOnly />
+                </CampoIcono>
               </>
             ) : (
-              <select id="tipoBien" name="tipoBien" value={tipo} onChange={(e) => setTipo(e.target.value as TipoBien)}>
+              <CampoIcono icono="bienes">
+                <select id="tipoBien" name="tipoBien" value={tipo} onChange={(e) => setTipo(e.target.value as TipoBien)}>
                 {TIPOS_BIEN.map((tb) => (
                   <option key={tb} value={tb}>{t(`tipo_bien.${tb}`)}</option>
                 ))}
               </select>
+              </CampoIcono>
             )}
           </div>
           {subtipos.length > 0 ? (
             <div className="campo">
               <label htmlFor="subtipo">{t("bienes.campo_subtipo")}</label>
-              <select id="subtipo" name="subtipo" defaultValue={valores.subtipo} aria-invalid={Boolean(errores.subtipo)}>
-                <option value="">—</option>
-                {subtipos.map((s) => (
-                  <option key={s} value={s}>{t(`subtipo.${s}`)}</option>
-                ))}
-              </select>
+              <CampoIcono icono="otros">
+                <select id="subtipo" name="subtipo" defaultValue={valores.subtipo} aria-invalid={Boolean(errores.subtipo)}>
+                  <option value="">—</option>
+                  {subtipos.map((s) => (
+                    <option key={s} value={s}>{t(`subtipo.${s}`)}</option>
+                  ))}
+                </select>
+              </CampoIcono>
               {error("subtipo")}
             </div>
           ) : null}
           <div className="campo">
             <label htmlFor="estado">{t("bienes.campo_estado")}</label>
-            <select id="estado" name="estado" defaultValue={valores.estado || estadoInicial(tipo)} key={tipo}>
-              {estados.map((e) => (
-                <option key={e} value={e}>{t(`estado_bien.${e}`)}</option>
-              ))}
-            </select>
+            <CampoIcono icono="info">
+              <select id="estado" name="estado" defaultValue={valores.estado || estadoInicial(tipo)} key={tipo}>
+                {estados.map((e) => (
+                  <option key={e} value={e}>{t(`estado_bien.${e}`)}</option>
+                ))}
+              </select>
+            </CampoIcono>
           </div>
         </div>
         <div className="campo">
           <label htmlFor="alias">{t("bienes.campo_alias")}</label>
-          <input id="alias" name="alias" type="text" defaultValue={valores.alias} aria-invalid={Boolean(errores.alias)} />
+          <CampoIcono icono="contratos">
+            <input id="alias" name="alias" type="text" defaultValue={valores.alias} aria-invalid={Boolean(errores.alias)} />
+          </CampoIcono>
           {error("alias")}
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
       {tipo === "inmueble" && (
-        <fieldset className="grupo">
-          <legend>{t("bienes.seccion_edificio")}</legend>
+        <SeccionFormulario icono="edificios" titulo={t("bienes.seccion_edificio")}>
           <p className="muted">{t("bienes.edificio_ayuda")}</p>
           <div className="fila fila-2">
             <div className="campo">
               <label htmlFor="edificioNombre">{t("bienes.campo_edificio")}</label>
-              <input
-                id="edificioNombre"
-                name="edificioNombre"
-                type="text"
-                list="lista-edificios"
-                value={nombreEdificio}
-                onChange={(e) => setNombreEdificio(e.target.value)}
-                autoComplete="off"
-              />
+              <CampoIcono icono="edificios">
+                <input
+                  id="edificioNombre"
+                  name="edificioNombre"
+                  type="text"
+                  list="lista-edificios"
+                  value={nombreEdificio}
+                  onChange={(e) => setNombreEdificio(e.target.value)}
+                  autoComplete="off"
+                />
+              </CampoIcono>
               <datalist id="lista-edificios">
                 {edificios.map((e) => (
                   <option key={e.id} value={e.nombre} />
@@ -173,7 +183,9 @@ export function FormularioBien({
             </div>
             <div className="campo">
               <label htmlFor="unidadFuncional">{t("bienes.campo_unidad")}</label>
-              <input id="unidadFuncional" name="unidadFuncional" type="text" defaultValue={valores.unidadFuncional} />
+              <CampoIcono icono="numero">
+                <input id="unidadFuncional" name="unidadFuncional" type="text" defaultValue={valores.unidadFuncional} />
+              </CampoIcono>
             </div>
           </div>
           {nombreEdificio.trim() !== "" && (
@@ -181,40 +193,49 @@ export function FormularioBien({
               {edificio ? t("bienes.edificio_existente", { direccion: edificio.direccion }) : t("bienes.edificio_nuevo")}
             </p>
           )}
-        </fieldset>
+        </SeccionFormulario>
       )}
 
       {conDireccion && (
-        <fieldset className="grupo">
-          <legend>{t("bienes.seccion_direccion")}</legend>
+        <SeccionFormulario icono="ubicacion" titulo={t("bienes.seccion_direccion")}>
           {!heredaDireccion && (
             <>
               <div className="fila fila-calle">
                 <div className="campo">
                   <label htmlFor="calle">{t("bienes.campo_calle")}</label>
-                  <input id="calle" name="calle" type="text" defaultValue={valores.calle} aria-invalid={Boolean(errores.calle)} />
+                  <CampoIcono icono="ubicacion">
+                    <input id="calle" name="calle" type="text" defaultValue={valores.calle} aria-invalid={Boolean(errores.calle)} />
+                  </CampoIcono>
                   {error("calle")}
                 </div>
                 <div className="campo">
                   <label htmlFor="numero">{t("bienes.campo_numero")}</label>
-                  <input id="numero" name="numero" type="text" defaultValue={valores.numero} aria-invalid={Boolean(errores.numero)} />
+                  <CampoIcono icono="numero">
+                    <input id="numero" name="numero" type="text" defaultValue={valores.numero} aria-invalid={Boolean(errores.numero)} />
+                  </CampoIcono>
                   {error("numero")}
                 </div>
               </div>
               <div className="fila fila-3">
                 <div className="campo">
                   <label htmlFor="localidad">{t("bienes.campo_localidad")}</label>
-                  <input id="localidad" name="localidad" type="text" defaultValue={valores.localidad} aria-invalid={Boolean(errores.localidad)} />
+                  <CampoIcono icono="ubicacion">
+                    <input id="localidad" name="localidad" type="text" defaultValue={valores.localidad} aria-invalid={Boolean(errores.localidad)} />
+                  </CampoIcono>
                   {error("localidad")}
                 </div>
                 <div className="campo">
                   <label htmlFor="provincia">{t("bienes.campo_provincia")}</label>
-                  <input id="provincia" name="provincia" type="text" defaultValue={valores.provincia} aria-invalid={Boolean(errores.provincia)} />
+                  <CampoIcono icono="ubicacion">
+                    <input id="provincia" name="provincia" type="text" defaultValue={valores.provincia} aria-invalid={Boolean(errores.provincia)} />
+                  </CampoIcono>
                   {error("provincia")}
                 </div>
                 <div className="campo">
                   <label htmlFor="codigoPostal">{t("bienes.campo_cp")}</label>
-                  <input id="codigoPostal" name="codigoPostal" type="text" defaultValue={valores.codigoPostal} />
+                  <CampoIcono icono="numero">
+                    <input id="codigoPostal" name="codigoPostal" type="text" defaultValue={valores.codigoPostal} />
+                  </CampoIcono>
                 </div>
               </div>
             </>
@@ -222,74 +243,82 @@ export function FormularioBien({
           <div className="fila fila-2">
             <div className="campo">
               <label htmlFor="piso">{t("bienes.campo_piso")}</label>
-              <input id="piso" name="piso" type="text" defaultValue={valores.piso} />
+              <CampoIcono icono="numero">
+                <input id="piso" name="piso" type="text" defaultValue={valores.piso} />
+              </CampoIcono>
             </div>
             <div className="campo">
               <label htmlFor="departamento">{t("bienes.campo_departamento")}</label>
-              <input id="departamento" name="departamento" type="text" defaultValue={valores.departamento} />
+              <CampoIcono icono="numero">
+                <input id="departamento" name="departamento" type="text" defaultValue={valores.departamento} />
+              </CampoIcono>
             </div>
           </div>
-        </fieldset>
+        </SeccionFormulario>
       )}
 
       {tipo === "vehiculo" && (
-        <fieldset className="grupo">
-          <legend>{t("bienes.seccion_vehiculo")}</legend>
+        <SeccionFormulario icono="vehiculo" titulo={t("bienes.seccion_vehiculo")}>
           <div className="fila fila-3">
             <div className="campo">
               <label htmlFor="dominio">{t("bienes.campo_dominio")}</label>
-              <input id="dominio" name="dominio" type="text" autoCapitalize="characters" defaultValue={valores.dominio} aria-invalid={Boolean(errores.dominio)} />
+              <CampoIcono icono="vehiculo">
+                <input id="dominio" name="dominio" type="text" autoCapitalize="characters" defaultValue={valores.dominio} aria-invalid={Boolean(errores.dominio)} />
+              </CampoIcono>
               {error("dominio")}
             </div>
             <div className="campo">
               <label htmlFor="marcaModelo">{t("bienes.campo_marca")}</label>
-              <input id="marcaModelo" name="marcaModelo" type="text" defaultValue={valores.marcaModelo} />
+              <CampoIcono icono="vehiculo">
+                <input id="marcaModelo" name="marcaModelo" type="text" defaultValue={valores.marcaModelo} />
+              </CampoIcono>
             </div>
             <div className="campo">
               <label htmlFor="anio">{t("bienes.campo_anio")}</label>
-              <input id="anio" name="anio" type="number" min={1900} defaultValue={valores.anio} />
+              <CampoIcono icono="calendario">
+                <input id="anio" name="anio" type="number" min={1900} defaultValue={valores.anio} />
+              </CampoIcono>
               {error("anio")}
             </div>
           </div>
-        </fieldset>
+        </SeccionFormulario>
       )}
 
       {!editando && propietarios && (
-        <fieldset className="grupo">
-          <legend>{t("bienes.seccion_titular")}</legend>
+        <SeccionFormulario icono="propietarios" titulo={t("bienes.seccion_titular")}>
           <p className="muted">{t("bienes.titular_ayuda")}</p>
           <div className="fila fila-tipo-nombre">
             <div className="campo">
               <label htmlFor="propietarioId">{t("bienes.campo_titular")}</label>
-              <select id="propietarioId" name="propietarioId" defaultValue="" aria-invalid={Boolean(errores.propietarioId)}>
-                <option value="">{t("bienes.elegir_propietario")}</option>
-                {propietarios.map((p) => (
-                  <option key={p.id} value={p.id}>{p.nombre}</option>
-                ))}
-              </select>
+              <CampoIcono icono="propietarios">
+                <select id="propietarioId" name="propietarioId" defaultValue="" aria-invalid={Boolean(errores.propietarioId)}>
+                  <option value="">{t("bienes.elegir_propietario")}</option>
+                  {propietarios.map((p) => (
+                    <option key={p.id} value={p.id}>{p.nombre}</option>
+                  ))}
+                </select>
+              </CampoIcono>
               {error("propietarioId")}
             </div>
             <div className="campo">
               <label htmlFor="porcentaje">{t("bienes.campo_porcentaje")}</label>
-              <input id="porcentaje" name="porcentaje" type="text" inputMode="decimal" defaultValue="100" aria-invalid={Boolean(errores.porcentaje)} />
+              <CampoIcono icono="porcentaje">
+                <input id="porcentaje" name="porcentaje" type="text" inputMode="decimal" defaultValue="100" aria-invalid={Boolean(errores.porcentaje)} />
+              </CampoIcono>
               {error("porcentaje")}
             </div>
           </div>
-        </fieldset>
+        </SeccionFormulario>
       )}
 
-      <fieldset className="grupo">
-        <legend>{t("bienes.seccion_otros")}</legend>
+      <SeccionFormulario icono="nota" titulo={t("bienes.seccion_otros")}>
         <div className="campo">
           <label htmlFor="observaciones">{t(tipo === "otros" ? "bienes.campo_descripcion" : "bienes.campo_observaciones")}</label>
           <textarea id="observaciones" name="observaciones" rows={3} defaultValue={valores.observaciones} />
         </div>
-      </fieldset>
+      </SeccionFormulario>
 
-      <div className="acciones">
-        <Link href={cancelarHref} className="boton boton-secundario">{t("app.cancelar")}</Link>
-        <button type="submit" className="boton" disabled={pendiente}>{t("app.guardar")}</button>
-      </div>
+      <AccionesFormulario cancelarHref={cancelarHref} pendiente={pendiente} />
     </form>
   );
 }

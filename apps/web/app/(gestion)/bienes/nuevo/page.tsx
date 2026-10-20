@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { formatearDireccion } from "@ai/domain";
 import { FormularioBien, VALORES_BIEN_NUEVO } from "@/components/FormularioBien";
 import { listarEdificios } from "@/lib/bienes";
@@ -21,9 +22,7 @@ export default async function NuevoBien() {
 
   return (
     <>
-      <div className="encabezado">
-        <h1>{t("bienes.alta_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="bienes">{t("bienes.alta_titulo")}</TituloConIcono>
       <FormularioBien
         accion={crearBien}
         valores={VALORES_BIEN_NUEVO}

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { formatearDireccion, type TipoBien } from "@ai/domain";
 import { FormularioBien } from "@/components/FormularioBien";
 import { listarEdificios, obtenerBien } from "@/lib/bienes";
@@ -20,9 +21,7 @@ export default async function EditarBien({ params }: { params: Promise<{ id: str
 
   return (
     <>
-      <div className="encabezado">
-        <h1>{t("bienes.edicion_titulo")}</h1>
-      </div>
+      <TituloConIcono icono="editar">{t("bienes.edicion_titulo")}</TituloConIcono>
       <FormularioBien
         editando
         accion={actualizarBien.bind(null, bien.id)}
