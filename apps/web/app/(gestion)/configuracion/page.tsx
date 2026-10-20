@@ -14,6 +14,10 @@ export default async function Configuracion() {
         <h1>{t("configuracion.titulo")}</h1>
       </div>
       <section className="accesos">
+        <Link href="/configuracion/administracion" className="acceso">
+          <strong>{t("configuracion.administracion")}</strong>
+          <span className="muted">{t("configuracion.administracion_desc")}</span>
+        </Link>
         <Link href="/configuracion/conceptos" className="acceso">
           <strong>{t("configuracion.conceptos")}</strong>
           <span className="muted">{t("configuracion.conceptos_desc")}</span>

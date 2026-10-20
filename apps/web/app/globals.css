@@ -458,3 +458,11 @@ a { color: var(--accent); }
 
 .enviar-whatsapp { display: flex; flex-direction: column; gap: 10px; }
 .enviar-whatsapp textarea { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 8px; }
+
+.logo-seccion { max-width: 860px; }
+.logo-seccion h2 { margin: 0; font-size: 1.1rem; }
+.logo-admin { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.logo-vista { width: 160px; height: 96px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--line); border-radius: 10px; background: var(--surface2); overflow: hidden; }
+.logo-vista img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.logo-acciones { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 8px; }
+.logo-acciones p { margin: 0; }

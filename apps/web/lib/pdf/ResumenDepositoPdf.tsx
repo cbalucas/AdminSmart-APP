@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { formatearImporte, type Moneda, type ResumenDeposito } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { coloresClaro as c } from "@ai/ui";
@@ -8,6 +8,8 @@ import type { ResumenDelPropietario } from "@/lib/resumen-deposito";
 const e = StyleSheet.create({
   pagina: { fontFamily: "Plex", fontSize: 9.5, color: c.text, paddingTop: 30, paddingBottom: 50, paddingHorizontal: 40 },
   cabecera: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: c.lineSoft },
+  marca: { flexDirection: "row", alignItems: "center", gap: 10 },
+  logo: { height: 34, maxWidth: 110, objectFit: "contain" },
   administracion: { fontFamily: "Serif", fontWeight: 700, fontSize: 14 },
   cabeceraDerecha: { alignItems: "flex-end" },
   tipoInforme: { fontWeight: 600, fontSize: 9.5 },
@@ -32,7 +34,7 @@ const e = StyleSheet.create({
   calculoTotal: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6, paddingHorizontal: 8, backgroundColor: "#E4EBF4" },
   calculoTotalTexto: { fontWeight: 600, color: c.accent },
   deposito: { flexDirection: "row", flexWrap: "wrap", backgroundColor: c.surface2, borderWidth: 1, borderColor: c.lineSoft, padding: 10 },
-  depositoCelda: { paddingRight: 8 },
+  depositoCelda: { paddingRight: 14 },
   nota: { marginTop: 10, color: c.muted, fontSize: 8.5 },
   pie: { position: "absolute", bottom: 24, left: 40, right: 40, flexDirection: "row", justifyContent: "space-between", color: c.muted, fontSize: 7.5, borderTopWidth: 0.5, borderTopColor: c.lineSoft, paddingTop: 6 },
 });
@@ -57,13 +59,18 @@ function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   );
 }
 
-function PaginaMoneda({ r, resumen, numero }: { r: ResumenDelPropietario; resumen: ResumenDeposito; numero: string | null }) {
+export type LogoPdf = { data: Buffer; format: "png" | "jpg" } | null;
+
+function PaginaMoneda({ r, resumen, numero, logo }: { r: ResumenDelPropietario; resumen: ResumenDeposito; numero: string | null; logo: LogoPdf }) {
   const m = (n: number) => formatearImporte(n, resumen.moneda as Moneda);
   const d = r.deposito;
   return (
     <Page size="A4" style={e.pagina}>
       <View style={e.cabecera}>
-        <Text style={e.administracion}>{d.administracion}</Text>
+        <View style={e.marca}>
+          {logo && <Image src={{ data: logo.data, format: logo.format }} style={e.logo} />}
+          <Text style={e.administracion}>{d.administracion}</Text>
+        </View>
         <View style={e.cabeceraDerecha}>
           <Text style={e.tipoInforme}>{t("pdf.titulo")}</Text>
           <Text style={e.numero}>{numero ? t("pdf.numero", { numero }) : t("pdf.vista_previa")}</Text>
@@ -203,10 +210,20 @@ function PaginaMoneda({ r, resumen, numero }: { r: ResumenDelPropietario; resume
       <View wrap={false}>
         <Text style={e.seccion}>{t("pdf.datos_deposito")}</Text>
         <View style={e.deposito}>
-          <View style={[e.depositoCelda, { width: "22%" }]}><Text style={e.datoEtiqueta}>{t("pdf.banco")}</Text><Text style={e.datoValor}>{d.banco ?? "—"}</Text></View>
-          <View style={[e.depositoCelda, { width: "27%" }]}><Text style={e.datoEtiqueta}>{t("pdf.titular")}</Text><Text style={e.datoValor}>{d.titular ?? "—"}</Text></View>
-          <View style={[e.depositoCelda, { width: "30%" }]}><Text style={e.datoEtiqueta}>{t("pdf.cbu")}</Text><Text style={e.datoValor}>{d.cbu ?? "—"}</Text></View>
-          <View style={[e.depositoCelda, { width: "21%" }]}><Text style={e.datoEtiqueta}>{t("pdf.alias")}</Text><Text style={e.datoValor}>{d.alias ?? "—"}</Text></View>
+          {/* Solo se muestran los datos cargados. */}
+          {[
+            { etiqueta: t("pdf.banco"), valor: d.banco, ancho: "22%" },
+            { etiqueta: t("pdf.titular"), valor: d.titular, ancho: "27%" },
+            { etiqueta: t("pdf.cbu"), valor: d.cbu, ancho: "30%" },
+            { etiqueta: t("pdf.alias"), valor: d.alias, ancho: "21%" },
+          ]
+            .filter((x) => x.valor)
+            .map((x) => (
+              <View key={x.etiqueta} style={[e.depositoCelda, { minWidth: x.ancho }]}>
+                <Text style={e.datoEtiqueta}>{x.etiqueta}</Text>
+                <Text style={e.datoValor}>{x.valor}</Text>
+              </View>
+            ))}
         </View>
         <Text style={e.nota}>{t("pdf.cierre")}</Text>
       </View>
@@ -219,14 +236,14 @@ function PaginaMoneda({ r, resumen, numero }: { r: ResumenDelPropietario; resume
   );
 }
 
-export function ResumenDepositoPdf({ r, numero }: { r: ResumenDelPropietario; numero: string | null }) {
+export function ResumenDepositoPdf({ r, numero, logo }: { r: ResumenDelPropietario; numero: string | null; logo: LogoPdf }) {
   return (
     <Document title={`${t("pdf.titulo")} ${numero ?? ""}`.trim()} author={r.deposito.administracion} creator="AdminSmart" producer="AdminSmart">
       {/* Pesos siempre; dólares solo si hay algo que informar o depositar en esa moneda. */}
       {r.resumenes
         .filter((x) => x.moneda === "ARS" || x.pendientes.length > 0 || x.aConfirmar.length > 0 || x.posibles.length > 0 || x.futuras.length > 0 || x.aDepositar > 0)
         .map((x) => (
-          <PaginaMoneda key={x.moneda} r={r} resumen={x} numero={numero} />
+          <PaginaMoneda key={x.moneda} r={r} resumen={x} numero={numero} logo={logo} />
         ))}
     </Document>
   );

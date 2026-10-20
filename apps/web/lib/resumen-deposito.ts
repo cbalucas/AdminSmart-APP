@@ -22,6 +22,8 @@ export interface DatosDeposito {
   titular: string | null;
   cbu: string | null;
   alias: string | null;
+  /** Ruta del logo en el almacén privado (para el PDF). */
+  logoPath: string | null;
 }
 
 export interface ResumenDelPropietario {
@@ -67,7 +69,7 @@ export async function calcularResumenDelPropietario(propietarioId: string, horiz
     titularesDe(bienIds),
     listarObligaciones(),
     supabase.from("saldo_propietario").select("moneda, saldo").eq("propietario_id", propietarioId),
-    supabase.from("organizacion").select("nombre, cuenta_deposito_banco, cuenta_deposito_titular, cuenta_deposito_cbu, cuenta_deposito_alias").limit(1).maybeSingle(),
+    supabase.from("organizacion").select("nombre, logo_path, cuenta_deposito_banco, cuenta_deposito_titular, cuenta_deposito_cbu, cuenta_deposito_alias").limit(1).maybeSingle(),
   ]);
 
   const bienDe = new Map((bienes ?? []).map((b) => [b.id as string, b]));
@@ -125,6 +127,7 @@ export async function calcularResumenDelPropietario(propietarioId: string, horiz
       titular: (org?.cuenta_deposito_titular as string | null | undefined) ?? null,
       cbu: (org?.cuenta_deposito_cbu as string | null | undefined) ?? null,
       alias: (org?.cuenta_deposito_alias as string | null | undefined) ?? null,
+      logoPath: (org?.logo_path as string | null | undefined) ?? null,
     },
   };
 }
