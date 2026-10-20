@@ -2,11 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { AccionIcono } from "@/components/AccionIcono";
-import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, type TipoBien } from "@ai/domain";
+import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, formatearImporte, type TipoBien } from "@ai/domain";
 import { BotonVolver } from "@/components/BotonVolver";
+import { IconoBien } from "@/components/IconoBien";
+import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { CambiarEstadoBien } from "@/components/CambiarEstadoBien";
 import { SeccionServicios } from "@/components/SeccionServicios";
 import { SeccionTitulares } from "@/components/SeccionTitulares";
+import { resumenDeBienes, type ItemDetalle } from "@/lib/estado-bienes";
 import { listarEdificios, obtenerBien, titularesDe } from "@/lib/bienes";
 import { esGestion } from "@/lib/menu";
 import { obtenerPropietario } from "@/lib/propietarios";
@@ -66,6 +69,15 @@ export default async function FichaBien({
     .map((p) => ({ id: p.id as string, nombre: p.nombre_razon_social as string }));
   const titulo = bien.esGastosVarios ? `${t("bienes.gastos_varios")} · ${titulares[0]?.nombre ?? ""}` : bien.alias;
   const vacio = t("propietarios.dato_vacio");
+  const situacion = (await resumenDeBienes([bien.id])).get(bien.id);
+  const totalDe = (items: ItemDetalle[]) =>
+    (["ARS", "USD"] as const)
+      .map((m) => ({ m, suma: items.filter((i) => i.moneda === m && i.monto !== null).reduce((x, i) => x + (i.monto as number), 0) }))
+      .filter((x) => x.suma > 0)
+      .map((x) => formatearImporte(x.suma, x.m))
+      .join(" · ");
+  const fechaCorta = (f: string | null) => (f ? f.split("-").reverse().join("/") : "");
+  const proxima = situacion?.proximas[0];
 
   return (
     <>
@@ -75,6 +87,7 @@ export default async function FichaBien({
       </p>
 
       <div className="ficha-cabecera">
+        <span className="icono-bien icono-bien-grande" aria-hidden="true"><IconoBien tipo={bien.tipoBien} /></span>
         <div className="ficha-datos">
           <h1>{titulo}</h1>
           <p className="muted">
@@ -98,6 +111,40 @@ export default async function FichaBien({
           )}
         </div>
       </div>
+
+      <section className="indicadores">
+        <TarjetaIndicador
+          id="vencidas"
+          icono="obligaciones"
+          tono={situacion && situacion.vencidas.length > 0 ? "peligro" : "ok"}
+          titulo={t("indicadores.vencidas")}
+          valor={String(situacion?.vencidas.length ?? 0)}
+          nota={situacion && situacion.vencidas.length > 0 ? totalDe(situacion.vencidas) || t("indicadores.sin_monto") : t("indicadores.nada")}
+        />
+        <TarjetaIndicador
+          id="proximas"
+          icono="calendario"
+          tono="acento"
+          titulo={t("indicadores.proximas")}
+          valor={String(situacion?.proximas.length ?? 0)}
+          nota={proxima ? t("indicadores.proximo", { fecha: fechaCorta(proxima.vencimiento) }) : t("indicadores.nada")}
+        />
+        <TarjetaIndicador
+          id="a-completar"
+          icono="recurrente"
+          tono="aviso"
+          titulo={t("indicadores.a_completar")}
+          valor={String(situacion?.aCompletar.length ?? 0)}
+          nota={(situacion?.aCompletar.length ?? 0) > 0 ? t("indicadores.sin_monto") : t("indicadores.nada")}
+        />
+        <TarjetaIndicador
+          id="situacion"
+          icono="auditoria"
+          tono={situacion?.situacion === "con_deuda" ? "peligro" : situacion?.situacion === "a_completar" ? "aviso" : "ok"}
+          titulo={t("indicadores.estado")}
+          valor={t(`bien_card.${situacion?.situacion ?? "sin_obligaciones"}`)}
+        />
+      </section>
 
       <nav className="pestanas" aria-label={t("bienes.titulo")}>
         {PESTANAS.map((clave) =>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { FormularioNuevaContrasena } from "@/components/FormularioNuevaContrasena";
 import { usuarioActual } from "@/lib/usuario-actual";
 
@@ -12,9 +13,7 @@ export default async function MiCuenta() {
 
   return (
     <>
-      <div className="encabezado">
-        <h1>{t("cuenta.titulo")}</h1>
-      </div>
+      <TituloConIcono icono="persona">{t("cuenta.titulo")}</TituloConIcono>
       <section className="panel panel-angosto">
         <dl className="datos">
           <dt>{t("cuenta.nombre")}</dt>

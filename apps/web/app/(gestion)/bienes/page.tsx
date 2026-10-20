@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { AccionIcono } from "@/components/AccionIcono";
 import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, normalizarNombre, TIPOS_BIEN } from "@ai/domain";
-import { formatearPorcentaje, listarBienes, listarEdificios, titularesDe, type Bien, type Edificio, type Titular } from "@/lib/bienes";
+import { listarBienes, listarEdificios, titularesDe, type Bien, type Edificio, type Titular } from "@/lib/bienes";
+import { IconoBien } from "@/components/IconoBien";
+import { resumenDeBienes } from "@/lib/estado-bienes";
 import { esGestion } from "@/lib/menu";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -72,73 +74,52 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
       return normalizarNombre([b.alias, u.texto, b.dominio ?? "", b.marcaModelo ?? ""].join(" ")).includes(buscado);
     });
 
+  const situaciones = await resumenDeBienes(lista.map((b) => b.id));
   const hayFiltros = Boolean(f.q || f.tipo || f.estado || f.propietario || f.edificio);
   const edificiosEnUso = edificios.filter((e) => todos.some((b) => b.edificioId === e.id));
 
-  const fila = (b: Bien) => {
+  const tarjeta = (b: Bien) => {
     const ts: Titular[] = titulares.get(b.id) ?? [];
     const edificio = b.edificioId ? edificioDe.get(b.edificioId) : undefined;
     const u = ubicacionDe(b, edificio);
     const titularidad = estadoTitularidad(ts.map((x) => x.porcentaje));
     const alerta = titularidad === "vacia" ? t("bienes.sin_titulares") : titularidad === "excedida" ? t("bienes.titularidad_excedida") : null;
+    const nombre = b.esGastosVarios ? `${t("bienes.gastos_varios")} · ${ts[0]?.nombre ?? ""}` : b.alias;
+    const situacion = situaciones.get(b.id)?.situacion ?? "sin_obligaciones";
+    const clase = { con_deuda: "estado estado-vencida", a_completar: "estado estado-ambar", al_dia: "estado estado-ok", sin_obligaciones: "estado estado-neutro" }[situacion];
+    const propietarios = ts.length === 0 ? "" : ts.length === 1 ? ts[0]!.nombre : `${ts[0]!.nombre} +${ts.length - 1}`;
     return (
-      <tr key={b.id}>
-        <td data-label={t("bienes.col_bien")}>
-          <Link href={`/bienes/${b.id}`} className="celda-bien">
-            <strong>{b.esGastosVarios ? `${t("bienes.gastos_varios")} · ${ts[0]?.nombre ?? ""}` : b.alias}</strong>
-            {b.dominio && <span className="muted">{b.dominio}</span>}
-          </Link>
-        </td>
-        <td data-label={t("bienes.col_tipo")}>
+      <li key={b.id} className="tarjeta-propietario tarjeta-bien">
+        <Link href={`/bienes/${b.id}`} className="tarjeta-propietario-vinculo" aria-label={nombre} />
+        <IconoBien tipo={b.tipoBien} />
+        <strong className="tarjeta-propietario-nombre">{nombre}</strong>
+        <span className="muted">
           {t(`tipo_bien.${b.tipoBien}`)}
-          {b.subtipo && <span className="muted"> · {t(`subtipo.${b.subtipo}`)}</span>}
-        </td>
-        <td data-label={t("bienes.col_propietarios")}>
-          {ts.length === 0 ? (
-            <span className="muted">—</span>
-          ) : (
-            ts.map((x) => (
-              <span key={x.vinculoId} className="linea">
-                {x.nombre} <span className="muted">{formatearPorcentaje(x.porcentaje)} %</span>
-              </span>
-            ))
-          )}
+          {b.subtipo && ` · ${t(`subtipo.${b.subtipo}`)}`}
+          {b.dominio && ` · ${b.dominio}`}
+        </span>
+        <p className="insignias">
+          <span className={["disponible", "activo", "alquilado"].includes(b.estado) ? "estado estado-ok" : "estado estado-neutro"}>{t(`estado_bien.${b.estado}`)}</span>
+          <span className={clase}>{t(`bien_card.${situacion}`)}</span>
           {alerta && <span className="estado estado-vencida">{alerta}</span>}
-        </td>
-        <td data-label={t("bienes.col_ubicacion")}>
-          {u.texto || <span className="muted">—</span>}
-          {edificio && <span className="linea muted">{edificio.nombre}{b.unidadFuncional && ` · ${b.unidadFuncional}`}</span>}
-          {u.mapa && (
-            <span className="linea">
-              <a href={u.mapa} target="_blank" rel="noreferrer">{t("bienes.ver_mapa")}</a>
-            </span>
-          )}
-        </td>
-        <td data-label={t("bienes.col_estado")}>
-          <span className={["disponible", "activo", "alquilado"].includes(b.estado) ? "estado estado-ok" : "estado estado-neutro"}>
-            {t(`estado_bien.${b.estado}`)}
+        </p>
+        <dl className="tarjeta-propietario-datos">
+          <div className="dato-ancho"><dt>{t("bienes.col_propietarios")}</dt><dd>{propietarios || "—"}</dd></div>
+          <div className="dato-ancho">
+            <dt>{t("bienes.col_ubicacion")}</dt>
+            <dd>{u.texto || "—"}{edificio && <span className="linea muted">{edificio.nombre}{b.unidadFuncional && ` · ${b.unidadFuncional}`}</span>}</dd>
+          </div>
+        </dl>
+        {u.mapa && (
+          <span className="tarjeta-esquina">
+            <AccionIcono href={u.mapa} externo icono="ubicacion" titulo={t("bienes.ver_mapa")} />
           </span>
-        </td>
-      </tr>
+        )}
+      </li>
     );
   };
 
-  const tabla = (bienes: Bien[]) => (
-    <div className="tabla-envoltorio">
-      <table className="tabla tabla-responsive">
-        <thead>
-          <tr>
-            <th>{t("bienes.col_bien")}</th>
-            <th>{t("bienes.col_tipo")}</th>
-            <th>{t("bienes.col_propietarios")}</th>
-            <th>{t("bienes.col_ubicacion")}</th>
-            <th>{t("bienes.col_estado")}</th>
-          </tr>
-        </thead>
-        <tbody>{bienes.map(fila)}</tbody>
-      </table>
-    </div>
-  );
+  const tabla = (bienes: Bien[]) => <ul className="tarjetas-bienes">{bienes.map(tarjeta)}</ul>;
 
   // Agrupado por edificio: cada edificio con sus unidades y, al final, los bienes sin edificio.
   const grupos =

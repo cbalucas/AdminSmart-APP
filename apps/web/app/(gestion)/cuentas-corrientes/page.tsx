@@ -4,6 +4,7 @@ import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { AccionIcono } from "@/components/AccionIcono";
 import { bienesDelPropietario, libroDelPropietario, propietariosParaCuenta, tieneCuentaEnDolares } from "@/lib/cuentas-corrientes";
+import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { BotonVolver } from "@/components/BotonVolver";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
 import { esGestion } from "@/lib/menu";
@@ -59,6 +60,9 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
   };
   const alta = (ruta: string) => `/cuentas-corrientes/${ruta}?propietario=${propietario.id}&moneda=${moneda}`;
   const hayFiltros = Boolean(f.bien || f.desde || f.hasta);
+  const vigentes = libro.filas.filter((m) => !m.anulado && !m.esContramovimiento);
+  const ingresos = vigentes.reduce((x, m) => x + m.haber, 0);
+  const egresos = vigentes.reduce((x, m) => x + m.debe, 0);
 
   return (
     <>
@@ -77,6 +81,19 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
             </>
           )}
         </div>      </div>
+
+      <section className="indicadores">
+        <TarjetaIndicador
+          id="saldo"
+          icono="cuentas"
+          tono={libro.saldoFinal < 0 ? "peligro" : "ok"}
+          titulo={t("indicadores.saldo")}
+          valor={formatearImporte(libro.saldoFinal, moneda)}
+          nota={libro.saldoFinal < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor")}
+        />
+        <TarjetaIndicador id="ingresos" icono="mas" tono="acento" titulo={t("indicadores.ingresos")} valor={formatearImporte(ingresos, moneda)} nota={t("indicadores.movimientos", { cantidad: String(vigentes.filter((m) => m.haber > 0).length) })} />
+        <TarjetaIndicador id="egresos" icono="traspaso" tono="aviso" titulo={t("indicadores.egresos")} valor={formatearImporte(egresos, moneda)} nota={t("indicadores.movimientos", { cantidad: String(vigentes.filter((m) => m.debe > 0).length) })} />
+      </section>
 
       <section className="panel">
         <form className="filtros filtros-separados filtros-cuenta" role="search">
@@ -118,12 +135,6 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
             </div>
           </div>
         </form>
-
-        <p className="saldo-resumen">
-          {t("cuentas.saldo_actual")}{" "}
-          <strong className={libro.saldoFinal < 0 ? "saldo-deudor" : undefined}>{formatearImporte(libro.saldoFinal, moneda)}</strong>
-          <span className="muted"> · {libro.saldoFinal < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor")}</span>
-        </p>
 
         {libro.filas.length === 0 ? (
           <p className="muted">{t("cuentas.vacio")}</p>

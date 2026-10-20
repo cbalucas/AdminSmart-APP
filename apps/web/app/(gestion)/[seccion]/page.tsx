@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TituloConIcono } from "@/components/ElementosFormulario";
 import { menuPara } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
 
@@ -13,9 +14,7 @@ export default async function Seccion({ params }: { params: Promise<{ seccion: s
 
   return (
     <>
-      <div className="encabezado">
-        <h1>{t(`menu.${item.clave}`)}</h1>
-      </div>
+      <TituloConIcono icono={item.icono}>{t(`menu.${item.clave}`)}</TituloConIcono>
       <section className="panel">
         <p className="muted">{t("app.seccion_proximamente")}</p>
       </section>

@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { Icono } from "@/components/Iconos";
 import { usuarioActual } from "@/lib/usuario-actual";
+
+const ACCESOS = [
+  { clave: "administracion", ruta: "/configuracion/administracion", icono: "edificios" },
+  { clave: "preferencias", ruta: "/configuracion/preferencias", icono: "configuracion" },
+  { clave: "plantillas", ruta: "/configuracion/plantillas", icono: "mail" },
+  { clave: "conceptos", ruta: "/configuracion/conceptos", icono: "obligaciones" },
+] as const;
 
 // P-39 Configuración: accesos a las pantallas de ajustes. Se suman a medida que se construyen.
 export default async function Configuracion() {
@@ -14,22 +22,13 @@ export default async function Configuracion() {
         <h1>{t("configuracion.titulo")}</h1>
       </div>
       <section className="accesos">
-        <Link href="/configuracion/administracion" className="acceso">
-          <strong>{t("configuracion.administracion")}</strong>
-          <span className="muted">{t("configuracion.administracion_desc")}</span>
-        </Link>
-        <Link href="/configuracion/preferencias" className="acceso">
-          <strong>{t("configuracion.preferencias")}</strong>
-          <span className="muted">{t("configuracion.preferencias_desc")}</span>
-        </Link>
-        <Link href="/configuracion/plantillas" className="acceso">
-          <strong>{t("configuracion.plantillas")}</strong>
-          <span className="muted">{t("configuracion.plantillas_desc")}</span>
-        </Link>
-        <Link href="/configuracion/conceptos" className="acceso">
-          <strong>{t("configuracion.conceptos")}</strong>
-          <span className="muted">{t("configuracion.conceptos_desc")}</span>
-        </Link>
+        {ACCESOS.map((a) => (
+          <Link key={a.clave} href={a.ruta} className="acceso">
+            <span className="acceso-icono" aria-hidden="true"><Icono nombre={a.icono} tamano={24} /></span>
+            <strong>{t(`configuracion.${a.clave}`)}</strong>
+            <span className="muted">{t(`configuracion.${a.clave}_desc`)}</span>
+          </Link>
+        ))}
       </section>
     </>
   );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { AccionIcono } from "@/components/AccionIcono";
 import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIEN, type EstadoObligacion } from "@ai/domain";
 import { listarBienes, titularesDe } from "@/lib/bienes";
@@ -71,6 +72,17 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   const paramsExport = new URLSearchParams();
   for (const k of ["estado", "propietario", "tipo", "responsable", "periodo"] as const) if (f[k]) paramsExport.set(k, f[k] as string);
   const hayFiltros = Boolean(f.propietario || f.tipo || f.responsable || f.periodo);
+  const montosDe = (estado: string) => {
+    const filas = todas.filter((o) => o.estado === estado);
+    const total = (["ARS", "USD"] as const)
+      .map((m) => ({ m, suma: filas.filter((o) => o.moneda === m && o.monto !== null).reduce((x, o) => x + (o.monto as number), 0) }))
+      .filter((x) => x.suma > 0)
+      .map((x) => formatearImporte(x.suma, x.m))
+      .join(" · ");
+    return { cantidad: filas.length, total };
+  };
+  const vencidasTot = montosDe("vencida");
+  const pendientesTot = montosDe("pendiente");
   const porCompletar = todas.filter((o) => o.estado === "a_completar").length;
   const conMonto = lista.filter((o) => o.monto !== null && o.moneda === "ARS").reduce((s, o) => s + (o.monto as number), 0);
 
@@ -164,6 +176,12 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           <AccionIcono href="/obligaciones/nueva" icono="mas" titulo={t("obligaciones.nueva")} tono="primario" />
         </div>
       </div>
+
+      <section className="indicadores">
+        <TarjetaIndicador id="vencidas" icono="obligaciones" tono={vencidasTot.cantidad > 0 ? "peligro" : "ok"} titulo={t("indicadores.vencidas")} valor={String(vencidasTot.cantidad)} nota={vencidasTot.total || t("indicadores.nada")} />
+        <TarjetaIndicador id="pendientes" icono="calendario" tono="acento" titulo={t("indicadores.proximas")} valor={String(pendientesTot.cantidad)} nota={pendientesTot.total || t("indicadores.nada")} />
+        <TarjetaIndicador id="a-completar" icono="recurrente" tono="aviso" titulo={t("indicadores.a_completar")} valor={String(porCompletar)} nota={porCompletar > 0 ? t("indicadores.sin_monto") : t("indicadores.nada")} />
+      </section>
 
       {f.aviso === "comprobante" && <p className="aviso-advertencia" role="status">{t("adjuntos.error_registrar_pago")}</p>}
       {porCompletar > 0 && (
