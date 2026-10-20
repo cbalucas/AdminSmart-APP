@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BuscadorEnVivo } from "@/components/BuscadorEnVivo";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, normalizarNombre, TIPOS_BIEN } from "@ai/domain";
@@ -159,7 +160,7 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
       <section className="panel">
         <form className="filtros" role="search">
           <div className="campo filtro-buscar">
-            <input type="search" name="q" defaultValue={f.q ?? ""} placeholder={t("bienes.buscar")} aria-label={t("bienes.buscar")} />
+            <BuscadorEnVivo defaultValue={f.q ?? ""} placeholder={t("bienes.buscar")} ariaLabel={t("bienes.buscar")} />
           </div>
           <div className="campo">
             <label htmlFor="f-tipo">{t("bienes.filtro_tipo")}</label>

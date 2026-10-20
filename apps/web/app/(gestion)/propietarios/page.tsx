@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BuscadorEnVivo } from "@/components/BuscadorEnVivo";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { formatearImporte, normalizarNombre, type Moneda } from "@ai/domain";
@@ -61,8 +62,7 @@ export default async function Propietarios({
       <section className="panel">
         <form className="barra-filtros" role="search">
           {verInactivos && <input type="hidden" name="inactivos" value="1" />}
-          <input type="search" name="q" defaultValue={q} placeholder={t("propietarios.buscar")} aria-label={t("propietarios.buscar")} />
-          <button type="submit" className="boton boton-secundario">{t("app.buscar")}</button>
+          <BuscadorEnVivo defaultValue={q} placeholder={t("propietarios.buscar")} ariaLabel={t("propietarios.buscar")} />
           <Link href={enlaceInactivos} className="enlace-filtro">
             {verInactivos ? t("propietarios.ocultar_inactivos") : t("propietarios.ver_inactivos")}
           </Link>
