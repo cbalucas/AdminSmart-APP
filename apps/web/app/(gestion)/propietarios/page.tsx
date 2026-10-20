@@ -72,7 +72,7 @@ export default async function Propietarios({
           <p className="muted">{hayDatos ? t("propietarios.sin_resultados") : t("propietarios.vacio")}</p>
         ) : (
           <div className="tabla-envoltorio">
-            <table className="tabla">
+            <table className="tabla tabla-responsive">
               <thead>
                 <tr>
                   <th>{t("propietarios.col_nombre")}</th>
@@ -87,22 +87,22 @@ export default async function Propietarios({
               <tbody>
                 {lista.map((p) => (
                   <tr key={p.id as string}>
-                    <td>
+                    <td data-label={t("propietarios.col_nombre")}>
                       <Link href={`/propietarios/${p.id}`} className="celda-persona">
                         <Avatar nombre={p.nombre_razon_social as string} url={enlaces.get(p.avatar_path as string)} />
                         <strong>{p.nombre_razon_social as string}</strong>
                       </Link>
                     </td>
-                    <td className="num">{cantidadBienes.get(p.id as string) ?? 0}</td>
-                    <td className="num">{formatearImporte(saldoDe(p.id as string, "ARS"), "ARS")}</td>
-                    <td className="num">{formatearImporte(saldoDe(p.id as string, "USD"), "USD")}</td>
-                    <td className="num muted">—</td>
-                    <td>
+                    <td className="num" data-label={t("propietarios.col_bienes")}>{cantidadBienes.get(p.id as string) ?? 0}</td>
+                    <td className="num" data-label={t("propietarios.col_saldo_ars")}>{formatearImporte(saldoDe(p.id as string, "ARS"), "ARS")}</td>
+                    <td className="num" data-label={t("propietarios.col_saldo_usd")}>{formatearImporte(saldoDe(p.id as string, "USD"), "USD")}</td>
+                    <td className="num muted" data-label={t("propietarios.col_a_depositar")}>—</td>
+                    <td data-label={t("propietarios.col_estado")}>
                       <span className={p.estado === "activo" ? "estado estado-ok" : "estado estado-neutro"}>
                         {t(`propietarios.estado_${p.estado}`)}
                       </span>
                     </td>
-                    <td>{conAcceso.has(p.id as string) ? t("propietarios.con_acceso") : t("propietarios.sin_acceso")}</td>
+                    <td data-label={t("propietarios.col_acceso")}>{conAcceso.has(p.id as string) ? t("propietarios.con_acceso") : t("propietarios.sin_acceso")}</td>
                   </tr>
                 ))}
               </tbody>

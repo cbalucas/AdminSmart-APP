@@ -71,7 +71,7 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
         </div>      </div>
 
       <section className="panel">
-        <form className="filtros filtros-separados" role="search">
+        <form className="filtros filtros-separados filtros-cuenta" role="search">
           <input type="hidden" name="moneda" value={moneda} />
           <div className="campo">
             <label htmlFor="c-prop">{t("cuentas.propietario")}</label>
@@ -120,7 +120,7 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
           <p className="muted">{t("cuentas.vacio")}</p>
         ) : (
           <div className="tabla-envoltorio">
-            <table className="tabla tabla-compacta">
+            <table className="tabla tabla-compacta tabla-responsive">
               <thead>
                 <tr>
                   <th>{t("cuentas.col_fecha")}</th>
@@ -143,16 +143,16 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
                 )}
                 {libro.filas.map((m) => (
                   <tr key={m.id} className={m.anulado || m.esContramovimiento ? "fila-anulada" : undefined}>
-                    <td className="nowrap">{fechaCorta(m.fecha)}</td>
-                    <td>{nombreBien.get(m.bienId) ?? "—"}</td>
-                    <td>{t(`cuentas.tipo_${m.tipo}`)}</td>
-                    <td>
+                    <td className="nowrap" data-label={t("cuentas.col_fecha")}>{fechaCorta(m.fecha)}</td>
+                    <td data-label={t("cuentas.col_bien")}>{nombreBien.get(m.bienId) ?? "—"}</td>
+                    <td data-label={t("cuentas.col_tipo")}>{t(`cuentas.tipo_${m.tipo}`)}</td>
+                    <td data-label={t("cuentas.col_descripcion")}>
                       {m.descripcion}
                       {m.anulado && <span className="estado estado-neutro">{t("cuentas.anulado")}</span>}
                     </td>
-                    <td className="num">{m.debe > 0 ? formatearImporte(m.debe, moneda) : ""}</td>
-                    <td className="num">{m.haber > 0 ? formatearImporte(m.haber, moneda) : ""}</td>
-                    <td className={m.saldo < 0 ? "num saldo-deudor" : "num"}>{formatearImporte(m.saldo, moneda)}</td>
+                    <td className="num" data-label={t("cuentas.col_debe")}>{m.debe > 0 ? formatearImporte(m.debe, moneda) : ""}</td>
+                    <td className="num" data-label={t("cuentas.col_haber")}>{m.haber > 0 ? formatearImporte(m.haber, moneda) : ""}</td>
+                    <td data-label={t("cuentas.col_saldo")} className={m.saldo < 0 ? "num saldo-deudor" : "num"}>{formatearImporte(m.saldo, moneda)}</td>
                     <td>
                       <div className="acciones-fila">
                         {((comprobantes.get(m.id) ?? []) as DocumentoFila[]).map((d, i) =>

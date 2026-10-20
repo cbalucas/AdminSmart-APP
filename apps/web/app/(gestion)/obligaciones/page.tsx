@@ -7,6 +7,8 @@ import { listarBienes, titularesDe } from "@/lib/bienes";
 import { generarOcurrenciasSiHaceFalta, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
 import { filtrarObligaciones } from "@/lib/filtrar-obligaciones";
+import { Icono } from "@/components/Iconos";
+import { IconoBien } from "@/components/IconoBien";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
 import { pagosVigentesDe } from "@/lib/pagos";
 import { esGestion } from "@/lib/menu";
@@ -31,6 +33,9 @@ const CLASE_ESTADO: Record<EstadoObligacion, string> = {
   a_completar: "estado estado-ambar",
   anulada: "estado estado-neutro",
 };
+
+// Primer titular y cuántos más hay: "Carlos José Paez Allende +2".
+const nombresCortos = (nombres: string[]) => (nombres.length <= 1 ? (nombres[0] ?? "") : `${nombres[0]} +${nombres.length - 1}`);
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
 
@@ -80,29 +85,34 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
     const ts = titulares.get(o.bienId) ?? [];
     return (
       <tr key={o.id}>
-        <td>
-          <strong>{bien ? (bien.esGastosVarios ? `${t("bienes.gastos_varios")} · ${ts[0]?.nombre ?? ""}` : bien.alias) : "—"}</strong>
-          {bien && (
-            <span className="linea muted">
-              {t(`tipo_bien.${bien.tipoBien}`)}
-              {ts.length > 0 && ` · ${ts.map((x) => x.nombre).join(" · ")}`}
-            </span>
-          )}
+        <td data-label={t("obligaciones.col_bien")}>
+          <div className="celda-bien-icono">
+            {bien && <IconoBien tipo={bien.tipoBien} />}
+            <div>
+              <strong>{bien ? (bien.esGastosVarios ? `${t("bienes.gastos_varios")} · ${ts[0]?.nombre ?? ""}` : bien.alias) : "—"}</strong>
+              {bien && (
+                <span className="linea muted">
+                  {t(`tipo_bien.${bien.tipoBien}`)}
+                  {ts.length > 0 && ` · ${nombresCortos(ts.map((x) => x.nombre))}`}
+                </span>
+              )}
+            </div>
+          </div>
         </td>
-        <td>
+        <td data-label={t("obligaciones.col_concepto")}>
           {o.concepto}
           <span className="linea muted">
             {o.empresa ?? o.descripcion ?? t("obligaciones.gasto_suelto")}
             {o.esRecurrente && o.frecuencia && ` · ${t("obligaciones.recurrente")} ${t(`obligaciones.frec_${o.frecuencia}`).toLowerCase()}`}
           </span>
         </td>
-        <td className="nowrap">{formatearPeriodo(o.periodo)}</td>
-        <td className="nowrap">{o.vencimiento ? fechaCorta(o.vencimiento) : <span className="muted">—</span>}</td>
-        <td className="num">
+        <td className="nowrap" data-label={t("obligaciones.col_periodo")}>{formatearPeriodo(o.periodo)}</td>
+        <td className="nowrap" data-label={t("obligaciones.col_vencimiento")}>{o.vencimiento ? fechaCorta(o.vencimiento) : <span className="muted">—</span>}</td>
+        <td className="num" data-label={t("obligaciones.col_monto")}>
           {o.monto === null ? <span className="falta-monto">{t("obligaciones.falta_monto")}</span> : formatearImporte(o.monto, o.moneda)}
         </td>
-        <td>{t(`obligaciones.responsable_${o.responsable}`)}</td>
-        <td className="nowrap">
+        <td data-label={t("obligaciones.col_responsable")}>{t(`obligaciones.responsable_${o.responsable}`)}</td>
+        <td className="nowrap" data-label={t("obligaciones.col_estado")}>
           <span className={CLASE_ESTADO[o.estado]}>{t(`obligaciones.estado_${o.estado}`)}</span>
           {pagos.get(o.id) && (
             <span className="linea muted">
@@ -158,13 +168,15 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
 
       {f.aviso === "comprobante" && <p className="aviso-advertencia" role="status">{t("adjuntos.error_registrar_pago")}</p>}
       {porCompletar > 0 && (
-        <p className="aviso-advertencia" role="status">
-          {porCompletar === 1 ? t("obligaciones.aviso_a_completar_uno") : t("obligaciones.aviso_a_completar", { cantidad: String(porCompletar) })}
-          <Link href="/obligaciones?completar=1" className="boton-texto">{t("obligaciones.completar_ahora")}</Link>
-        </p>
+        <div className="aviso-advertencia aviso-con-icono" role="status">
+          <Icono nombre="recurrente" tamano={20} />
+          <span>{porCompletar === 1 ? t("obligaciones.aviso_a_completar_uno") : t("obligaciones.aviso_a_completar", { cantidad: String(porCompletar) })}</span>
+          <Link href="/obligaciones?completar=1" className="aviso-enlace">{t("obligaciones.completar_ahora")}</Link>
+        </div>
       )}
 
       <section className="panel">
+        <div className="fila-pildoras">
         <nav className="pildoras" aria-label={t("obligaciones.col_estado")}>
           <Link href={enlace("")} className={!f.estado ? "pildora activa" : "pildora"}>
             {t("obligaciones.estado_todas")} <span className="contador">{sinEstado.length}</span>
@@ -175,8 +187,14 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
             </Link>
           ))}
         </nav>
+        <p className="resumen-lista-pie">
+          {lista.length === 1
+            ? t("obligaciones.resumen_uno", { total: formatearImporte(conMonto, "ARS") })
+            : t("obligaciones.resumen", { cantidad: String(lista.length), total: formatearImporte(conMonto, "ARS") })}
+        </p>
+        </div>
 
-        <form className="filtros filtros-separados" role="search">
+        <form className="filtros filtros-separados filtros-en-fila" role="search">
           {f.estado && <input type="hidden" name="estado" value={f.estado} />}
           <div className="campo">
             <label htmlFor="f-prop">{t("obligaciones.filtro_propietario")}</label>
@@ -213,16 +231,9 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
               ))}
             </select>
           </div>
-          <div className="filtros-pie">
-            <p className="resumen-lista">
-              {lista.length === 1
-                ? t("obligaciones.resumen_uno", { total: formatearImporte(conMonto, "ARS") })
-                : t("obligaciones.resumen", { cantidad: String(lista.length), total: formatearImporte(conMonto, "ARS") })}
-            </p>
-            <div className="acciones">
-              {(hayFiltros || f.estado) && <Link href="/obligaciones" className="boton-texto">{t("obligaciones.limpiar")}</Link>}
-              <button type="submit" className="boton boton-secundario">{t("obligaciones.filtrar")}</button>
-            </div>
+          <div className="filtros-boton">
+            <button type="submit" className="boton boton-secundario">{t("obligaciones.filtrar")}</button>
+            {(hayFiltros || f.estado) && <Link href="/obligaciones" className="boton-texto">{t("obligaciones.limpiar")}</Link>}
           </div>
         </form>
 
@@ -230,7 +241,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           <p className="muted">{todas.length === 0 ? t("obligaciones.vacio") : t("obligaciones.sin_resultados")}</p>
         ) : (
           <div className="tabla-envoltorio">
-            <table className="tabla">
+            <table className="tabla tabla-responsive">
               <thead>
                 <tr>
                   <th>{t("obligaciones.col_bien")}</th>

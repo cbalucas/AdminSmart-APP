@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { t } from "@ai/i18n";
 import { formatearTamano, generarUuidV7, rutaDocumento, validarArchivoDocumento, type EntidadDocumento, type TipoDocumento } from "@ai/domain";
+import { Icono } from "@/components/Iconos";
 import { crearClienteNavegador } from "@/lib/supabase/navegador";
 import type { AdjuntoSubido, DocumentoFila } from "@/lib/documentos";
 
@@ -27,6 +28,8 @@ export function CampoAdjuntos({
   const entrada = useRef<HTMLInputElement>(null);
   const [subidos, setSubidos] = useState<AdjuntoSubido[]>([]);
   const [subiendo, setSubiendo] = useState(false);
+  // Vista previa de las fotos recién elegidas (ruta del almacén → dirección local de la imagen).
+  const [vistas, setVistas] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
   async function elegir(archivos: FileList | null) {
@@ -48,6 +51,7 @@ export function CampoAdjuntos({
         continue;
       }
       nuevos.push({ path, nombre: archivo.name, tipoMime: archivo.type, tamano: archivo.size, tipo, visiblePropietario: false });
+      if (archivo.type.startsWith("image/")) setVistas((v) => ({ ...v, [path]: URL.createObjectURL(archivo) }));
     }
     setSubidos((s) => [...s, ...nuevos]);
     setSubiendo(false);
@@ -67,6 +71,7 @@ export function CampoAdjuntos({
         <ul className="adjuntos-lista">
           {existentes.map((d) => (
             <li key={d.id}>
+              <Miniatura url={d.tipoMime.startsWith("image/") ? d.url : null} />
               <span>
                 {d.url ? <a href={d.url} target="_blank" rel="noreferrer">{d.nombre}</a> : d.nombre}
                 <span className="muted"> · {formatearTamano(d.tamano)}{d.visiblePropietario ? ` · ${t("adjuntos.visible")}` : ""}</span>
@@ -75,6 +80,7 @@ export function CampoAdjuntos({
           ))}
           {subidos.map((a) => (
             <li key={a.path}>
+              <Miniatura url={vistas[a.path] ?? null} />
               <span>
                 {a.nombre}
                 <span className="muted"> · {formatearTamano(a.tamano)} · {t("adjuntos.listo")}</span>
@@ -99,12 +105,27 @@ export function CampoAdjuntos({
           hidden
           onChange={(e) => void elegir(e.target.files)}
         />
-        <button type="button" className="boton boton-secundario" disabled={subiendo} onClick={() => entrada.current?.click()}>
+        <button type="button" className="boton-adjuntar" disabled={subiendo} onClick={() => entrada.current?.click()}>
+          <Icono nombre="camara" tamano={20} />
           {subiendo ? t("adjuntos.subiendo") : t("adjuntos.agregar")}
         </button>
         <p className="muted">{t("adjuntos.ayuda")}</p>
       </div>
       {error && <p className="error-campo" role="alert">{t(error)}</p>}
     </div>
+  );
+}
+
+// Miniatura de una foto, o el ícono de documento para un PDF.
+function Miniatura({ url }: { url: string | null }) {
+  return (
+    <span className="miniatura" aria-hidden="true">
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt="" />
+      ) : (
+        <Icono nombre="documento" tamano={20} />
+      )}
+    </span>
   );
 }

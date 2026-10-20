@@ -94,7 +94,7 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
           <p className="muted">{t("auditoria.vacio")}</p>
         ) : (
           <div className="tabla-envoltorio">
-            <table className="tabla tabla-compacta">
+            <table className="tabla tabla-compacta tabla-responsive">
               <thead>
                 <tr>
                   <th>{t("auditoria.col_fecha")}</th>
@@ -107,16 +107,16 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
               <tbody>
                 {filas.map((r) => (
                   <tr key={r.id}>
-                    <td className="nowrap">{fechaHora(r.fecha)}</td>
-                    <td>{r.usuario ?? (r.usuarioId ? "—" : t("auditoria.sistema"))}</td>
-                    <td>
+                    <td className="nowrap" data-label={t("auditoria.col_fecha")}>{fechaHora(r.fecha)}</td>
+                    <td data-label={t("auditoria.col_usuario")}>{r.usuario ?? (r.usuarioId ? "—" : t("auditoria.sistema"))}</td>
+                    <td data-label={t("auditoria.col_objeto")}>
                       <strong>{t(`auditoria.tabla_${r.tabla}`)}</strong>
                       {r.descripcion && <span className="linea muted">{r.descripcion}</span>}
                     </td>
-                    <td className="nowrap">
+                    <td className="nowrap" data-label={t("auditoria.col_accion")}>
                       <span className={CLASE_ACCION[r.accion] ?? "estado estado-neutro"}>{t(`auditoria.accion_${r.accion}`)}</span>
                     </td>
-                    <td>
+                    <td data-label={t("auditoria.col_cambios")}>
                       <ResumenCambios cambios={r.cambios} moneda={r.moneda} alta={r.accion === "alta"} />
                       {r.cambios.length > 0 && (
                         <DetalleCambios cambios={r.cambios} moneda={r.moneda} antes={r.antes} despues={r.despues} alta={r.accion === "alta"} />

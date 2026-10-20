@@ -133,7 +133,7 @@ export default async function ResumenDeposito({ params, searchParams }: { params
               <p className="muted">{t("resumen.sin_pendientes")}</p>
             ) : (
               <div className="tabla-envoltorio">
-                <table className="tabla tabla-compacta">
+                <table className="tabla tabla-compacta tabla-responsive">
                   <thead>
                     <tr>
                       <th>{t("resumen.col_bien")}</th>
@@ -146,14 +146,14 @@ export default async function ResumenDeposito({ params, searchParams }: { params
                   <tbody>
                     {resumen.pendientes.map((o) => (
                       <tr key={o.id}>
-                        <td>{o.bien}</td>
-                        <td>
+                        <td data-label={t("resumen.col_bien")}>{o.bien}</td>
+                        <td data-label={t("resumen.col_concepto")}>
                           {o.concepto}
                           {o.porcentaje < 100 && <span className="linea muted">{t("resumen.su_parte", { porcentaje: String(o.porcentaje).replace(".", ",") })}</span>}
                         </td>
-                        <td className="nowrap">{periodoCorto(o.periodo)}</td>
-                        <td className="nowrap">{fechaCorta(o.vencimiento as string)}</td>
-                        <td className="num">{total(o.monto as number)}</td>
+                        <td className="nowrap" data-label={t("resumen.col_periodo")}>{periodoCorto(o.periodo)}</td>
+                        <td className="nowrap" data-label={t("resumen.col_vencimiento")}>{fechaCorta(o.vencimiento as string)}</td>
+                        <td className="num" data-label={t("resumen.col_monto")}>{total(o.monto as number)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -173,7 +173,7 @@ export default async function ResumenDeposito({ params, searchParams }: { params
             <section className="panel">
               <h2>{t("resumen.futuras")}</h2>
               <div className="tabla-envoltorio">
-                <table className="tabla tabla-compacta">
+                <table className="tabla tabla-compacta tabla-responsive">
                   <thead>
                     <tr>
                       <th>{t("resumen.col_bien")}</th>
@@ -186,14 +186,14 @@ export default async function ResumenDeposito({ params, searchParams }: { params
                   <tbody>
                     {resumen.futuras.map((o) => (
                       <tr key={o.id}>
-                        <td>{o.bien}</td>
-                        <td>
+                        <td data-label={t("resumen.col_bien")}>{o.bien}</td>
+                        <td data-label={t("resumen.col_concepto")}>
                           {o.concepto}
                           {o.porcentaje < 100 && <span className="linea muted">{t("resumen.su_parte", { porcentaje: String(o.porcentaje).replace(".", ",") })}</span>}
                         </td>
-                        <td className="nowrap">{periodoCorto(o.periodo)}</td>
-                        <td className="nowrap">{fechaCorta(o.vencimiento as string)}</td>
-                        <td className="num">{total(o.monto as number)}</td>
+                        <td className="nowrap" data-label={t("resumen.col_periodo")}>{periodoCorto(o.periodo)}</td>
+                        <td className="nowrap" data-label={t("resumen.col_vencimiento")}>{fechaCorta(o.vencimiento as string)}</td>
+                        <td className="num" data-label={t("resumen.col_monto")}>{total(o.monto as number)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -298,7 +298,7 @@ export default async function ResumenDeposito({ params, searchParams }: { params
           <p className="muted">{t("resumen.sin_historial")}</p>
         ) : (
           <div className="tabla-envoltorio">
-            <table className="tabla tabla-compacta">
+            <table className="tabla tabla-compacta tabla-responsive">
               <thead>
                 <tr>
                   <th>{t("resumen.col_numero")}</th>
@@ -311,10 +311,10 @@ export default async function ResumenDeposito({ params, searchParams }: { params
               <tbody>
                 {historial.map((h) => (
                   <tr key={h.id}>
-                    <td className="nowrap"><strong>{h.numero}</strong></td>
-                    <td className="nowrap">{fechaCorta(h.fecha)}</td>
-                    <td className="nowrap">{fechaCorta(h.fechaLimite)}</td>
-                    <td className="num">{h.montos.map((m) => formatearImporte(m.aDepositar, m.moneda)).join(" · ")}</td>
+                    <td className="nowrap" data-label={t("resumen.col_numero")}><strong>{h.numero}</strong></td>
+                    <td className="nowrap" data-label={t("resumen.col_fecha")}>{fechaCorta(h.fecha)}</td>
+                    <td className="nowrap" data-label={t("resumen.col_horizonte")}>{fechaCorta(h.fechaLimite)}</td>
+                    <td className="num" data-label={t("resumen.col_a_depositar")}>{h.montos.map((m) => formatearImporte(m.aDepositar, m.moneda)).join(" · ")}</td>
                     <td>
                       {h.tienePdf ? (
                         <a className="boton-texto" href={`/propietarios/${id}/resumen-deposito/pdf/${h.id}`}>{t("resumen.descargar")}</a>

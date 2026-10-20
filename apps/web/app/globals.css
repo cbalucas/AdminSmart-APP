@@ -502,3 +502,96 @@ a { color: var(--accent); }
 .datos-crudos { margin: 8px 0 0; padding: 10px 12px; max-height: 260px; overflow: auto; font-size: 0.78rem; background: var(--surface2); border-radius: 8px; white-space: pre-wrap; word-break: break-word; }
 .paginacion { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; }
 .resumen-lista-pie { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+/* ------------------------------------------------------------------ pasada de diseño */
+/* Contraste de los botones y píldoras activas en ambos modos. */
+.pildora.activa { color: var(--onAccent); }
+.pildora.activa .contador { background: rgba(127, 127, 127, 0.28); color: var(--onAccent); }
+.boton-peligro { color: var(--onAccent); }
+
+/* Foco visible en todo lo que se puede accionar con el teclado. */
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Ícono redondo del tipo de bien. */
+.icono-bien { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--line); color: var(--accent); flex: none; }
+.celda-bien-icono { display: flex; align-items: center; gap: 10px; }
+.celda-bien-icono > div, .celda-bien-icono > span:last-child { min-width: 0; }
+
+/* Aviso con ícono y enlace a la derecha. */
+.aviso-con-icono { flex-direction: row; align-items: center; gap: 10px; }
+.aviso-con-icono .aviso-enlace { margin-left: auto; font-weight: 600; white-space: nowrap; }
+
+/* Pestañas de estado con el resumen a la derecha, y filtros en una sola fila. */
+.fila-pildoras { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.fila-pildoras .resumen-lista-pie { white-space: nowrap; }
+.filtros-en-fila { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; align-items: end; }
+.filtros-boton { display: flex; align-items: center; gap: 10px; }
+.filtros-cuenta { grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); }
+
+/* Ventana de fin de mes: ícono del encabezado y de cada fila. */
+.ventana-cabecera { display: flex; gap: 14px; align-items: flex-start; }
+.ventana-icono { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: var(--warnBg); color: var(--warn); flex: none; }
+.ventana-dato-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+/* Adjuntos: zona punteada, miniaturas. */
+.boton-adjuntar { display: inline-flex; align-items: center; gap: 10px; justify-content: center; padding: 14px 18px; font: inherit; color: var(--text); background: transparent; border: 1.5px dashed var(--inputLine); border-radius: 12px; cursor: pointer; width: 100%; }
+.boton-adjuntar:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.boton-adjuntar:disabled { opacity: 0.6; cursor: default; }
+.miniatura { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 8px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); color: var(--muted); flex: none; }
+.miniatura img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Logo de la administración: botones alineados a la izquierda. */
+.logo-acciones .acciones-fila { justify-content: flex-start; }
+
+/* Listas de resumen: los renglones largos se acomodan sin romperse. */
+.resumen-lista li { flex-wrap: wrap; align-items: baseline; }
+.resumen-calculo div { gap: 4px 16px; flex-wrap: wrap; }
+.resumen-calculo dd { margin-left: auto; white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .filtros-en-fila, .filtros-cuenta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filtros-boton { grid-column: 1 / -1; justify-content: flex-end; }
+}
+
+/* Celular: tablas como tarjetas, botones y campos cómodos para el dedo. */
+@media (max-width: 700px) {
+  .tabla-responsive { display: block; }
+  .tabla-responsive thead { display: none; }
+  .tabla-responsive tbody { display: flex; flex-direction: column; gap: 10px; }
+  .tabla-responsive tr { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  .tabla-responsive tbody tr:hover { background: var(--surface); }
+  .tabla-responsive td { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 0; border: none; text-align: right; }
+  .tabla-responsive td[data-label]::before { content: attr(data-label); color: var(--muted); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; text-align: left; flex: none; }
+  .tabla-responsive td:first-child { justify-content: flex-start; text-align: left; font-size: 1.02rem; }
+  .tabla-responsive td:first-child[data-label]::before { display: none; }
+  .tabla-responsive td .linea { text-align: right; }
+  .tabla-responsive td:first-child .linea { text-align: left; }
+  .tabla-responsive td .acciones-fila { justify-content: flex-end; }
+  .tabla-responsive .fila-saldo-anterior td { justify-content: space-between; }
+  .acciones { flex-direction: column-reverse; align-items: stretch; }
+  .acciones .boton, .acciones button.boton { width: 100%; justify-content: center; text-align: center; }
+  .encabezado .acciones { flex-direction: row; flex-wrap: wrap; }
+  .encabezado .acciones .boton { width: auto; flex: 1 1 140px; }
+  .boton, .boton-texto, select, input[type="text"], input[type="date"], input[type="month"], input[type="number"], input[type="search"] { min-height: 44px; }
+  .boton-texto { display: inline-flex; align-items: center; }
+  .indicador { padding: 14px 16px; }
+  .resumen-importe .cifra { font-size: 2.1rem; }
+}
+
+/* Escritorio: las líneas secundarias de las tablas no se parten en muchos renglones. */
+@media (min-width: 701px) {
+  .tabla-responsive td:not(:last-child) .linea { display: block; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tabla-responsive td .celda-bien-icono strong { white-space: nowrap; }
+}
+@media (min-width: 701px) {
+  .tabla-responsive th, .tabla-responsive td { padding-left: 8px; padding-right: 8px; }
+}
+@media (min-width: 701px) {
+  .tabla-responsive td:last-child { white-space: nowrap; }
+}
+@media (min-width: 701px) and (max-width: 1400px) {
+  .tabla-responsive { font-size: 0.88rem; }
+  .tabla-responsive .icono-bien { width: 28px; height: 28px; }
+  .tabla-responsive .celda-bien-icono { gap: 8px; }
+  .tabla-responsive td:not(:last-child) .linea { max-width: 110px; }
+}

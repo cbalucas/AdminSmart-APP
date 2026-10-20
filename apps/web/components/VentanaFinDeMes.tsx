@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { t } from "@ai/i18n";
 import { formatearImporte } from "@ai/domain";
+import { Icono } from "@/components/Iconos";
+import { IconoBien } from "@/components/IconoBien";
 import { completarGastos, dejarDeRepetir } from "@/app/(gestion)/obligaciones/ventana";
 import type { ItemVentana } from "@/lib/ventana";
 
@@ -90,8 +92,11 @@ export function VentanaFinDeMes({ items, mes }: { items: ItemVentana[]; mes: str
     <div className="ventana-fondo" role="presentation">
       <div className="ventana" role="dialog" aria-modal="true" aria-labelledby="ventana-titulo">
         <header className="ventana-cabecera">
-          <h2 id="ventana-titulo">{t("ventana.titulo", { mes })}</h2>
-          <p className="muted">{t("ventana.ayuda")}</p>
+          <span className="ventana-icono" aria-hidden="true"><Icono nombre="recurrente" tamano={22} /></span>
+          <div>
+            <h2 id="ventana-titulo">{t("ventana.titulo", { mes })}</h2>
+            <p className="muted">{t("ventana.ayuda")}</p>
+          </div>
         </header>
         <div className="ventana-progreso">
           <div className="progreso-barra">
@@ -106,12 +111,15 @@ export function VentanaFinDeMes({ items, mes }: { items: ItemVentana[]; mes: str
               <h3 className="ventana-grupo">{g.titulo}</h3>
               {g.items.map((i) => (
                 <div key={i.id} className="ventana-fila">
-                  <div className="ventana-dato">
+                  <div className="ventana-dato celda-bien-icono">
+                    <IconoBien tipo={i.tipoBien} />
+                    <div className="ventana-dato-texto">
                     <strong>{i.concepto}</strong>
                     <span className="muted">
                       {t("ventana.periodo", { periodo: i.periodo.slice(0, 7).split("-").reverse().join("/") })}
                       {i.anterior !== null && ` · ${t("ventana.anterior", { monto: formatearImporte(i.anterior, i.moneda) })}`}
                     </span>
+                    </div>
                   </div>
                   <div className="campo">
                     <label htmlFor={`m-${i.id}`}>{t("ventana.monto")} ({i.moneda})</label>

@@ -81,17 +81,17 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
     const alerta = titularidad === "vacia" ? t("bienes.sin_titulares") : titularidad === "excedida" ? t("bienes.titularidad_excedida") : null;
     return (
       <tr key={b.id}>
-        <td>
+        <td data-label={t("bienes.col_bien")}>
           <Link href={`/bienes/${b.id}`} className="celda-bien">
             <strong>{b.esGastosVarios ? `${t("bienes.gastos_varios")} · ${ts[0]?.nombre ?? ""}` : b.alias}</strong>
             {b.dominio && <span className="muted">{b.dominio}</span>}
           </Link>
         </td>
-        <td>
+        <td data-label={t("bienes.col_tipo")}>
           {t(`tipo_bien.${b.tipoBien}`)}
           {b.subtipo && <span className="muted"> · {t(`subtipo.${b.subtipo}`)}</span>}
         </td>
-        <td>
+        <td data-label={t("bienes.col_propietarios")}>
           {ts.length === 0 ? (
             <span className="muted">—</span>
           ) : (
@@ -103,7 +103,7 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
           )}
           {alerta && <span className="estado estado-vencida">{alerta}</span>}
         </td>
-        <td>
+        <td data-label={t("bienes.col_ubicacion")}>
           {u.texto || <span className="muted">—</span>}
           {edificio && <span className="linea muted">{edificio.nombre}{b.unidadFuncional && ` · ${b.unidadFuncional}`}</span>}
           {u.mapa && (
@@ -112,7 +112,7 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
             </span>
           )}
         </td>
-        <td>
+        <td data-label={t("bienes.col_estado")}>
           <span className={["disponible", "activo", "alquilado"].includes(b.estado) ? "estado estado-ok" : "estado estado-neutro"}>
             {t(`estado_bien.${b.estado}`)}
           </span>
@@ -123,7 +123,7 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
 
   const tabla = (bienes: Bien[]) => (
     <div className="tabla-envoltorio">
-      <table className="tabla">
+      <table className="tabla tabla-responsive">
         <thead>
           <tr>
             <th>{t("bienes.col_bien")}</th>

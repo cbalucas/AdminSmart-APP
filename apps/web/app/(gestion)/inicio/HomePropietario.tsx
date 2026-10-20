@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { IconoBien } from "@/components/IconoBien";
 import { datosHomePropietario } from "@/lib/home-propietario";
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
@@ -73,7 +74,7 @@ export async function HomePropietario({ propietarioId, nombre, fecha }: { propie
             <p className="muted">{t("inicio.mis_obligaciones_vacio")}</p>
           ) : (
             <div className="tabla-envoltorio">
-              <table className="tabla tabla-compacta">
+              <table className="tabla tabla-compacta tabla-responsive">
                 <thead>
                   <tr>
                     <th>{t("resumen.col_bien")}</th>
@@ -85,17 +86,17 @@ export async function HomePropietario({ propietarioId, nombre, fecha }: { propie
                 <tbody>
                   {filas.map(({ o, adelante }) => (
                     <tr key={o.id}>
-                      <td>{o.bien}</td>
-                      <td>
+                      <td data-label={t("resumen.col_bien")}>{o.bien}</td>
+                      <td data-label={t("resumen.col_concepto")}>
                         {o.concepto} <span className="muted">{periodoCorto(o.periodo)}</span>
                         {o.porcentaje < 100 && <span className="linea muted">{t("resumen.su_parte", { porcentaje: porcentajeTexto(o.porcentaje) })}</span>}
                       </td>
-                      <td className="nowrap">
+                      <td className="nowrap" data-label={t("resumen.col_vencimiento")}>
                         {fechaCorta(o.vencimiento as string)}
                         {(o.vencimiento as string) < r.hoy && <span className="estado estado-vencida">{t("obligaciones.estado_vencida")}</span>}
                         {adelante && <span className="linea muted">{t("inicio.mas_adelante")}</span>}
                       </td>
-                      <td className="num">{fm(o.monto as number, o.moneda)}</td>
+                      <td className="num" data-label={t("resumen.col_monto")}>{fm(o.monto as number, o.moneda)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -138,9 +139,12 @@ export async function HomePropietario({ propietarioId, nombre, fecha }: { propie
             <ul className="resumen-lista">
               {bienes.map((b) => (
                 <li key={b.id}>
-                  <span>
+                  <span className="celda-bien-icono">
+                    <IconoBien tipo={b.tipoBien} />
+                    <span>
                     <strong>{b.esGastosVarios ? t("bienes.gastos_varios") : b.alias}</strong>{" "}
                     <span className="muted">· {t(`tipo_bien.${b.tipoBien}`)}{b.porcentaje < 100 ? ` · ${porcentajeTexto(b.porcentaje)} %` : ""}</span>
+                    </span>
                   </span>
                   <span className="estado estado-neutro">{t(`estado_bien.${b.estado}`)}</span>
                 </li>
