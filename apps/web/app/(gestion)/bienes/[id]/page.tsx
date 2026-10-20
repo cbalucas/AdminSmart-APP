@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, type TipoBien } from "@ai/domain";
 import { BotonVolver } from "@/components/BotonVolver";
 import { CambiarEstadoBien } from "@/components/CambiarEstadoBien";
@@ -90,10 +91,10 @@ export default async function FichaBien({
         {!bien.esGastosVarios && <CambiarEstadoBien bienId={bien.id} tipo={bien.tipoBien as TipoBien} estado={bien.estado} />}
         <div className="acciones-rapidas">
           {mapa && (
-            <a href={mapa} target="_blank" rel="noreferrer" className="boton boton-secundario">{t("bienes.ver_mapa")}</a>
+            <AccionIcono href={mapa} externo icono="ubicacion" titulo={t("bienes.ver_mapa")} />
           )}
           {!bien.esGastosVarios && (
-            <Link href={`/bienes/${bien.id}/editar`} className="boton boton-secundario">{t("app.editar")}</Link>
+            <AccionIcono href={`/bienes/${bien.id}/editar`} icono="editar" titulo={t("app.editar")} />
           )}
         </div>
       </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BuscadorEnVivo } from "@/components/BuscadorEnVivo";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { formatearImporte, normalizarNombre, type Moneda } from "@ai/domain";
 import { Avatar } from "@/components/Avatar";
 import { enlacesDeAvatares } from "@/lib/avatares";
@@ -56,7 +57,7 @@ export default async function Propietarios({
     <>
       <div className="encabezado">
         <h1>{t("propietarios.titulo")}</h1>
-        <Link href="/propietarios/nuevo" className="boton">{t("propietarios.nuevo")}</Link>
+        <AccionIcono href="/propietarios/nuevo" icono="mas" titulo={t("propietarios.nuevo")} tono="primario" />
       </div>
 
       <section className="panel">

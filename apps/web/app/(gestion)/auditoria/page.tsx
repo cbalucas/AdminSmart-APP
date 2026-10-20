@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { DetalleCambios, ResumenCambios } from "@/components/ResumenCambios";
 import { ACCIONES_AUDITORIA, consultarAuditoria, TABLAS_AUDITADAS, usuariosParaFiltro, type FiltrosAuditoria } from "@/lib/auditoria";
 import { esGestion } from "@/lib/menu";
@@ -41,7 +42,7 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
           <p className="muted">{t("auditoria.subtitulo")}</p>
           <h1>{t("auditoria.titulo")}</h1>
         </div>
-        <a href={`/auditoria/exportar?${paramsExport.toString()}`} className="boton boton-secundario">{t("auditoria.exportar")}</a>
+        <AccionIcono href={`/auditoria/exportar?${paramsExport.toString()}`} icono="descargar" titulo={t("auditoria.exportar")} />
       </div>
 
       <section className="panel">

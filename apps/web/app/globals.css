@@ -813,3 +813,36 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .indicador { grid-template-columns: 36px minmax(0, 1fr) 36px; padding-left: 14px; padding-right: 14px; }
 .indicador-icono { width: 36px; height: 36px; border-radius: 11px; }
 .indicador .cifra { font-size: inherit; }
+
+/* ------------------------------------------------------------------ acciones solo ícono con descripción al pasar el mouse */
+.accion-icono { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; flex: none; padding: 0; text-decoration: none; cursor: pointer; border-radius: 12px; border: 1px solid var(--inputLine); transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, transform 0.12s ease; }
+.accion-icono:hover:not(:disabled) { transform: translateY(-1px); }
+.accion-icono:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.accion-icono:disabled { opacity: 0.5; cursor: default; }
+.accion-icono-secundario { color: var(--text); background: var(--surface); }
+.accion-icono-secundario:hover:not(:disabled) { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+.accion-icono-primario { color: var(--onAccent); background: var(--accent); border-color: var(--accent); }
+.accion-icono-primario:hover:not(:disabled) { filter: brightness(1.1); }
+.accion-icono-peligro { color: var(--danger); background: var(--surface); }
+.accion-icono-peligro:hover:not(:disabled) { background: var(--dangerBg); border-color: var(--danger); }
+.tabla .accion-icono, .acciones-fila .accion-icono, .acciones-cuenta .accion-icono { width: 34px; height: 34px; border-radius: 10px; }
+.acciones-fila { flex-wrap: wrap; justify-content: flex-end; }
+
+/* Globo de descripción */
+[data-tip] { position: relative; }
+[data-tip]::after { content: attr(data-tip); position: absolute; z-index: 40; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); padding: 6px 10px; width: max-content; max-width: 260px; font-size: 0.8rem; font-weight: 500; line-height: 1.3; text-align: center; color: #FFFFFF; background: #18212B; border-radius: 8px; box-shadow: 0 6px 18px rgba(10, 16, 24, 0.3); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.12s ease; }
+:root[data-tema="oscuro"] [data-tip]::after { color: #E8ECEF; background: #2C3846; }
+[data-tip]:hover::after, [data-tip]:focus-visible::after { opacity: 1; visibility: visible; }
+/* Lo que queda pegado al borde derecho abre el globo hacia la izquierda */
+.encabezado > :last-child > [data-tip]:last-child::after, .acciones-rapidas > [data-tip]:last-child::after, .acciones > [data-tip]:last-child::after, .acciones-fila > [data-tip]:last-child::after { left: auto; right: 0; transform: none; }
+
+/* Cuentas bancarias del propietario como tarjetas */
+.tarjetas-cuentas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.tarjeta-cuenta { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 16px 16px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(20, 30, 40, 0.04); }
+.tarjeta-cuenta-inactiva { opacity: 0.75; background: var(--surface2); }
+.tarjeta-cuenta p { margin: 0; }
+.tarjeta-cuenta .insignias { justify-content: center; }
+.tarjeta-cuenta .acciones-cuenta { margin-top: 6px; padding-top: 12px; width: 100%; justify-content: center; border-top: 1px solid var(--lineSoft); }
+.tarjeta-cuenta .acciones-cuenta .error-campo { width: 100%; justify-content: center; }
+/* Dentro de las tablas el globo se abre hacia la izquierda, para no agrandar el área desplazable */
+.tabla [data-tip]::after { top: 50%; left: auto; right: calc(100% + 8px); transform: translateY(-50%); }

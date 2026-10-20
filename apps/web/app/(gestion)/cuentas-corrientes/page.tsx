@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { bienesDelPropietario, libroDelPropietario, propietariosParaCuenta, tieneCuentaEnDolares } from "@/lib/cuentas-corrientes";
 import { BotonVolver } from "@/components/BotonVolver";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
@@ -68,11 +69,11 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
           <h1>{t("cuentas.titulo")}</h1>
         </div>
         <div className="acciones">
-          <a href={`/cuentas-corrientes/exportar?propietario=${propietario.id}&moneda=${moneda}${f.bien ? `&bien=${f.bien}` : ""}${f.desde ? `&desde=${f.desde}` : ""}${f.hasta ? `&hasta=${f.hasta}` : ""}`} className="boton boton-secundario">{t("cuentas.exportar")}</a>
+          <AccionIcono href={`/cuentas-corrientes/exportar?propietario=${propietario.id}&moneda=${moneda}${f.bien ? `&bien=${f.bien}` : ""}${f.desde ? `&desde=${f.desde}` : ""}${f.hasta ? `&hasta=${f.hasta}` : ""}`} icono="descargar" titulo={t("cuentas.exportar")} />
           {esAdmin && (
             <>
-              <Link href={alta("traspaso")} className="boton boton-secundario">{t("cuentas.traspaso")}</Link>
-              <Link href={alta("movimiento")} className="boton">{t("cuentas.nuevo_movimiento")}</Link>
+              <AccionIcono href={alta("traspaso")} icono="traspaso" titulo={t("cuentas.traspaso")} />
+              <AccionIcono href={alta("movimiento")} icono="mas" titulo={t("cuentas.nuevo_movimiento")} tono="primario" />
             </>
           )}
         </div>      </div>
@@ -165,15 +166,11 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
                       <div className="acciones-fila">
                         {((comprobantes.get(m.id) ?? []) as DocumentoFila[]).map((d, i) =>
                           d.url ? (
-                            <a key={d.id} className="boton-texto" href={d.url} target="_blank" rel="noreferrer">
-                              {i === 0 ? t("cuentas.comprobante") : t("cuentas.comprobante_n", { n: i + 1 })}
-                            </a>
+                            <AccionIcono key={d.id} href={d.url} externo icono="documento" titulo={i === 0 ? t("cuentas.comprobante") : t("cuentas.comprobante_n", { n: i + 1 })} />
                           ) : null,
                         )}
                         {esAdmin && m.anulable && (
-                          <Link className="boton-texto" href={`/cuentas-corrientes/${m.id}/anular?propietario=${propietario.id}&moneda=${moneda}`}>
-                            {t("cuentas.anular")}
-                          </Link>
+                          <AccionIcono href={`/cuentas-corrientes/${m.id}/anular?propietario=${propietario.id}&moneda=${moneda}`} icono="anular" titulo={t("cuentas.anular")} tono="peligro" />
                         )}
                       </div>
                     </td>

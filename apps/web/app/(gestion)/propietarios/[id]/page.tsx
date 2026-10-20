@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { calcularPagoPromedio, formatearImporte, type Moneda } from "@ai/domain";
 import { CambiarFoto } from "@/components/CambiarFoto";
 import { BotonEstadoPropietario } from "@/components/BotonEstadoPropietario";
-import { Icono } from "@/components/Iconos";
 import { SeccionCuentas } from "@/components/SeccionCuentas";
 import { TarjetaBien, type FilaDetalle } from "@/components/TarjetaBien";
 import { TarjetaIndicador } from "@/components/TarjetaIndicador";
@@ -110,7 +110,6 @@ export default async function FichaPropietario({
         />
         <div className="ficha-datos">
           <h1>{p.nombre}</h1>
-          <p className="muted">{t(`propietarios.tipo_${p.tipoPersona}`)}</p>
           <p className="insignias">
             <span className="estado estado-neutro">{t("propietarios.informes_es")}</span>
             <span className={activo ? "estado estado-ok" : "estado estado-neutro"}>{t(`propietarios.estado_${p.estado}`)}</span>
@@ -118,14 +117,8 @@ export default async function FichaPropietario({
           </p>
         </div>
         <div className="acciones-rapidas acciones-ficha">
-          <Link href={`/propietarios/${p.id}/editar`} className="boton boton-secundario boton-con-icono">
-            <Icono nombre="editar" tamano={18} />
-            {t("app.editar")}
-          </Link>
-          <Link href={`/propietarios/${p.id}/resumen-deposito`} className="boton boton-secundario boton-con-icono">
-            <Icono nombre="liquidaciones" tamano={18} />
-            {t("propietarios.ver_resumen")}
-          </Link>
+          <AccionIcono href={`/propietarios/${p.id}/editar`} icono="editar" titulo={t("app.editar")} />
+          <AccionIcono href={`/propietarios/${p.id}/resumen-deposito`} icono="liquidaciones" titulo={t("propietarios.ver_resumen")} />
           <BotonEstadoPropietario id={p.id} activo={activo} />
         </div>
       </div>

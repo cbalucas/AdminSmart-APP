@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { t } from "@ai/i18n";
-import { Icono } from "@/components/Iconos";
+import { AccionIcono } from "@/components/AccionIcono";
 import {
   desactivarPropietario,
   reactivarPropietario,
@@ -27,10 +27,7 @@ export function BotonEstadoPropietario({ id, activo }: { id: string; activo: boo
 
   return (
     <div className="estado-propietario">
-      <button type="button" className="boton boton-secundario boton-con-icono" onClick={cambiar} disabled={pendiente}>
-        <Icono nombre={activo ? "desactivar" : "reactivar"} tamano={18} />
-        {activo ? t("propietarios.desactivar") : t("propietarios.reactivar")}
-      </button>
+      <AccionIcono icono={activo ? "desactivar" : "reactivar"} titulo={activo ? t("propietarios.desactivar") : t("propietarios.reactivar")} onClick={cambiar} disabled={pendiente} tono={activo ? "secundario" : "primario"} />
       {resultado.impedimentos && (
         <div className="aviso-advertencia" role="alert">
           <p>{t("propietarios.no_se_puede_desactivar")}</p>

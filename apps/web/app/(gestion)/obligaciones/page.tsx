@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIEN, type EstadoObligacion } from "@ai/domain";
 import { listarBienes, titularesDe } from "@/lib/bienes";
 import { generarOcurrenciasSiHaceFalta, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
@@ -125,26 +126,24 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
             <div className="acciones-fila">
               {(boletas.get(o.id) as DocumentoFila[]).map((b, i) =>
                 b.url ? (
-                  <a key={b.id} className="boton-texto" href={b.url} target="_blank" rel="noreferrer">
-                    {i === 0 ? t("obligaciones.ver_boleta") : t("obligaciones.ver_boleta_n", { n: i + 1 })}
-                  </a>
+                  <AccionIcono key={b.id} href={b.url} externo icono="documento" titulo={i === 0 ? t("obligaciones.ver_boleta") : t("obligaciones.ver_boleta_n", { n: i + 1 })} />
                 ) : null,
               )}
             </div>
           )}
           {o.estado !== "pagada" && o.estado !== "anulada" && (
             <div className="acciones-fila">
-              <Link className="boton-texto" href={`/obligaciones/${o.id}/pagar`}>{t("pagos.registrar")}</Link>
+              <AccionIcono href={`/obligaciones/${o.id}/pagar`} icono="dinero" titulo={t("pagos.registrar")} />
             </div>
           )}
           {o.estado === "pagada" && esAdmin && (
             <div className="acciones-fila">
-              <Link className="boton-texto" href={`/obligaciones/${o.id}/anular-pago`}>{t("pagos.anular_pago")}</Link>
+              <AccionIcono href={`/obligaciones/${o.id}/anular-pago`} icono="anular" titulo={t("pagos.anular_pago")} tono="peligro" />
             </div>
           )}
           {puedeModificarObligacion({ pagada: o.estado === "pagada", anulada: o.estado === "anulada" }) && (
             <div className="acciones-fila">
-              <Link className="boton-texto" href={`/obligaciones/${o.id}/editar`}>{t("app.editar")}</Link>
+              <AccionIcono href={`/obligaciones/${o.id}/editar`} icono="editar" titulo={t("app.editar")} />
             </div>
           )}
         </td>
@@ -160,9 +159,9 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           <h1>{t("obligaciones.titulo")}</h1>
         </div>
         <div className="acciones">
-          <a href={`/obligaciones/exportar?${paramsExport.toString()}`} className="boton boton-secundario">{t("obligaciones.exportar")}</a>
-          <Link href="/obligaciones/pago-directo" className="boton boton-secundario">{t("pagos.registrar_directo")}</Link>
-          <Link href="/obligaciones/nueva" className="boton">{t("obligaciones.nueva")}</Link>
+          <AccionIcono href={`/obligaciones/exportar?${paramsExport.toString()}`} icono="descargar" titulo={t("obligaciones.exportar")} />
+          <AccionIcono href="/obligaciones/pago-directo" icono="dinero" titulo={t("pagos.registrar_directo")} />
+          <AccionIcono href="/obligaciones/nueva" icono="mas" titulo={t("obligaciones.nueva")} tono="primario" />
         </div>
       </div>
 

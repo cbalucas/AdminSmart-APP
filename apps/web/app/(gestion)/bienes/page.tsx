@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BuscadorEnVivo } from "@/components/BuscadorEnVivo";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, normalizarNombre, TIPOS_BIEN } from "@ai/domain";
 import { formatearPorcentaje, listarBienes, listarEdificios, titularesDe, type Bien, type Edificio, type Titular } from "@/lib/bienes";
 import { esGestion } from "@/lib/menu";
@@ -154,7 +155,7 @@ export default async function Bienes({ searchParams }: { searchParams: Promise<F
     <>
       <div className="encabezado">
         <h1>{t("bienes.titulo")}</h1>
-        <Link href="/bienes/nuevo" className="boton">{t("bienes.nuevo")}</Link>
+        <AccionIcono href="/bienes/nuevo" icono="mas" titulo={t("bienes.nuevo")} tono="primario" />
       </div>
 
       <section className="panel">

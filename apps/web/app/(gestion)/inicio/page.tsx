@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { Icono } from "@/components/Iconos";
+import { AccionIcono } from "@/components/AccionIcono";
 import { datosHomeGestion, type Total } from "@/lib/home-gestion";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -96,11 +97,9 @@ export default async function Inicio() {
           <h1>{t("inicio.titulo")}</h1>
         </div>
         <div className="acciones-rapidas">
-          <Link href="/obligaciones/pago-directo" className="boton">{t("inicio.registrar_pago")}</Link>
-          <Link href="/obligaciones/nueva" className="boton boton-secundario">{t("inicio.nueva_obligacion")}</Link>
-          <button type="button" className="boton boton-secundario" disabled title={t("inicio.llega_con_alquileres")}>
-            {t("inicio.registrar_cobro")}
-          </button>
+          <AccionIcono href="/obligaciones/pago-directo" icono="dinero" titulo={t("inicio.registrar_pago")} tono="primario" />
+          <AccionIcono href="/obligaciones/nueva" icono="mas" titulo={t("inicio.nueva_obligacion")} />
+          <AccionIcono icono="cuentas" titulo={`${t("inicio.registrar_cobro")} · ${t("inicio.llega_con_alquileres")}`} disabled />
         </div>
       </div>
 

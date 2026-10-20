@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import { formatearImporte } from "@ai/domain";
 import { cambiarEstadoServicio } from "@/app/(gestion)/bienes/[id]/servicios/acciones";
 import type { Servicio } from "@/lib/servicios";
@@ -26,7 +26,7 @@ export function SeccionServicios({ bienId, servicios }: { bienId: string; servic
     <section className="panel">
       <div className="encabezado">
         <h2>{t("servicios.titulo")}</h2>
-        <Link href={`/bienes/${bienId}/servicios/nuevo`} className="boton boton-secundario">{t("servicios.agregar")}</Link>
+        <AccionIcono href={`/bienes/${bienId}/servicios/nuevo`} icono="mas" titulo={t("servicios.agregar")} tono="primario" />
       </div>
 
       {servicios.length === 0 ? (
@@ -74,10 +74,8 @@ export function SeccionServicios({ bienId, servicios }: { bienId: string; servic
                   <td>{t(`servicios.responsable_${s.responsableDefault}`)}</td>
                   <td>
                     <div className="acciones-fila">
-                      <Link className="boton-texto" href={`/bienes/${bienId}/servicios/${s.id}/editar`}>{t("app.editar")}</Link>
-                      <button type="button" className="boton-texto" disabled={pendiente} onClick={() => cambiar(s)}>
-                        {s.estado === "activo" ? t("servicios.desactivar") : t("servicios.activar")}
-                      </button>
+                      <AccionIcono href={`/bienes/${bienId}/servicios/${s.id}/editar`} icono="editar" titulo={t("app.editar")} />
+                      <AccionIcono icono={s.estado === "activo" ? "desactivar" : "activar"} titulo={s.estado === "activo" ? t("servicios.desactivar") : t("servicios.activar")} disabled={pendiente} onClick={() => cambiar(s)} />
                     </div>
                   </td>
                 </tr>

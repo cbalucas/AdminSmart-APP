@@ -30,7 +30,7 @@ export function CampoIcono({ icono, children }: { icono: string; children: React
 /** Botón chico que muestra solo un ícono; el nombre sale al pasar el mouse y lo leen los lectores de pantalla. */
 export function BotonIcono({ icono, titulo, onClick, tono = "neutro", disabled }: { icono: string; titulo: string; onClick?: () => void; tono?: "neutro" | "peligro" | "acento"; disabled?: boolean }) {
   return (
-    <button type="button" className={`boton-accion boton-accion-${tono}`} onClick={onClick} aria-label={titulo} title={titulo} disabled={disabled}>
+    <button type="button" className={`boton-accion boton-accion-${tono}`} onClick={onClick} aria-label={titulo} data-tip={titulo} disabled={disabled}>
       <Icono nombre={icono} tamano={18} />
     </button>
   );

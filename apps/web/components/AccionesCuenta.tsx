@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { t } from "@ai/i18n";
+import { AccionIcono } from "@/components/AccionIcono";
 import {
   cambiarEstadoCuenta,
   desvincularCuenta,
@@ -31,25 +31,23 @@ export function AccionesCuenta({ propietarioId, cuenta }: { propietarioId: strin
 
   return (
     <div className="acciones-cuenta">
-      <Link className="boton-texto" href={`/propietarios/${propietarioId}/cuentas/${cuenta.cuentaId}/editar`}>
-        {t("app.editar")}
-      </Link>
+      <AccionIcono href={`/propietarios/${propietarioId}/cuentas/${cuenta.cuentaId}/editar`} icono="editar" titulo={t("app.editar")} />
       {activa && !cuenta.predeterminada && (
-        <button type="button" className="boton-texto" disabled={pendiente} onClick={() => ejecutar(() => marcarPredeterminada(propietarioId, cuenta.vinculoId))}>
-          {t("cuentas.marcar_predeterminada")}
-        </button>
+        <AccionIcono icono="estrella" titulo={t("cuentas.marcar_predeterminada")} disabled={pendiente} onClick={() => ejecutar(() => marcarPredeterminada(propietarioId, cuenta.vinculoId))} />
       )}
-      <button type="button" className="boton-texto" disabled={pendiente} onClick={() => ejecutar(() => cambiarEstadoCuenta(propietarioId, cuenta.cuentaId, !activa))}>
-        {activa ? t("cuentas.desactivar") : t("cuentas.activar")}
-      </button>
-      <button
-        type="button"
-        className="boton-texto"
+      <AccionIcono
+        icono={activa ? "desactivar" : "activar"}
+        titulo={activa ? t("cuentas.desactivar") : t("cuentas.activar")}
+        disabled={pendiente}
+        onClick={() => ejecutar(() => cambiarEstadoCuenta(propietarioId, cuenta.cuentaId, !activa))}
+      />
+      <AccionIcono
+        icono="desvincular"
+        titulo={t("cuentas.desvincular")}
+        tono="peligro"
         disabled={pendiente}
         onClick={() => ejecutar(() => desvincularCuenta(propietarioId, cuenta.vinculoId), t("cuentas.desvincular_confirmar"))}
-      >
-        {t("cuentas.desvincular")}
-      </button>
+      />
       {error && <span className="error-campo" role="alert">{t(error)}</span>}
     </div>
   );
