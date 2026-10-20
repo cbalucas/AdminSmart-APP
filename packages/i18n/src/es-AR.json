@@ -93,6 +93,8 @@
   "app.seccion_proximamente": "Esta sección todavía está en construcción.",
   "menu.etiqueta": "Menú principal",
   "inicio.ver_observacion": "Ver la observación",
+  "menu.subir": "Subir en el menú",
+  "menu.bajar": "Bajar en el menú",
   "menu.contraer": "Contraer el menú",
   "menu.expandir": "Desplegar el menú",
   "menu.inicio": "Inicio",
