@@ -672,3 +672,34 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   .menu-flecha { display: none; }
   .menu-zona .menu-items { flex: 1; }
 }
+
+/* ------------------------------------------------------------------ ingreso moderno */
+.ingreso-pagina { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.ingreso-marca { display: flex; align-items: center; justify-content: center; padding: 48px; color: #E8ECEF; background: radial-gradient(circle at 20% 15%, #2C3846 0%, var(--sidebar) 55%, #0D1116 100%); }
+.ingreso-marca-cuerpo { max-width: 440px; display: flex; flex-direction: column; gap: 18px; }
+.ingreso-marca h1 { font-size: 2.6rem; color: #FFFFFF; }
+.ingreso-lema { margin: 0; font-size: 1.15rem; line-height: 1.5; color: #C9D2DB; }
+.ingreso-puntos { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.ingreso-puntos li { display: flex; align-items: center; gap: 12px; color: #E8ECEF; }
+.ingreso-puntos svg { flex: none; width: 30px; height: 30px; padding: 6px; border-radius: 50%; color: #7DD3B2; background: rgba(125, 211, 178, 0.14); }
+.ingreso-panel { display: flex; align-items: center; justify-content: center; padding: 32px 20px; }
+.formulario-ingreso { max-width: 420px; gap: 16px; padding: 34px 32px; border-radius: 20px; box-shadow: 0 12px 40px rgba(20, 30, 40, 0.1); }
+.ingreso-encabezado { display: flex; flex-direction: column; gap: 4px; text-align: center; }
+.ingreso-encabezado h2 { font-size: 1.7rem; }
+.formulario-ingreso .campo input[type="text"], .formulario-ingreso .campo input[type="password"] { padding: 12px 14px; border-radius: 10px; }
+.formulario-ingreso .boton { padding: 13px 16px; border-radius: 10px; }
+.boton-google { gap: 12px; color: var(--text); background: var(--surface); border-color: var(--inputLine); font-weight: 500; }
+.boton-google:hover { background: var(--surface2); }
+:root[data-tema="oscuro"] .boton-google { background: #FFFFFF; color: #1F2933; }
+:root[data-tema="oscuro"] .boton-google:hover { background: #F1F3F5; }
+@media (max-width: 860px) {
+  .ingreso-pagina { grid-template-columns: minmax(0, 1fr); }
+  .ingreso-marca { padding: 28px 20px 24px; }
+  .ingreso-marca-cuerpo { align-items: center; text-align: center; gap: 8px; }
+  .ingreso-marca h1 { font-size: 1.8rem; }
+  .ingreso-marca img { width: 52px; height: 52px; }
+  .ingreso-lema { font-size: 0.95rem; }
+  .ingreso-puntos { display: none; }
+  .ingreso-panel { padding: 20px 16px 32px; }
+  .formulario-ingreso { margin-top: -8px; padding: 26px 20px; }
+}
