@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { IconoBien } from "@/components/IconoBien";
+import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { datosHomePropietario } from "@/lib/home-propietario";
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
@@ -29,14 +30,6 @@ export async function HomePropietario({ propietarioId, nombre, fecha }: { propie
   const filas = r.resumenes.flatMap((x) => [...x.pendientes.map((o) => ({ o, adelante: false })), ...x.futuras.map((o) => ({ o, adelante: true }))]);
   const verResumen = `/propietarios/${propietarioId}/resumen-deposito`;
 
-  const tarjeta = (titulo: string, valor: string, nota: string) => (
-    <article className="indicador">
-      <p className="muted">{titulo}</p>
-      <strong className="cifra">{valor}</strong>
-      <p className="muted">{nota}</p>
-    </article>
-  );
-
   return (
     <>
       <div className="encabezado home-propietario-cabecera">
@@ -53,18 +46,32 @@ export async function HomePropietario({ propietarioId, nombre, fecha }: { propie
       </div>
 
       <section className="indicadores">
-        {tarjeta(
-          t("propietarios.saldo_ars"),
-          fm(ars?.saldoDisponible ?? 0, "ARS"),
-          (ars?.saldoDisponible ?? 0) < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor"),
+        <TarjetaIndicador
+          id="saldo-ars"
+          icono="cuentas"
+          tono="ok"
+          titulo={t("propietarios.saldo_ars")}
+          valor={fm(ars?.saldoDisponible ?? 0, "ARS")}
+          nota={(ars?.saldoDisponible ?? 0) < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor")}
+        />
+        {hayUsd && (
+          <TarjetaIndicador
+            id="saldo-usd"
+            icono="cuentas"
+            tono="acento"
+            titulo={t("propietarios.saldo_usd")}
+            valor={fm(usd?.saldoDisponible ?? 0, "USD")}
+            nota={(usd?.saldoDisponible ?? 0) < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor")}
+          />
         )}
-        {hayUsd &&
-          tarjeta(
-            t("propietarios.saldo_usd"),
-            fm(usd?.saldoDisponible ?? 0, "USD"),
-            (usd?.saldoDisponible ?? 0) < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor"),
-          )}
-        {tarjeta(t("propietarios.a_depositar"), aDepositar || fm(0, "ARS"), t("propietarios.a_depositar_hasta", { fecha: fechaCorta(r.fechaLimite) }))}
+        <TarjetaIndicador
+          id="a-depositar"
+          icono="dinero"
+          tono="aviso"
+          titulo={t("propietarios.a_depositar")}
+          valor={aDepositar || fm(0, "ARS")}
+          nota={t("propietarios.a_depositar_hasta", { fecha: fechaCorta(r.fechaLimite) })}
+        />
       </section>
 
       <div className="paneles">

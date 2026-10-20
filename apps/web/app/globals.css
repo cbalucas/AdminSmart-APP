@@ -764,3 +764,17 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 }
 .titulo-lista { display: flex; align-items: center; gap: 10px; }
 .titulo-lista .boton-accion { width: 30px; height: 30px; border-radius: 8px; }
+
+/* ------------------------------------------------------------------ ficha del propietario */
+.boton-volver { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 10px; font-weight: 500; text-decoration: none; color: var(--text); background: var(--surface); border: 1px solid var(--inputLine); border-radius: 999px; transition: background 0.12s ease, border-color 0.12s ease; }
+.boton-volver:hover { background: var(--surface2); border-color: var(--accent); }
+.boton-volver:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.acciones-ficha { align-items: flex-start; }
+.acciones-ficha .boton { border-radius: 12px; }
+.acciones-ficha .estado-propietario { display: flex; flex-direction: column; gap: 8px; }
+.tarjetas-bienes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.tarjeta-bien .icono-bien { width: 52px; height: 52px; }
+.tarjeta-bien .icono-bien svg { width: 24px; height: 24px; }
+/* La cifra de un indicador nunca se parte en dos renglones: se achica si hace falta. */
+.indicador .cifra { white-space: nowrap; font-size: clamp(1.45rem, 2vw, 2.2rem); min-width: 0; text-align: center; }
+@media (max-width: 700px) { .indicador .cifra { font-size: clamp(1.25rem, 5.4vw, 1.7rem); } .indicador { grid-template-columns: 38px 1fr 38px; } .indicador-icono { width: 38px; height: 38px; } }

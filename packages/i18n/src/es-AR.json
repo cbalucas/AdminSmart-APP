@@ -99,6 +99,7 @@
   "inicio.ver_observacion": "Ver la observación",
   "menu.subir": "Subir en el menú",
   "menu.bajar": "Bajar en el menú",
+  "app.volver_a": "Volver a {nombre}",
   "menu.contraer": "Contraer el menú",
   "menu.expandir": "Desplegar el menú",
   "menu.inicio": "Inicio",

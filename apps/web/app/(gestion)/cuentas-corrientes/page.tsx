@@ -3,9 +3,12 @@ import { notFound } from "next/navigation";
 import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { bienesDelPropietario, libroDelPropietario, propietariosParaCuenta, tieneCuentaEnDolares } from "@/lib/cuentas-corrientes";
+import { BotonVolver } from "@/components/BotonVolver";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
 import { esGestion } from "@/lib/menu";
+import { obtenerPropietario } from "@/lib/propietarios";
 import { usuarioActual } from "@/lib/usuario-actual";
+import { rutaDeVolver } from "@/lib/volver";
 
 interface Filtros {
   propietario?: string;
@@ -13,6 +16,7 @@ interface Filtros {
   bien?: string;
   desde?: string;
   hasta?: string;
+  volver?: string;
 }
 
 const fechaCorta = (f: string) => f.split("-").reverse().join("/");
@@ -41,6 +45,8 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
     tieneCuentaEnDolares(propietario.id),
     libroDelPropietario({ propietarioId: propietario.id, moneda, bienId: f.bien || undefined, desde: f.desde || undefined, hasta: f.hasta || undefined }),
   ]);
+  const destino = rutaDeVolver(f.volver);
+  const origen = destino ? await obtenerPropietario(destino.propietarioId) : null;
   const comprobantes = await documentosDe("movimiento", libro.filas.map((m) => m.id));
   const etiquetaBien = (b: { nombre: string; esGeneral: boolean }) => (b.esGeneral ? t("cuentas.general") : b.nombre);
   const nombreBien = new Map(bienes.map((b) => [b.id, etiquetaBien(b)]));
@@ -55,6 +61,7 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
 
   return (
     <>
+      {destino && origen && <BotonVolver href={destino.href} nombre={origen.nombre} />}
       <div className="encabezado">
         <div>
           <p className="muted">{t("cuentas.subtitulo")}</p>
@@ -73,6 +80,7 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
       <section className="panel">
         <form className="filtros filtros-separados filtros-cuenta" role="search">
           <input type="hidden" name="moneda" value={moneda} />
+          {destino && <input type="hidden" name="volver" value={destino.href} />}
           <div className="campo">
             <label htmlFor="c-prop">{t("cuentas.propietario")}</label>
             <select id="c-prop" name="propietario" defaultValue={propietario.id}>

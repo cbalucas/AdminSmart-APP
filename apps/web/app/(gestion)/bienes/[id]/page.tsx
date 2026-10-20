@@ -2,14 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { t } from "@ai/i18n";
 import { enlaceGoogleMaps, estadoTitularidad, formatearDireccion, type TipoBien } from "@ai/domain";
+import { BotonVolver } from "@/components/BotonVolver";
 import { CambiarEstadoBien } from "@/components/CambiarEstadoBien";
 import { SeccionServicios } from "@/components/SeccionServicios";
 import { SeccionTitulares } from "@/components/SeccionTitulares";
 import { listarEdificios, obtenerBien, titularesDe } from "@/lib/bienes";
 import { esGestion } from "@/lib/menu";
+import { obtenerPropietario } from "@/lib/propietarios";
 import { serviciosDelBien } from "@/lib/servicios";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
+import { conVolver, rutaDeVolver } from "@/lib/volver";
 
 const PESTANAS = ["datos", "servicios", "obligaciones", "documentos"] as const;
 const HABILITADAS: readonly string[] = ["datos", "servicios"];
@@ -20,16 +23,18 @@ export default async function FichaBien({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; volver?: string }>;
 }) {
   const { usuario } = await usuarioActual();
   if (!usuario || !esGestion(usuario.roles)) notFound();
   const { id } = await params;
   const bien = await obtenerBien(id);
   if (!bien) notFound();
-  const { tab = "datos" } = await searchParams;
+  const { tab = "datos", volver } = await searchParams;
   const pestana = HABILITADAS.includes(tab) ? tab : "datos";
 
+  const destino = rutaDeVolver(volver);
+  const origen = destino ? await obtenerPropietario(destino.propietarioId) : null;
   const titulares = (await titularesDe([bien.id])).get(bien.id) ?? [];
   const edificio = bien.edificioId ? (await listarEdificios()).find((e) => e.id === bien.edificioId) : undefined;
   const base = edificio ?? bien;
@@ -63,6 +68,7 @@ export default async function FichaBien({
 
   return (
     <>
+      {destino && origen && <BotonVolver href={destino.href} nombre={origen.nombre} />}
       <p className="migas">
         <Link href="/bienes">{t("bienes.migas")}</Link> / {titulo}
       </p>
@@ -97,7 +103,7 @@ export default async function FichaBien({
           HABILITADAS.includes(clave) ? (
             <Link
               key={clave}
-              href={`/bienes/${bien.id}?tab=${clave}`}
+              href={`/bienes/${bien.id}?tab=${clave}${destino ? `&${conVolver(destino.href)}` : ""}`}
               className={pestana === clave ? "pestana activa" : "pestana"}
               aria-current={pestana === clave ? "page" : undefined}
             >

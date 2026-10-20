@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { t } from "@ai/i18n";
+import { Icono } from "@/components/Iconos";
 import {
   desactivarPropietario,
   reactivarPropietario,
@@ -26,7 +27,8 @@ export function BotonEstadoPropietario({ id, activo }: { id: string; activo: boo
 
   return (
     <div className="estado-propietario">
-      <button type="button" className="boton boton-secundario" onClick={cambiar} disabled={pendiente}>
+      <button type="button" className="boton boton-secundario boton-con-icono" onClick={cambiar} disabled={pendiente}>
+        <Icono nombre={activo ? "desactivar" : "reactivar"} tamano={18} />
         {activo ? t("propietarios.desactivar") : t("propietarios.reactivar")}
       </button>
       {resultado.impedimentos && (

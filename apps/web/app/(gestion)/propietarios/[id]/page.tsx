@@ -4,9 +4,13 @@ import { t } from "@ai/i18n";
 import { calcularPagoPromedio, formatearImporte, type Moneda } from "@ai/domain";
 import { CambiarFoto } from "@/components/CambiarFoto";
 import { BotonEstadoPropietario } from "@/components/BotonEstadoPropietario";
+import { Icono } from "@/components/Iconos";
+import { IconoBien } from "@/components/IconoBien";
 import { SeccionCuentas } from "@/components/SeccionCuentas";
+import { TarjetaIndicador } from "@/components/TarjetaIndicador";
 import { enlacesDeAvatares } from "@/lib/avatares";
 import { esGestion } from "@/lib/menu";
+import { conVolver } from "@/lib/volver";
 import { obtenerPropietario } from "@/lib/propietarios";
 import { calcularResumenDelPropietario } from "@/lib/resumen-deposito";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
@@ -79,13 +83,6 @@ export default async function FichaPropietario({
   const principal = p.emails.find((e) => e.principal) ?? p.emails[0];
   const telefono = p.telefonos[0];
   const activo = p.estado === "activo";
-  const tarjeta = (titulo: string, valor: string, nota: string) => (
-    <article className="indicador">
-      <p className="muted">{titulo}</p>
-      <strong className="cifra">{valor}</strong>
-      <p className="muted">{nota}</p>
-    </article>
-  );
   const vacio = t("propietarios.dato_vacio");
 
   return (
@@ -115,36 +112,57 @@ export default async function FichaPropietario({
             {usuarioVinculado && <span className="estado estado-ok">{t("propietarios.con_acceso")}</span>}
           </p>
         </div>
-        <div className="acciones-rapidas">
-          <Link href={`/propietarios/${p.id}/editar`} className="boton boton-secundario">{t("app.editar")}</Link>
-          <Link href={`/propietarios/${p.id}/resumen-deposito`} className="boton boton-secundario">{t("propietarios.ver_resumen")}</Link>
+        <div className="acciones-rapidas acciones-ficha">
+          <Link href={`/propietarios/${p.id}/editar`} className="boton boton-secundario boton-con-icono">
+            <Icono nombre="editar" tamano={18} />
+            {t("app.editar")}
+          </Link>
+          <Link href={`/propietarios/${p.id}/resumen-deposito`} className="boton boton-secundario boton-con-icono">
+            <Icono nombre="liquidaciones" tamano={18} />
+            {t("propietarios.ver_resumen")}
+          </Link>
           <BotonEstadoPropietario id={p.id} activo={activo} />
         </div>
       </div>
 
       <section className="indicadores">
-        {tarjeta(
-          t("propietarios.saldo_ars"),
-          formatearImporte(saldoDe("ARS"), "ARS"),
-          !hayMovimientos("ARS") ? t("propietarios.saldo_sin_movimientos") : saldoDe("ARS") < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor"),
-        )}
-        {tarjeta(
-          t("propietarios.saldo_usd"),
-          formatearImporte(saldoDe("USD"), "USD"),
-          !hayMovimientos("USD") ? t("propietarios.saldo_sin_movimientos") : saldoDe("USD") < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor"),
-        )}
-        {tarjeta(
-          t("propietarios.a_depositar"),
-          aDepositar ?? formatearImporte(0, "ARS"),
-          resumenInicial ? t("propietarios.a_depositar_hasta", { fecha: resumenInicial.fechaLimite.split("-").reverse().join("/") }) : t("propietarios.a_depositar_nota"),
-        )}
-        {tarjeta(t("propietarios.pago_promedio"), formatearImporte(promedio("ARS"), "ARS"), t("propietarios.pago_promedio_nota"))}
+        <TarjetaIndicador
+          id="saldo-ars"
+          icono="cuentas"
+          tono="ok"
+          titulo={t("propietarios.saldo_ars")}
+          valor={formatearImporte(saldoDe("ARS"), "ARS")}
+          nota={!hayMovimientos("ARS") ? t("propietarios.saldo_sin_movimientos") : saldoDe("ARS") < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor")}
+        />
+        <TarjetaIndicador
+          id="saldo-usd"
+          icono="cuentas"
+          tono="acento"
+          titulo={t("propietarios.saldo_usd")}
+          valor={formatearImporte(saldoDe("USD"), "USD")}
+          nota={!hayMovimientos("USD") ? t("propietarios.saldo_sin_movimientos") : saldoDe("USD") < 0 ? t("propietarios.saldo_deudor") : t("propietarios.saldo_a_favor")}
+        />
+        <TarjetaIndicador
+          id="a-depositar"
+          icono="dinero"
+          tono="aviso"
+          titulo={t("propietarios.a_depositar")}
+          valor={aDepositar ?? formatearImporte(0, "ARS")}
+          nota={resumenInicial ? t("propietarios.a_depositar_hasta", { fecha: resumenInicial.fechaLimite.split("-").reverse().join("/") }) : t("propietarios.a_depositar_nota")}
+        />
+        <TarjetaIndicador
+          id="pago-promedio"
+          icono="reportes"
+          titulo={t("propietarios.pago_promedio")}
+          valor={formatearImporte(promedio("ARS"), "ARS")}
+          observacion={t("propietarios.pago_promedio_nota")}
+        />
       </section>
 
       <nav className="pestanas" aria-label={t("propietarios.titulo")}>
         {PESTANAS.map((clave) =>
           clave === "cuenta" ? (
-          <Link key={clave} href={`/cuentas-corrientes?propietario=${p.id}`} className="pestana">
+          <Link key={clave} href={`/cuentas-corrientes?propietario=${p.id}&${conVolver(`/propietarios/${p.id}`)}`} className="pestana">
             {t(`propietarios.tab_${clave}`)}
           </Link>
         ) : HABILITADAS.includes(clave) ? (
@@ -213,33 +231,26 @@ export default async function FichaPropietario({
           {(bienes ?? []).filter((b) => !b.es_gastos_varios).length === 0 && (
             <p className="muted">{t("propietarios.bienes_vacio")}</p>
           )}
-          <div className="tabla-envoltorio">
-            <table className="tabla">
-              <thead>
-                <tr>
-                  <th>{t("propietarios.col_bien")}</th>
-                  <th>{t("propietarios.col_tipo")}</th>
-                  <th className="num">{t("propietarios.col_porcentaje")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(bienes ?? [])
-                  .sort((a, b) => Number(a.es_gastos_varios) - Number(b.es_gastos_varios) || String(a.alias).localeCompare(String(b.alias)))
-                  .map((b) => {
-                    const porcentaje = Number((vinculos ?? []).find((v) => v.bien_id === b.id)?.porcentaje ?? 0);
-                    return (
-                      <tr key={b.id as string}>
-                        <td>
-                          <strong>{b.es_gastos_varios ? t("propietarios.bien_gastos_varios") : (b.alias as string)}</strong>
-                        </td>
-                        <td>{t(`tipo_bien.${b.tipo_bien}`)}</td>
-                        <td className="num">{t("propietarios.bien_porcentaje", { porcentaje: String(porcentaje).replace(".", ",") })}</td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          </div>
+          <ul className="tarjetas-bienes">
+            {(bienes ?? [])
+              .sort((a, b) => Number(a.es_gastos_varios) - Number(b.es_gastos_varios) || String(a.alias).localeCompare(String(b.alias)))
+              .map((b) => {
+                const porcentaje = Number((vinculos ?? []).find((v) => v.bien_id === b.id)?.porcentaje ?? 0);
+                const nombre = b.es_gastos_varios ? t("propietarios.bien_gastos_varios") : (b.alias as string);
+                return (
+                  <li key={b.id as string} className="tarjeta-propietario tarjeta-bien">
+                    <Link href={`/bienes/${b.id}?${conVolver(`/propietarios/${p.id}?tab=bienes`)}`} className="tarjeta-propietario-vinculo" aria-label={nombre} />
+                    <IconoBien tipo={b.tipo_bien as string} />
+                    <strong className="tarjeta-propietario-nombre">{nombre}</strong>
+                    <span className="muted">{t(`tipo_bien.${b.tipo_bien}`)}</span>
+                    <dl className="tarjeta-propietario-datos">
+                      <div><dt>{t("propietarios.col_estado")}</dt><dd>{t(`estado_bien.${b.estado}`)}</dd></div>
+                      <div><dt>{t("propietarios.col_porcentaje")}</dt><dd>{t("propietarios.bien_porcentaje", { porcentaje: String(porcentaje).replace(".", ",") })}</dd></div>
+                    </dl>
+                  </li>
+                );
+              })}
+          </ul>
         </section>
       )}
     </>
