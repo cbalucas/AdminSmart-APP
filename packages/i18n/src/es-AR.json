@@ -92,6 +92,8 @@
   "app.proximamente": "Próximamente",
   "app.seccion_proximamente": "Esta sección todavía está en construcción.",
   "menu.etiqueta": "Menú principal",
+  "menu.contraer": "Contraer el menú",
+  "menu.expandir": "Desplegar el menú",
   "menu.inicio": "Inicio",
   "menu.propietarios": "Propietarios",
   "menu.bienes": "Bienes",

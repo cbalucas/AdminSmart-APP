@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatearImporte, type Moneda } from "@ai/domain";
 import { t } from "@ai/i18n";
+import { Icono } from "@/components/Iconos";
 import { datosHomeGestion, type Total } from "@/lib/home-gestion";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
@@ -15,6 +16,17 @@ function montosTexto(montos: Record<Moneda, number>): string {
   const partes = (["ARS", "USD"] as const).filter((m) => montos[m] !== 0).map((m) => formatearImporte(montos[m], m));
   return partes.length > 0 ? partes.join(" · ") : "—";
 }
+
+// Ícono y tono de cada indicador del inicio.
+const ICONO_INDICADOR: Record<string, [string, string]> = {
+  vencidas: ["obligaciones", "peligro"],
+  vencen_7: ["contratos", "aviso"],
+  vencen_30: ["contratos", "acento"],
+  a_completar: ["recurrente", "aviso"],
+  total_administrado: ["cuentas", "ok"],
+  sin_cobrar: ["inquilinos", "neutro"],
+  deuda_inquilinos: ["inquilinos", "neutro"],
+};
 
 // P-07 Home de gestión y P-08 Home del propietario.
 export default async function Inicio() {
@@ -45,15 +57,16 @@ export default async function Inicio() {
   const indicador = (clave: string, valor: string, nota: string, href?: string) => {
     const contenido = (
       <>
-        <p className="muted">{t(`inicio.ind_${clave}`)}</p>
+        <span className="indicador-icono" aria-hidden="true"><Icono nombre={ICONO_INDICADOR[clave]?.[0] ?? "inicio"} tamano={22} /></span>
+        <p className="muted indicador-titulo">{t(`inicio.ind_${clave}`)}</p>
         <strong className="cifra">{valor}</strong>
         <p className="muted">{nota}</p>
       </>
     );
     return href ? (
-      <Link key={clave} href={href} className="indicador indicador-enlace">{contenido}</Link>
+      <Link key={clave} href={href} className={`indicador indicador-enlace tono-${ICONO_INDICADOR[clave]?.[1] ?? "neutro"}`}>{contenido}</Link>
     ) : (
-      <article key={clave} className="indicador">{contenido}</article>
+      <article key={clave} className={`indicador tono-${ICONO_INDICADOR[clave]?.[1] ?? "neutro"}`}>{contenido}</article>
     );
   };
   const nota = (tot: Total) => (tot.cantidad === 0 ? t("inicio.nada_pendiente") : montosTexto(tot.montos));

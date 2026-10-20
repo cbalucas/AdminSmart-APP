@@ -18,6 +18,7 @@ export function MenuLateral({ items }: { items: ItemMenu[] }) {
             href={item.ruta}
             className={activo ? "menu-item activo" : "menu-item"}
             aria-current={activo ? "page" : undefined}
+            title={t(`menu.${item.clave}`)}
           >
             <Icono nombre={item.icono} />
             <span>{t(`menu.${item.clave}`)}</span>

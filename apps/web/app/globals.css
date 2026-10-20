@@ -595,3 +595,51 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   .tabla-responsive .celda-bien-icono { gap: 8px; }
   .tabla-responsive td:not(:last-child) .linea { max-width: 110px; }
 }
+
+/* ------------------------------------------------------------------ menú contraíble */
+.lateral { transition: width 0.18s ease; }
+.lateral-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.boton-menu { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; color: #C9D2DB; background: transparent; border: 1px solid var(--sidebarActive); border-radius: 8px; cursor: pointer; }
+.boton-menu:hover { background: var(--sidebarActive); color: #FFFFFF; }
+.boton-menu:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+@media (min-width: 901px) {
+  .marco[data-menu="contraido"] .lateral { width: 76px; padding: 16px 12px; }
+  .marco[data-menu="contraido"] .lateral-cabecera { flex-direction: column; gap: 12px; }
+  .marco[data-menu="contraido"] .marca { padding: 0; }
+  .marco[data-menu="contraido"] .marca strong,
+  .marco[data-menu="contraido"] .menu-item span { display: none; }
+  .marco[data-menu="contraido"] .menu-item { justify-content: center; padding: 12px 0; }
+  .marco[data-menu="contraido"] .sincronizacion { font-size: 0; justify-content: center; padding-left: 0; padding-right: 0; }
+}
+@media (max-width: 900px) {
+  .lateral { flex-wrap: wrap; }
+  .lateral-cabecera { flex: none; }
+  .menu-items { flex: 1 1 100%; order: 3; }
+  .marco[data-menu="contraido"] .menu-items { display: none; }
+}
+
+/* ------------------------------------------------------------------ inicio moderno */
+.indicadores { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.indicador { align-items: center; text-align: center; gap: 6px; padding: 22px 20px; border-radius: 16px; box-shadow: 0 1px 2px rgba(20, 30, 40, 0.04); transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+.indicador-enlace:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(20, 30, 40, 0.1); border-color: var(--inputLine); }
+.indicador-icono { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 14px; margin-bottom: 4px; background: var(--surface2); color: var(--muted); }
+.indicador-titulo { margin: 0; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.03em; text-transform: uppercase; }
+.indicador .cifra { font-size: 2.2rem; line-height: 1.1; }
+.indicador p { margin: 0; }
+.tono-peligro .indicador-icono { background: var(--dangerBg); color: var(--danger); }
+.tono-peligro .cifra { color: var(--danger); }
+.tono-aviso .indicador-icono { background: var(--warnBg); color: var(--warn); }
+.tono-ok .indicador-icono { background: var(--okBg); color: var(--ok); }
+.tono-acento .indicador-icono { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+
+.panel { border-radius: 16px; box-shadow: 0 1px 2px rgba(20, 30, 40, 0.04); }
+.panel > h2, .panel > .muted, .panel > .boton-texto { text-align: center; align-self: center; }
+.panel .resumen-lista li { justify-content: center; text-align: center; gap: 4px 12px; }
+.panel .tabla th, .panel .tabla td { text-align: center; }
+.panel .tabla td.num, .panel .tabla th.num { text-align: center; }
+@media (max-width: 700px) {
+  .indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .indicador { padding: 16px 10px; }
+  .indicador .cifra { font-size: 1.8rem; }
+  .indicador-titulo { font-size: 0.72rem; }
+}

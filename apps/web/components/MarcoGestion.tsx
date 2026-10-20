@@ -3,6 +3,7 @@ import Link from "next/link";
 import { t } from "@ai/i18n";
 import { cerrarSesion } from "@/app/(gestion)/acciones";
 import type { ItemMenu } from "@/lib/menu";
+import { BotonMenu } from "./BotonMenu";
 import { BotonModo } from "./BotonModo";
 import { Icono } from "./Iconos";
 import { MenuLateral } from "./MenuLateral";
@@ -30,10 +31,13 @@ export function MarcoGestion({
   return (
     <div className="marco">
       <aside className="lateral">
-        <Link href="/inicio" className="marca">
-          <Image src="/logo.svg" alt="" width={36} height={36} />
-          <strong>{t("app.nombre")}</strong>
-        </Link>
+        <div className="lateral-cabecera">
+          <Link href="/inicio" className="marca">
+            <Image src="/logo.svg" alt="" width={36} height={36} />
+            <strong>{t("app.nombre")}</strong>
+          </Link>
+          <BotonMenu />
+        </div>
         <MenuLateral items={items} />
         <p className="sincronizacion">
           <span className="punto" aria-hidden="true" />
