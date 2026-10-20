@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { esquemaIngreso } from "@ai/domain";
 import { t } from "@ai/i18n";
 import { guardarPreferencia, leerPreferencia } from "../almacenamiento";
-import { Aviso, Boton, Campo, Enlace, Interruptor, PantallaAcceso, Separador, Tarjeta, Titulo } from "../componentes";
+import { Aviso, Boton, Campo, Enlace, IconoGoogle, Interruptor, PantallaAcceso, Separador, Tarjeta, Titulo } from "../componentes";
 import { ingresarConGoogle } from "../google";
 import { ingresarConIdentificador } from "../ingreso";
 import { supabase } from "../supabase";
@@ -79,7 +79,7 @@ export function Ingreso({ errorInicial, alIngresar, alRecuperar }: Props) {
         <Interruptor etiqueta={t("ingreso.recordar_email")} valor={recordar} alCambiar={setRecordar} />
         <Boton texto={t("ingreso.boton")} alPresionar={ingresar} enCurso={enCurso} />
         <Separador />
-        <Boton texto={t("ingreso.google")} alPresionar={conGoogle} secundario deshabilitado={enCurso} />
+        <Boton icono={<IconoGoogle />} texto={t("ingreso.google")} alPresionar={conGoogle} secundario deshabilitado={enCurso} />
         <Enlace texto={t("ingreso.olvide")} alPresionar={alRecuperar} />
       </Tarjeta>
     </PantallaAcceso>
