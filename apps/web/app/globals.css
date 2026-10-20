@@ -851,3 +851,4 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 [data-tip]:hover, [data-tip]:focus-visible { z-index: 50; }
 .indicador:hover, .indicador:focus-within, .tarjeta-propietario:hover, .tarjeta-propietario:focus-within { z-index: 20; }
 .indicador-info:hover, .indicador-info:focus-within { z-index: 30; }
+.ver-mas { display: flex; justify-content: center; padding-top: 4px; }

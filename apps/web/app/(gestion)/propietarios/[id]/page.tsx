@@ -5,6 +5,7 @@ import { AccionIcono } from "@/components/AccionIcono";
 import { calcularPagoPromedio, formatearImporte, type Moneda } from "@ai/domain";
 import { CambiarFoto } from "@/components/CambiarFoto";
 import { BotonEstadoPropietario } from "@/components/BotonEstadoPropietario";
+import { CuentaReciente } from "@/components/CuentaReciente";
 import { SeccionCuentas } from "@/components/SeccionCuentas";
 import { TarjetaBien, type FilaDetalle } from "@/components/TarjetaBien";
 import { TarjetaIndicador } from "@/components/TarjetaIndicador";
@@ -18,7 +19,7 @@ import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { usuarioActual } from "@/lib/usuario-actual";
 
 const PESTANAS = ["datos", "bienes", "cuenta", "liquidaciones", "usuario", "documentos"] as const;
-const HABILITADAS = ["datos", "bienes"];
+const HABILITADAS = ["datos", "bienes", "cuenta"];
 
 const fechaHoy = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Argentina/Cordoba" }).format(new Date());
 
@@ -158,11 +159,7 @@ export default async function FichaPropietario({
 
       <nav className="pestanas" aria-label={t("propietarios.titulo")}>
         {PESTANAS.map((clave) =>
-          clave === "cuenta" ? (
-          <Link key={clave} href={`/cuentas-corrientes?propietario=${p.id}&${conVolver(`/propietarios/${p.id}`)}`} className="pestana">
-            {t(`propietarios.tab_${clave}`)}
-          </Link>
-        ) : HABILITADAS.includes(clave) ? (
+          HABILITADAS.includes(clave) ? (
             <Link
               key={clave}
               href={`/propietarios/${p.id}?tab=${clave}`}
@@ -226,6 +223,8 @@ export default async function FichaPropietario({
         {usuario.roles.includes("administrador") && <SeccionCuentas propietarioId={p.id} />}
         </>
       )}
+
+      {pestana === "cuenta" && <CuentaReciente propietarioId={p.id} />}
 
       {pestana === "bienes" && (
         <section className="panel">
