@@ -99,7 +99,10 @@ export function FormularioPropietario({
       <SeccionFormulario icono="telefono" titulo={t("propietarios.seccion_contacto")}>
 
         <div className="lista-campos">
-          <p className="etiqueta-lista">{t("propietarios.campo_telefonos")}</p>
+          <div className="titulo-lista">
+            <p className="etiqueta-lista">{t("propietarios.campo_telefonos")}</p>
+            <BotonIcono icono="mas" tono="acento" titulo={t("propietarios.agregar_telefono")} onClick={() => setTelefonos([...telefonos, { tipo: "celular", numero: "", k: nuevaClave() }])} />
+          </div>
           {telefonos.map((tel, i) => (
             <div className="fila-lista" key={tel.k}>
               <select name="telefono_tipo" defaultValue={tel.tipo} aria-label={t("propietarios.campo_telefono_tipo")}>
@@ -116,11 +119,13 @@ export function FormularioPropietario({
             </div>
           ))}
           {error("telefonos")}
-          <BotonIcono icono="mas" tono="acento" titulo={t("propietarios.agregar_telefono")} onClick={() => setTelefonos([...telefonos, { tipo: "celular", numero: "", k: nuevaClave() }])} />
         </div>
 
         <div className="lista-campos">
-          <p className="etiqueta-lista">{t("propietarios.campo_emails")}</p>
+          <div className="titulo-lista">
+            <p className="etiqueta-lista">{t("propietarios.campo_emails")}</p>
+            <BotonIcono icono="mas" tono="acento" titulo={t("propietarios.agregar_email")} onClick={() => setEmails([...emails, { email: "", principal: false, k: nuevaClave() }])} />
+          </div>
           {emails.map((mail, i) => (
             <div className="fila-lista" key={mail.k}>
               <CampoIcono icono="mail">
@@ -144,7 +149,6 @@ export function FormularioPropietario({
             </div>
           ))}
           {error("emails")}
-          <BotonIcono icono="mas" tono="acento" titulo={t("propietarios.agregar_email")} onClick={() => setEmails([...emails, { email: "", principal: false, k: nuevaClave() }])} />
         </div>
       </SeccionFormulario>
 

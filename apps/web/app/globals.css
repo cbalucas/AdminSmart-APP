@@ -762,3 +762,5 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   .acciones-formulario .boton { flex: 1; }
   .grupo { padding: 16px 14px 18px; }
 }
+.titulo-lista { display: flex; align-items: center; gap: 10px; }
+.titulo-lista .boton-accion { width: 30px; height: 30px; border-radius: 8px; }
