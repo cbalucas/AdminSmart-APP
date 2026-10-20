@@ -79,3 +79,21 @@ export function descripcionDelRegistro(valores: Valores): string {
 
 /** "bien_servicio" → "bien servicio": respaldo cuando un campo no tiene texto propio. */
 export const humanizarCampo = (campo: string) => campo.replace(/_/g, " ");
+
+/** Tablas cuyo registro de auditoría nunca se apaga: el dinero, los usuarios y la configuración de la administración. */
+export const TABLAS_SIEMPRE_AUDITADAS = [
+  "organizacion", "usuario", "usuario_bien", "movimiento", "pago", "cobro_alquiler",
+  "resumen_deposito", "resumen_deposito_monto", "liquidacion", "liquidacion_total",
+] as const;
+
+/**
+ * AUD-04: ¿se registra este cambio? Copia, para documentarla y probarla, la regla que aplica el disparador de la base.
+ * Siempre se audita lo que mueve dinero; el resto, si la auditoría general está activa y el registro no pertenece a
+ * propietarios o, si pertenece, al menos uno de ellos la tiene activa.
+ */
+export function debeAuditar(args: { tabla: string; auditoriaActiva: boolean; propietarios: { auditar: boolean }[] }): boolean {
+  if ((TABLAS_SIEMPRE_AUDITADAS as readonly string[]).includes(args.tabla)) return true;
+  if (!args.auditoriaActiva) return false;
+  if (args.propietarios.length === 0) return true;
+  return args.propietarios.some((p) => p.auditar);
+}

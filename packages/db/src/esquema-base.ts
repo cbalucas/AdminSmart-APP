@@ -57,6 +57,7 @@ export const organizacion = pgTable("organizacion", {
   diasAvisoRecurrentes: integer("dias_aviso_recurrentes").notNull().default(5),
   politicaDobleFactor: politicaDobleFactor("politica_doble_factor").notNull().default("desactivado"), // USU-09
   registroAbiertoHabilitado: boolean("registro_abierto_habilitado").notNull().default(false), // USU-08
+  auditoriaActiva: boolean("auditoria_activa").notNull().default(true), // AUD-04
 });
 
 export const organizacionId = () =>
@@ -72,6 +73,7 @@ export const propietario = pgTable(
     organizacionId: organizacionId(),
     tipoPersona: tipoPersona("tipo_persona").notNull().default("humana"),
     nombreRazonSocial: text("nombre_razon_social").notNull(),
+    auditar: boolean("auditar").notNull().default(true), // AUD-04: se registra la auditoría de sus datos
     // [{ tipo, numero }], al menos uno
     telefonos: jsonb("telefonos").$type<{ tipo: string; numero: string }[]>().notNull(),
     // [{ email, principal }], exactamente uno principal (PRO-04)

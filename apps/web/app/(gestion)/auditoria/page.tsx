@@ -5,6 +5,7 @@ import { AccionIcono } from "@/components/AccionIcono";
 import { FormularioEnVivo } from "@/components/FormularioEnVivo";
 import { DetalleCambios, ResumenCambios } from "@/components/ResumenCambios";
 import { ACCIONES_AUDITORIA, consultarAuditoria, TABLAS_AUDITADAS, type FiltrosAuditoria } from "@/lib/auditoria";
+import { obtenerConfigAuditoria } from "@/lib/auditoria-config";
 import { esGestion } from "@/lib/menu";
 import { usuarioActual } from "@/lib/usuario-actual";
 
@@ -24,7 +25,8 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
   if (!usuario || !esGestion(usuario.roles)) notFound();
   const f = await searchParams;
 
-  const { filas, total, pagina, paginas } = await consultarAuditoria(f);
+  const [{ filas, total, pagina, paginas }, config] = await Promise.all([consultarAuditoria(f), obtenerConfigAuditoria()]);
+  const sinAuditar = config.propietarios.filter((p) => !p.auditar).length;
   const hayFiltros = Boolean(f.q || f.tabla || f.accion || f.desde || f.hasta);
 
   const enlace = (cambios: Partial<FiltrosAuditoria>) => {
@@ -45,6 +47,11 @@ export default async function Auditoria({ searchParams }: { searchParams: Promis
         </div>
         <AccionIcono href={`/auditoria/exportar?${paramsExport.toString()}`} icono="descargar" titulo={t("auditoria.exportar")} />
       </div>
+
+      {!config.activa && <p className="aviso-advertencia" role="status">{t("auditoria.aviso_apagada")}</p>}
+      {config.activa && sinAuditar > 0 && (
+        <p className="aviso-advertencia" role="status">{t("auditoria.aviso_parcial", { cantidad: sinAuditar, total: config.propietarios.length })}</p>
+      )}
 
       <section className="panel">
         <FormularioEnVivo className="filtros filtros-compactos">

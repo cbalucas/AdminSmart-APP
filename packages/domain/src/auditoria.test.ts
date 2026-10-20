@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cambiosDeCampos, descripcionDelRegistro, formatearValorAuditoria, humanizarCampo } from "./auditoria";
+import { cambiosDeCampos, debeAuditar, descripcionDelRegistro, formatearValorAuditoria, humanizarCampo } from "./auditoria";
 
 describe("Resumen de la auditoría", () => {
   it("SEG-05: una modificación lista solo los campos que cambiaron", () => {
@@ -55,5 +55,29 @@ describe("Resumen de la auditoría", () => {
   });
   it("SEG-05: un campo sin texto propio se muestra sin guiones bajos", () => {
     expect(humanizarCampo("dia_vencimiento")).toBe("dia vencimiento");
+  });
+});
+
+describe("Auditoría configurable", () => {
+  it("AUD-04: con la auditoría activa y sin propietarios asociados, se registra", () => {
+    expect(debeAuditar({ tabla: "concepto", auditoriaActiva: true, propietarios: [] })).toBe(true);
+  });
+  it("AUD-04: con la auditoría general apagada no se registran los datos", () => {
+    expect(debeAuditar({ tabla: "bien", auditoriaActiva: false, propietarios: [{ auditar: true }] })).toBe(false);
+  });
+  it("AUD-04: un registro de varios titulares se audita si al menos uno tiene la auditoría activa", () => {
+    expect(debeAuditar({ tabla: "bien", auditoriaActiva: true, propietarios: [{ auditar: false }, { auditar: true }] })).toBe(true);
+  });
+  it("AUD-04: si ningún titular tiene la auditoría activa, no se registra", () => {
+    expect(debeAuditar({ tabla: "obligacion", auditoriaActiva: true, propietarios: [{ auditar: false }, { auditar: false }] })).toBe(false);
+  });
+  it("AUD-04: el dinero se audita siempre, aunque la auditoría esté apagada", () => {
+    for (const tabla of ["movimiento", "pago", "resumen_deposito", "liquidacion"]) {
+      expect(debeAuditar({ tabla, auditoriaActiva: false, propietarios: [{ auditar: false }] })).toBe(true);
+    }
+  });
+  it("AUD-04: la configuración de la administración y los usuarios se auditan siempre", () => {
+    expect(debeAuditar({ tabla: "organizacion", auditoriaActiva: false, propietarios: [] })).toBe(true);
+    expect(debeAuditar({ tabla: "usuario", auditoriaActiva: false, propietarios: [] })).toBe(true);
   });
 });

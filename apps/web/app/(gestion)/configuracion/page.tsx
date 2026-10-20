@@ -9,6 +9,7 @@ const ACCESOS = [
   { clave: "preferencias", ruta: "/configuracion/preferencias", icono: "configuracion" },
   { clave: "plantillas", ruta: "/configuracion/plantillas", icono: "mail" },
   { clave: "conceptos", ruta: "/configuracion/conceptos", icono: "obligaciones" },
+  { clave: "auditoria", ruta: "/configuracion/auditoria", icono: "auditoria" },
 ] as const;
 
 // P-39 Configuración: accesos a las pantallas de ajustes. Se suman a medida que se construyen.
