@@ -16,6 +16,6 @@ Se actualiza al terminar cada paso. Estado: ✅ hecho · 🔄 en curso · ⏳ po
 | 9 | Resumen de depósito en PDF | ✅ | 9a cálculo y pantalla ✅ · 9b PDF e historial (DEP-AAAA-NNNN) ✅ · 9c envío por WhatsApp ✅ (el envío por email queda para el final o una versión nueva con validación de Gmail y autorización de envío) |
 | 10 | Datos de la administración y plantillas de envío | ✅ | 10a datos y logo ✅ · 10b preferencias generales ✅ · 10c plantillas editables ✅ |
 | 11 | Inicio del propietario y de gestión | ✅ | 11a acceso del propietario ✅ · 11b home del propietario (P-08) ✅ · 11c home de gestión (P-07) ✅ |
-| 12 | Auditoría y cierre de la fase | 🔄 | 12a auditoría (P-45) ⏳ · 12b exportación a Excel ⏳ · 12c revisión y cierre ✅ · 12d pasada de diseño (al dar el visto bueno final) ⏳ |
+| 12 | Auditoría y cierre de la fase | 🔄 | 12a auditoría (P-45) ✅ · 12b exportación a Excel ✅ · 12c revisión y cierre ✅ · 12d pasada de diseño (al dar el visto bueno final) ⏳ |
 | — | Sincronización sin conexión (PowerSync) | ⏳ | Se decide cuándo intercalarla; hoy la app funciona en modo nube |
 | — | Datos de prueba desde el Excel actual | ⏳ | Espera el archivo |

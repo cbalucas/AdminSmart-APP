@@ -16,3 +16,4 @@ export * from "./whatsapp";
 export * from "./administracion";
 export * from "./preferencias";
 export * from "./plantillas";
+export * from "./auditoria";

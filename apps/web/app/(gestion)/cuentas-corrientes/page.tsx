@@ -60,13 +60,15 @@ export default async function CuentasCorrientes({ searchParams }: { searchParams
           <p className="muted">{t("cuentas.subtitulo")}</p>
           <h1>{t("cuentas.titulo")}</h1>
         </div>
-        {esAdmin && (
-          <div className="acciones">
-            <Link href={alta("traspaso")} className="boton boton-secundario">{t("cuentas.traspaso")}</Link>
-            <Link href={alta("movimiento")} className="boton">{t("cuentas.nuevo_movimiento")}</Link>
-          </div>
-        )}
-      </div>
+        <div className="acciones">
+          <a href={`/cuentas-corrientes/exportar?propietario=${propietario.id}&moneda=${moneda}${f.bien ? `&bien=${f.bien}` : ""}${f.desde ? `&desde=${f.desde}` : ""}${f.hasta ? `&hasta=${f.hasta}` : ""}`} className="boton boton-secundario">{t("cuentas.exportar")}</a>
+          {esAdmin && (
+            <>
+              <Link href={alta("traspaso")} className="boton boton-secundario">{t("cuentas.traspaso")}</Link>
+              <Link href={alta("movimiento")} className="boton">{t("cuentas.nuevo_movimiento")}</Link>
+            </>
+          )}
+        </div>      </div>
 
       <section className="panel">
         <form className="filtros filtros-separados" role="search">

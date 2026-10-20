@@ -51,7 +51,8 @@ describe("Textos del sistema", () => {
       for (const m of codigo.matchAll(/["']([a-z_]+(?:\.[a-z0-9_]+)+)["']/g)) {
         const clave = m[1] as string;
         if (!prefijos.has(clave.split(".")[0] as string)) continue;
-        if (!(clave in textos)) faltan.push(`${clave}  (${archivo.replace(RAIZ, "").split("\\").join("/")})`);
+        // Un prefijo que termina en "_" (por ejemplo "pagos.medio_") se completa en tiempo de ejecución: alcanza con que exista alguna clave que lo use.
+        if (clave.endsWith("_") ? !claves.some((k) => k.startsWith(clave)) : !(clave in textos)) faltan.push(`${clave}  (${archivo.replace(RAIZ, "").split("\\").join("/")})`);
       }
     }
     expect([...new Set(faltan)]).toEqual([]);

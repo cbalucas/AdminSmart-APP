@@ -495,3 +495,10 @@ a { color: var(--accent); }
 .esqueleto-panel { height: 320px; }
 @keyframes esqueleto { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .esqueleto-barra { animation: none; } }
+
+.cambios { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.detalle-auditoria { margin-top: 6px; }
+.detalle-auditoria summary { cursor: pointer; color: var(--accent); font-size: 0.85rem; }
+.datos-crudos { margin: 8px 0 0; padding: 10px 12px; max-height: 260px; overflow: auto; font-size: 0.78rem; background: var(--surface2); border-radius: 8px; white-space: pre-wrap; word-break: break-word; }
+.paginacion { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; }
+.resumen-lista-pie { margin: 0; color: var(--muted); font-size: 0.9rem; }

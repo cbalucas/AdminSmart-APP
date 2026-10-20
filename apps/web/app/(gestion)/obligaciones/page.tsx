@@ -6,6 +6,7 @@ import { formatearImporte, formatearPeriodo, puedeModificarObligacion, TIPOS_BIE
 import { listarBienes, titularesDe } from "@/lib/bienes";
 import { generarOcurrenciasSiHaceFalta, listarObligaciones, type FilaObligacion } from "@/lib/obligaciones";
 import { VentanaFinDeMes } from "@/components/VentanaFinDeMes";
+import { filtrarObligaciones } from "@/lib/filtrar-obligaciones";
 import { documentosDe, type DocumentoFila } from "@/lib/documentos";
 import { pagosVigentesDe } from "@/lib/pagos";
 import { esGestion } from "@/lib/menu";
@@ -54,20 +55,15 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
   for (const lista of titulares.values()) for (const x of lista) propietarios.set(x.propietarioId, x.nombre);
   const periodos = [...new Set(todas.map((o) => o.periodo))].sort().reverse();
 
-  // Todos los filtros menos el estado: sobre este resultado se cuentan las pestañas.
-  const sinEstado = todas
-    .filter((o) => !f.propietario || (titulares.get(o.bienId) ?? []).some((x) => x.propietarioId === f.propietario))
-    .filter((o) => !f.tipo || bienDe.get(o.bienId)?.tipoBien === f.tipo)
-    .filter((o) => !f.responsable || o.responsable === f.responsable)
-    .filter((o) => !f.periodo || o.periodo === f.periodo);
+  // Todos los filtros menos el estado: sobre ese resultado se cuentan las pestañas.
+  const { sinEstado, lista } = filtrarObligaciones(todas, f, titulares, bienDe);
   const cuenta = (e: EstadoObligacion) => sinEstado.filter((o) => o.estado === e).length;
-  const lista = sinEstado
-    .filter((o) => !f.estado || o.estado === f.estado)
-    .sort((a, b) => a.periodo.localeCompare(b.periodo) || (a.vencimiento ?? "9999").localeCompare(b.vencimiento ?? "9999"));
 
   // "Completar ahora": si hoy no es época de la ventana, se abre a pedido. En época, ya la muestra el marco.
   const abrirVentana = f.completar === "1" && !(await configVentana()).enVentana ? await itemsDeVentana() : null;
 
+  const paramsExport = new URLSearchParams();
+  for (const k of ["estado", "propietario", "tipo", "responsable", "periodo"] as const) if (f[k]) paramsExport.set(k, f[k] as string);
   const hayFiltros = Boolean(f.propietario || f.tipo || f.responsable || f.periodo);
   const porCompletar = todas.filter((o) => o.estado === "a_completar").length;
   const conMonto = lista.filter((o) => o.monto !== null && o.moneda === "ARS").reduce((s, o) => s + (o.monto as number), 0);
@@ -154,6 +150,7 @@ export default async function Obligaciones({ searchParams }: { searchParams: Pro
           <h1>{t("obligaciones.titulo")}</h1>
         </div>
         <div className="acciones">
+          <a href={`/obligaciones/exportar?${paramsExport.toString()}`} className="boton boton-secundario">{t("obligaciones.exportar")}</a>
           <Link href="/obligaciones/pago-directo" className="boton boton-secundario">{t("pagos.registrar_directo")}</Link>
           <Link href="/obligaciones/nueva" className="boton">{t("obligaciones.nueva")}</Link>
         </div>

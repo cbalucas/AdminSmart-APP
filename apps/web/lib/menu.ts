@@ -2,7 +2,7 @@ import type { Rol } from "./usuario-actual";
 
 export type IconoMenu =
   | "inicio" | "propietarios" | "bienes" | "edificios" | "inquilinos" | "contratos"
-  | "obligaciones" | "cuentas" | "liquidaciones" | "reportes" | "configuracion";
+  | "obligaciones" | "cuentas" | "liquidaciones" | "reportes" | "auditoria" | "configuracion";
 
 export interface ItemMenu {
   clave: string; // texto: menu.<clave>
@@ -22,6 +22,7 @@ const MENU_GESTION: ItemMenu[] = [
   { clave: "cuentas", ruta: "/cuentas-corrientes", icono: "cuentas" },
   { clave: "liquidaciones", ruta: "/liquidaciones", icono: "liquidaciones" },
   { clave: "reportes", ruta: "/reportes", icono: "reportes" },
+  { clave: "auditoria", ruta: "/auditoria", icono: "auditoria" },
   { clave: "configuracion", ruta: "/configuracion", icono: "configuracion", soloAdministrador: true },
 ];
 

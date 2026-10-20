@@ -10,6 +10,7 @@ const TRAZOS: Record<string, string> = {
   cuentas: "M3 7a2 2 0 0 1 2-2h14v4M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3M17 14h4v-4h-4a2 2 0 0 0 0 4",
   liquidaciones: "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",
   reportes: "M4 20V10M10 20V4M16 20v-8M22 20H2",
+  auditoria: "M12 3l8 3v6c0 5-3.4 8-8 9-4.6-1-8-4-8-9V6zM9 12l2 2 4-4",
   configuracion: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1",
   buscar: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.3-4.3",
   luna: "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8",
