@@ -936,5 +936,5 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 
 /* Consulta rápida: tres listas en una fila */
 .filtros-consulta { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
-.filtros-consulta .campo { flex: 1 1 200px; max-width: 320px; }
+.filtros-consulta .campo { flex: 1 1 170px; max-width: 280px; }
 .filtros-consulta > .boton-texto { align-self: center; }

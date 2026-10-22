@@ -13,6 +13,8 @@ import { usuarioActual } from "@/lib/usuario-actual";
 import type { EstadoObligacion } from "@ai/domain";
 
 interface Filtros {
+  vista?: string;
+  propietario?: string;
   bien?: string;
   anio?: string;
   concepto?: string;
@@ -57,10 +59,14 @@ export default async function Consulta({ searchParams }: { searchParams: Promise
   // Opciones de las listas: lo que existe en los datos que el usuario puede ver.
   const aniosDisponibles = [...new Set([anioActual, ...todas.map(anioDe)])].sort().reverse();
   const conceptos = [...new Set(todas.map((o) => o.concepto))].sort((a, b) => a.localeCompare(b));
-  const bienesConDatos = bienes.filter((b) => todas.some((o) => o.bienId === b.id)).sort((a, b) => nombreBien(a.id).localeCompare(nombreBien(b.id)));
+  const propietarios = new Map<string, string>();
+  for (const lista of titulares.values()) for (const x of lista) propietarios.set(x.propietarioId, x.nombre);
+  const esDelPropietario = (bienId: string) => !f.propietario || (titulares.get(bienId) ?? []).some((x) => x.propietarioId === f.propietario);
+  const bienesConDatos = bienes.filter((b) => todas.some((o) => o.bienId === b.id) && esDelPropietario(b.id)).sort((a, b) => nombreBien(a.id).localeCompare(nombreBien(b.id)));
 
   const filtradas = todas
     .filter((o) => o.estado !== "anulada")
+    .filter((o) => esDelPropietario(o.bienId))
     .filter((o) => !f.bien || o.bienId === f.bien)
     .filter((o) => !anio || anioDe(o) === anio)
     .filter((o) => !f.concepto || o.concepto === f.concepto);
@@ -75,7 +81,48 @@ export default async function Consulta({ searchParams }: { searchParams: Promise
   const pendiente: Record<Moneda, number> = { ARS: 0, USD: 0 };
   for (const o of pagadas) pagado[o.moneda] += pagos.get(o.id)?.importe ?? o.monto ?? 0;
   for (const o of sinPagar) pendiente[o.moneda] += o.monto ?? 0;
-  const hayFiltros = Boolean(f.bien || f.concepto || (f.anio !== undefined && f.anio !== anioActual));
+  // Control de recurrentes: un renglón por bien + concepto + año (gastos recurrentes o de servicios).
+  const hoy = fechaHoy();
+  interface Control {
+    clave: string;
+    bienId: string;
+    concepto: string;
+    anio: string;
+    cargadas: number;
+    pagadas: number;
+    vencidas: number;
+    porVencer: number;
+    aCompletar: number;
+    falta: Record<Moneda, number>;
+  }
+  const controles = new Map<string, Control>();
+  for (const o of filtradas.filter((x) => x.esRecurrente || x.bienServicioId)) {
+    const clave = `${o.bienId}|${o.concepto}|${anioDe(o)}`;
+    const c = controles.get(clave) ?? { clave, bienId: o.bienId, concepto: o.concepto, anio: anioDe(o), cargadas: 0, pagadas: 0, vencidas: 0, porVencer: 0, aCompletar: 0, falta: { ARS: 0, USD: 0 } };
+    c.cargadas++;
+    if (o.estado === "pagada") c.pagadas++;
+    else if (o.estado === "vencida" || (o.estado === "pendiente" && o.vencimiento !== null && o.vencimiento < hoy)) {
+      c.vencidas++;
+      c.falta[o.moneda] += o.monto ?? 0;
+    } else if (o.estado === "a_completar") c.aCompletar++;
+    else c.porVencer++;
+    controles.set(clave, c);
+  }
+  const filasControl = [...controles.values()].sort(
+    (a, b) => Number(b.vencidas > 0) - Number(a.vencidas > 0) || nombreBien(a.bienId).localeCompare(nombreBien(b.bienId)) || a.concepto.localeCompare(b.concepto) || b.anio.localeCompare(a.anio),
+  );
+  const conFalta = filasControl.filter((c) => c.vencidas > 0);
+  const faltaTotal: Record<Moneda, number> = { ARS: 0, USD: 0 };
+  for (const c of conFalta) for (const m of ["ARS", "USD"] as const) faltaTotal[m] += c.falta[m];
+  const verControl = f.vista === "control";
+  const enlaceVista = (vista: string) => {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(f)) if (v && k !== "vista") q.set(k, v);
+    if (vista !== "pagos") q.set("vista", vista);
+    const texto = q.toString();
+    return texto ? `/consulta?${texto}` : "/consulta";
+  };
+  const hayFiltros = Boolean(f.propietario || f.bien || f.concepto || (f.anio !== undefined && f.anio !== anioActual));
 
   return (
     <>
@@ -88,6 +135,15 @@ export default async function Consulta({ searchParams }: { searchParams: Promise
 
       <section className="panel">
         <FormularioEnVivo className="filtros filtros-consulta">
+          <div className="campo">
+            <label htmlFor="q-prop">{t("consulta.propietario")}</label>
+            <select id="q-prop" name="propietario" defaultValue={f.propietario ?? ""}>
+              <option value="">{t("consulta.todos")}</option>
+              {[...propietarios].sort((a, b) => a[1].localeCompare(b[1])).map(([id, nombre]) => (
+                <option key={id} value={id}>{nombre}</option>
+              ))}
+            </select>
+          </div>
           <div className="campo">
             <label htmlFor="q-bien">{t("consulta.bien")}</label>
             <select id="q-bien" name="bien" defaultValue={f.bien ?? ""}>
@@ -117,8 +173,65 @@ export default async function Consulta({ searchParams }: { searchParams: Promise
           </div>
           {hayFiltros && <Link href="/consulta" className="boton-texto">{t("consulta.limpiar")}</Link>}
         </FormularioEnVivo>
+        <nav className="pildoras" aria-label={t("consulta.titulo")}>
+          <Link href={enlaceVista("pagos")} className={!verControl ? "pildora activa" : "pildora"}>{t("consulta.vista_pagos")}</Link>
+          <Link href={enlaceVista("control")} className={verControl ? "pildora activa" : "pildora"}>{t("consulta.vista_control")}</Link>
+        </nav>
       </section>
 
+      {verControl ? (
+        <>
+          <section className="indicadores">
+            <TarjetaIndicador id="controlados" icono="consulta" tono="acento" titulo={t("consulta.control_controlados")} valor={String(filasControl.length)} />
+            <TarjetaIndicador id="al-dia" icono="obligaciones" tono="ok" titulo={t("consulta.control_al_dia")} valor={String(filasControl.length - conFalta.length)} />
+            <TarjetaIndicador id="falta" icono="cuentas" tono={conFalta.length > 0 ? "peligro" : "ok"} titulo={t("consulta.control_total_falta")} valor={totalTexto(faltaTotal)} nota={`${conFalta.length} · ${t("consulta.control_falta")}`} />
+          </section>
+          <section className="panel">
+            <p className="muted">{t("consulta.control_ayuda")}</p>
+            {filasControl.length === 0 ? (
+              <p className="muted">{t("consulta.control_vacio")}</p>
+            ) : (
+              <div className="tabla-envoltorio">
+                <table className="tabla tabla-compacta tabla-responsive">
+                  <thead>
+                    <tr>
+                      <th>{t("consulta.col_bien")}</th>
+                      <th>{t("consulta.col_concepto")}</th>
+                      <th>{t("consulta.col_anio")}</th>
+                      <th className="num">{t("consulta.col_cargadas")}</th>
+                      <th className="num">{t("consulta.col_pagadas")}</th>
+                      <th className="num">{t("consulta.col_vencidas")}</th>
+                      <th className="num">{t("consulta.col_por_vencer")}</th>
+                      <th className="num">{t("consulta.col_a_completar")}</th>
+                      <th className="num">{t("consulta.col_falta_monto")}</th>
+                      <th>{t("consulta.col_estado")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filasControl.map((c) => (
+                      <tr key={c.clave}>
+                        <td data-label={t("consulta.col_bien")}><strong>{nombreBien(c.bienId)}</strong></td>
+                        <td data-label={t("consulta.col_concepto")}>{c.concepto}</td>
+                        <td data-label={t("consulta.col_anio")}>{c.anio}</td>
+                        <td className="num" data-label={t("consulta.col_cargadas")}>{c.cargadas}</td>
+                        <td className="num" data-label={t("consulta.col_pagadas")}>{c.pagadas}</td>
+                        <td className="num" data-label={t("consulta.col_vencidas")}>{c.vencidas}</td>
+                        <td className="num" data-label={t("consulta.col_por_vencer")}>{c.porVencer}</td>
+                        <td className="num" data-label={t("consulta.col_a_completar")}>{c.aCompletar}</td>
+                        <td className="num" data-label={t("consulta.col_falta_monto")}>{c.vencidas > 0 ? totalTexto(c.falta) : <span className="muted">—</span>}</td>
+                        <td className="nowrap" data-label={t("consulta.col_estado")}>
+                          <span className={c.vencidas > 0 ? "estado estado-vencida" : "estado estado-ok"}>{c.vencidas > 0 ? t("consulta.control_falta") : t("consulta.control_al_dia")}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </>
+      ) : (
+        <>
       <section className="indicadores">
         <TarjetaIndicador id="encontrados" icono="consulta" tono="acento" titulo={t("consulta.encontrados")} valor={String(lista.length)} />
         <TarjetaIndicador id="pagado" icono="cuentas" tono="ok" titulo={t("consulta.total_pagado")} valor={totalTexto(pagado)} nota={`${pagadas.length} · ${t("obligaciones.estado_pagada")}`} />
@@ -181,6 +294,8 @@ export default async function Consulta({ searchParams }: { searchParams: Promise
           </div>
         )}
       </section>
+        </>
+      )}
     </>
   );
 }
