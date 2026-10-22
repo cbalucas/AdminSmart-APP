@@ -77,6 +77,10 @@ docs/           especificación, prototipos, modelos, marca y registro de cambio
 - Usá las capturas y los prototipos para que cada pantalla se parezca a lo diseñado.
 - No agregues funciones que no estén en la especificación sin preguntar.
 
+## Versiones
+
+Cada vez que se genera una versión (APK y AAB de la app móvil) se hace en este orden: (1) definir el número MAYOR.MENOR.PARCHE; (2) escribir en `docs/VERSIONES.md` el resumen de lo más relevante hecho desde la versión anterior, en lenguaje claro para el usuario y con el modelo que figura en ese archivo; (3) actualizar `version` y `android.versionCode` (siempre mayor que el anterior) en `apps/mobile/app.json`; (4) correr las pruebas; (5) generar con `pnpm --filter mobile generar:android`; (6) comitear. No se genera una versión sin su resumen.
+
 ## Regla de mantenimiento
 
 La especificación online (un documento vivo que el usuario mantiene con Claude en su proyecto de claude.ai) es la fuente de verdad. Los archivos de `docs/especificacion/` son una copia.
@@ -89,6 +93,7 @@ Cada vez que durante el desarrollo se decida algo que cambia o completa la espec
 - Web en modo desarrollo: `pnpm --filter web dev`
 - App móvil: `pnpm --filter mobile start` (se abre con Expo Go en el teléfono)
 - App móvil con ingreso por Google o enlaces del email: `pnpm --filter mobile movil`. Supabase no acepta direcciones con número IP como retorno; este comando hace que Expo use un nombre (192-168-x-x.sslip.io). Si el router bloquea ese nombre, en el teléfono se configura el DNS de Google (8.8.8.8 o, en Android, DNS privado `dns.google`)
+- Generar APK y AAB de la app móvil: `pnpm --filter mobile generar:android` (quedan en `apps/mobile/releases/<versión>/`; ver la sección "Versiones")
 - Pruebas: `pnpm test` (dominio y textos del sistema). Cobertura del dominio (mínimo 80 %): `pnpm --filter @ai/domain cobertura`
 - Tipos de todo el proyecto: `pnpm typecheck`. Estilo de código de la web: `pnpm --filter web lint`
 - Web como en producción (más rápida que el modo desarrollo; hay que volver a compilar al cambiar variables de entorno): `pnpm --filter web build` y `pnpm --filter web start`
