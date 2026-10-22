@@ -909,3 +909,27 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .ventana-detalle .datos dd { text-align: left; }
 .ventana-detalle .detalle-pie { flex-wrap: wrap; gap: 10px; }
 .ventana-detalle .datos dt, .ventana-detalle .datos dd { text-align: left; }
+
+/* Pie del menú: estado de conexión y versión con su historial */
+.lateral-pie { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--sidebarActive); }
+.lateral-pie .sincronizacion { border-top: none; padding: 0 8px; }
+.version-app { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px 0 8px; }
+.version-numero { font-size: 0.8rem; color: #9AA6B2; font-variant-numeric: tabular-nums; }
+.version-boton { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; color: #C9D2DB; background: transparent; border: 1px solid var(--sidebarActive); border-radius: 8px; cursor: pointer; }
+.version-boton:hover { color: #FFFFFF; background: var(--sidebarActive); }
+.version-boton:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.version-boton[data-tip]::after { top: auto; bottom: calc(100% + 8px); left: 0; transform: none; }
+.ventana-versiones { width: min(620px, calc(100vw - 32px)); }
+.versiones-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: calc(100vh - 220px); }
+.version-item { padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface2); text-align: left; }
+.version-cabecera { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.version-cabecera strong { font-family: var(--fuente-titulo), serif; font-size: 1.2rem; }
+.version-titulo { margin: 6px 0 2px; font-weight: 600; }
+.version-subtitulo { margin: 10px 0 4px; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.version-item ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 0.92rem; }
+.version-item p { margin: 0; }
+@media (min-width: 901px) {
+  .marco[data-menu="contraido"] .version-app { justify-content: center; padding: 0; flex-direction: column; gap: 6px; }
+  .marco[data-menu="contraido"] .version-numero { font-size: 0.7rem; }
+}
+@media (max-width: 900px) { .lateral-pie { display: none; } }

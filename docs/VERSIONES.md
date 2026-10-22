@@ -16,7 +16,7 @@ La app del teléfono además lleva un **código de compilación** (`versionCode`
 
 ## Cómo se genera una versión nueva
 
-1. Decidir el número nuevo y escribir el resumen en este archivo (modelo al final).
+1. Decidir el número nuevo y escribir el resumen en este archivo (modelo al final). La misma versión se agrega al principio de `packages/domain/src/versiones.ts`: es el historial que se ve en el menú de la aplicación (número de versión y reloj).
 2. Actualizar `version` y `android.versionCode` en `apps/mobile/app.json`.
 3. Pasar las pruebas (`pnpm test`, `pnpm typecheck`, `pnpm --filter web lint`).
 4. Generar los archivos con `pnpm --filter mobile generar:android`. Quedan en `apps/mobile/releases/<versión>/` como `AdminSmart-<versión>-<código>.apk` (para instalar en el teléfono) y `.aab` (para Google Play).

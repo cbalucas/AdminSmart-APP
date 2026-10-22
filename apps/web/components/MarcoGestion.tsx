@@ -4,9 +4,11 @@ import { t } from "@ai/i18n";
 import { cerrarSesion } from "@/app/(gestion)/acciones";
 import type { ItemMenu } from "@/lib/menu";
 import { BotonMenu } from "./BotonMenu";
+import { VERSIONES } from "@ai/domain";
 import { BotonModo } from "./BotonModo";
 import { Icono } from "./Iconos";
 import { MenuLateral } from "./MenuLateral";
+import { VersionApp } from "./VersionApp";
 
 const iniciales = (nombre: string) =>
   nombre
@@ -39,10 +41,13 @@ export function MarcoGestion({
           <BotonMenu />
         </div>
         <MenuLateral items={items} />
-        <p className="sincronizacion">
-          <span className="punto" aria-hidden="true" />
-          {t("barra.modo_nube")}
-        </p>
+        <div className="lateral-pie">
+          <p className="sincronizacion">
+            <span className="punto" aria-hidden="true" />
+            {t("barra.modo_nube")}
+          </p>
+          <VersionApp versiones={VERSIONES} />
+        </div>
       </aside>
 
       <div className="contenido">

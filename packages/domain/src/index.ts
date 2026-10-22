@@ -17,3 +17,4 @@ export * from "./administracion";
 export * from "./preferencias";
 export * from "./plantillas";
 export * from "./auditoria";
+export * from "./versiones";

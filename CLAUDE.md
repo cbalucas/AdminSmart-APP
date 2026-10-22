@@ -79,7 +79,7 @@ docs/           especificación, prototipos, modelos, marca y registro de cambio
 
 ## Versiones
 
-Cada vez que se genera una versión (APK y AAB de la app móvil) se hace en este orden: (1) definir el número MAYOR.MENOR.PARCHE; (2) escribir en `docs/VERSIONES.md` el resumen de lo más relevante hecho desde la versión anterior, en lenguaje claro para el usuario y con el modelo que figura en ese archivo; (3) actualizar `version` y `android.versionCode` (siempre mayor que el anterior) en `apps/mobile/app.json`; (4) correr las pruebas; (5) generar con `pnpm --filter mobile generar:android`; (6) comitear. No se genera una versión sin su resumen.
+Cada vez que se genera una versión (APK y AAB de la app móvil) se hace en este orden: (1) definir el número MAYOR.MENOR.PARCHE; (2) escribir en `docs/VERSIONES.md` el resumen de lo más relevante hecho desde la versión anterior, en lenguaje claro para el usuario y con el modelo que figura en ese archivo, y agregar la misma versión al principio de `packages/domain/src/versiones.ts` (es lo que se muestra en el menú, con el reloj de historial); (3) actualizar `version` y `android.versionCode` (siempre mayor que el anterior) en `apps/mobile/app.json`; (4) correr las pruebas; (5) generar con `pnpm --filter mobile generar:android`; (6) comitear. No se genera una versión sin su resumen.
 
 ## Regla de mantenimiento
 

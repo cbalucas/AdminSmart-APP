@@ -31,6 +31,10 @@ const app = JSON.parse(fs.readFileSync(path.join(raiz, "app.json"), "utf8")).exp
 const version = app.version;
 const codigo = app.android?.versionCode;
 if (!codigo) throw new Error("Falta android.versionCode en app.json.");
+// La versión de app.json debe ser la última del historial (packages/domain/src/versiones.ts).
+const historial = fs.readFileSync(path.join(raiz, "..", "..", "packages", "domain", "src", "versiones.ts"), "utf8");
+const ultima = /version:\s*"(\d+\.\d+\.\d+)"/.exec(historial)?.[1];
+if (ultima !== version) throw new Error(`La versión de app.json (${version}) no coincide con la última del historial (${ultima}). Agregala en packages/domain/src/versiones.ts.`);
 
 try {
   // 1. Proyecto nativo de Android a partir de app.json (se regenera cada vez; no se sube a Git).
