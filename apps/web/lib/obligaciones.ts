@@ -17,6 +17,7 @@ export interface FilaObligacion {
   esRecurrente: boolean;
   frecuencia: string | null;
   descripcion: string | null;
+  observaciones: string | null;
   estado: EstadoObligacion;
 }
 
@@ -47,6 +48,7 @@ export const listarObligaciones = cache(async (): Promise<FilaObligacion[]> => {
     esRecurrente: Boolean(o.es_recurrente),
     frecuencia: (o.frecuencia as string | null) ?? null,
     descripcion: (o.descripcion as string | null) ?? null,
+    observaciones: (o.observaciones as string | null) ?? null,
     estado: estadoDe.get(o.id as string) ?? "pendiente",
   }));
 });

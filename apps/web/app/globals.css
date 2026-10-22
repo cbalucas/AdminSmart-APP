@@ -933,3 +933,8 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   .marco[data-menu="contraido"] .version-numero { font-size: 0.7rem; }
 }
 @media (max-width: 900px) { .lateral-pie { display: none; } }
+
+/* Consulta rápida: tres listas en una fila */
+.filtros-consulta { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.filtros-consulta .campo { flex: 1 1 200px; max-width: 320px; }
+.filtros-consulta > .boton-texto { align-self: center; }
